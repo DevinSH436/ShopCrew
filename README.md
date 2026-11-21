@@ -242,16 +242,7 @@ The tests cover the tools and stats (with hand-checkable fixtures), every schema
 - **Collaboration needs structure.** Typed outputs passed through `context` gave the Marketer concrete fields to build on (top praise, price position), which made "the campaign references the other agents" testable.
 - **Sequential vs hierarchical** is a real trade-off: hierarchical mode costs about twice the LLM calls (16 vs 8 in demo mode) in exchange for a manager that can re-route work.
 
-## Resume bullets
 
-- Built **ShopCrew**, a multi-agent AI system (CrewAI, Python, Claude) in which 4 specialised agents analyse reviews, benchmark competitor pricing, write SEO copy and plan marketing campaigns, with outputs flowing between agents through typed task context.
-- Made LLM outputs reliable with **Pydantic structured outputs, validating guardrails with automatic retry, and deterministic tool-side calculations** that correct any numeric field the model gets wrong.
-- Implemented **sequential and hierarchical (manager-delegated) orchestration**, selectable from a CLI flag, plus per-run token and cost tracking that fixes a usage double-counting issue in the framework.
-- Shipped a **Streamlit dashboard** with live per-agent progress via the framework's event bus, accessible charts (Plotly) and zip export, packaged as a **non-root Docker image** with health checks.
-- Built **Northcart**, a full e-commerce site (FastAPI, SQLAlchemy, Jinja) with storefront, checkout, order tracking and a seller admin panel, and integrated the agent crew through a pluggable data-source interface so its insights apply to live listings; runs fully locally on **Ollama**.
-- Wrote **166 pytest tests** (including end-to-end crew runs and UI tests against a protocol-compatible mock LLM) running in **GitHub Actions CI** with ruff and a container smoke test; no API key needed.
-
----
 
 ## Roadmap
 
