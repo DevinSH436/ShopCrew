@@ -1,0 +1,19 @@
+ShopCrew run for watch-01 (FitPulse Active Smartwatch)
+Process: sequential | Model: mock
+Duration: 0.2s
+Tokens: 17,221 (15,489 in / 1,732 out, 8 LLM calls) - estimated cost: $0.0000
+
+[22:44:58] Crew           run_started  FitPulse Active Smartwatch | process=sequential | model=mock
+[22:44:58] Review Analyst started      task started
+[22:44:58] Review Analyst tool         Review Analyst used review_loader({"product_id": "watch-01"})
+[22:44:58] Review Analyst completed    {"average_rating":3.42,"sentiment_breakdown":{"positive":50.0,"neutral":16.7,"negative":33.3},"top_praises":["Notifications come through instantly, very hand...
+[22:44:58] Price Tracker  started      task started
+[22:44:58] Price Tracker  tool         Price Tracker used competitor_prices({"product_id": "watch-01"})
+[22:44:58] Price Tracker  completed    {"our_price":57.0,"competitor_min":46.99,"competitor_max":53.99,"competitor_avg":50.99,"position":"most_expensive","recommended_price":52.0,"reasoning":"At $...
+[22:44:58] SEO Writer     started      task started
+[22:44:58] SEO Writer     tool         SEO Writer used product_info({"product_id": "watch-01"})
+[22:44:58] SEO Writer     completed    {"title":"FitPulse Active Smartwatch | 1.83\" AMOLED display","meta_description":"FitPulse Active Smartwatch: 1.83\" amoled display. Rated 3.42/5 by real buy...
+[22:44:58] Marketer       started      task started
+[22:44:58] Marketer       tool         Marketer used product_info({"product_id": "watch-01"})
+[22:44:58] Marketer       completed    {"target_audience":"Health-conscious young professionals aged 22-40 who want fitness tracking and calls on the wrist","positioning_statement":"For health-con...
+[22:44:58] Crew           run_finished Tokens: 17,221 (15,489 in / 1,732 out, 8 LLM calls) - estimated cost: $0.0000

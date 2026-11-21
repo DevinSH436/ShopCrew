@@ -1,0 +1,86 @@
+{% from "admin/_macros.html" import icon, csrf with context %}<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Dashboard{% endblock %} · {{ settings.store_name }} Seller Hub</title>
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/admin.css">
+  {% block head %}{% endblock %}
+</head>
+<body class="admin">
+<a class="skip-link" href="#content">Skip to content</a>
+{% set nav = [
+  ("dashboard", "/admin", "Dashboard"),
+  ("orders", "/admin/orders", "Orders"),
+  ("products", "/admin/products", "Products"),
+  ("inventory", "/admin/inventory", "Inventory"),
+  ("categories", "/admin/categories", "Categories"),
+  ("customers", "/admin/customers", "Customers"),
+  ("reviews", "/admin/reviews", "Reviews"),
+  ("coupons", "/admin/coupons", "Coupons"),
+  ("ai", "/admin/ai", "AI Crew"),
+  ("reports", "/admin/reports", "Reports"),
+  ("settings", "/admin/settings", "Settings"),
+] %}
+<aside class="sidebar" id="sidebar" data-sidebar>
+  <a href="/admin" class="side-brand">
+    <span class="logo-wrap">{% include "partials/logo.svg" %}</span>
+    <span class="side-tag">Seller Hub</span>
+  </a>
+  <nav class="side-nav" aria-label="Admin">
+    {% for key, url, label in nav %}
+      {% if key == "ai" %}<div class="side-sep">Growth</div>{% elif key == "settings" %}<div class="side-sep">Store</div>{% endif %}
+      <a href="{{ url }}" class="{{ 'active' if section == key }}" {% if section == key %}aria-current="page"{% endif %}>
+        {{ icon(key) }}<span>{{ label }}</span>
+        {% if key == "orders" and pending_count %}<span class="side-badge" title="Orders needing action">{{ pending_count }}</span>{% endif %}
+        {% if key == "ai" %}<span class="side-chip {{ 'ok' if ai.ok else 'bad' }}" title="{{ ai.model }}">{{ 'Ollama' if ai.provider in ('ollama', 'ollama_chat') else ai.provider|capitalize }}</span>{% endif %}
+      </a>
+    {% endfor %}
+  </nav>
+  <div class="side-foot">
+    <a href="/" target="_blank" rel="noopener">{{ icon("store") }}<span>View store</span>{{ icon("external", 14) }}</a>
+  </div>
+</aside>
+<div class="scrim" data-scrim hidden></div>
+
+<div class="main-wrap">
+  <header class="topbar">
+    <button class="icon-btn side-toggle" data-side-toggle aria-label="Open navigation" aria-controls="sidebar">{{ icon("menu", 22) }}</button>
+    <form class="top-search" action="/admin/search" method="get" role="search">
+      {{ icon("search") }}
+      <input type="search" name="q" placeholder="Search orders (HT-…), products, customers" value="{{ request.query_params.get('q', '') if section == '' else '' }}" aria-label="Search the admin">
+      <kbd>/</kbd>
+    </form>
+    <div class="top-actions">
+      <a href="/" class="btn btn-ghost btn-sm hide-sm" target="_blank" rel="noopener">{{ icon("store", 16) }} View store</a>
+      <details class="user-menu">
+        <summary aria-label="Account menu"><span class="avatar">{{ user.name[:1] }}</span><span class="hide-sm">{{ user.name }}</span></summary>
+        <div class="user-pop">
+          <p class="strong">{{ user.name }}</p>
+          <p class="muted small">{{ user.email }}</p>
+          <a href="/account">My customer account</a>
+          <form method="post" action="/logout">{{ csrf() }}<button type="submit">{{ icon("logout", 16) }} Sign out</button></form>
+        </div>
+      </details>
+    </div>
+  </header>
+
+  <div class="toasts" aria-live="polite" data-toasts>
+    {% for f in flashes %}<div class="toast toast-{{ f.kind }}" role="status">{{ f.text }}</div>{% endfor %}
+  </div>
+
+  <main id="content" class="content">
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+<script src="/static/js/admin.js" defer></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

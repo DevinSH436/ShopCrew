@@ -1,0 +1,21 @@
+product_id,competitor,price,in_stock,last_checked
+earbuds-01,MegaStore,39.99,true,2026-11-12
+earbuds-01,ShopMart,37.99,true,2026-11-13
+earbuds-01,TechBarn,42.99,true,2026-11-12
+earbuds-01,GadgetHub,40.99,false,2026-11-15
+earbuds-01,ClickCart,34.99,true,2026-11-12
+watch-01,MegaStore,49.99,true,2026-11-15
+watch-01,ShopMart,46.99,true,2026-11-13
+watch-01,TechBarn,53.99,true,2026-11-13
+watch-01,GadgetHub,52.99,true,2026-11-13
+watch-01,ClickCart,50.99,false,2026-11-15
+bottle-01,MegaStore,13.99,true,2026-11-12
+bottle-01,ShopMart,13.99,true,2026-11-15
+bottle-01,GlowBox Home,16.99,true,2026-11-12
+bottle-01,HomeNest,15.99,false,2026-11-12
+bottle-01,ValueMart,12.99,true,2026-11-15
+backpack-01,MegaStore,23.99,true,2026-11-14
+backpack-01,ShopMart,22.99,true,2026-11-13
+backpack-01,StyleLane,26.99,true,2026-11-12
+backpack-01,Threadly,24.99,true,2026-11-12
+backpack-01,ClickCart,23.99,false,2026-11-15

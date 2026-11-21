@@ -1,0 +1,49 @@
+{% extends "admin/base.html" %}
+{% from "admin/_macros.html" import icon, csrf with context %}
+{% block title %}Categories{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Categories</h1><p>Shown in the store's navigation in this order.</p></div></div>
+<div class="grid grid-main-r">
+  <section class="card">
+    <div class="table-wrap no-max">
+      <table class="table">
+        <thead><tr><th class="num">Order</th><th>Name</th><th>Slug</th><th>Icon</th><th>Description</th><th class="num">Products</th><th></th></tr></thead>
+        <tbody>
+        {% for c, n in rows %}
+          <tr>
+            <td class="num"><input class="input" form="cat-{{ c.id }}" name="sort_order" type="number" value="{{ c.sort_order }}" style="width:64px" aria-label="Sort order"></td>
+            <td><input class="input" form="cat-{{ c.id }}" name="name" value="{{ c.name }}" aria-label="Name"></td>
+            <td><input class="input mono" form="cat-{{ c.id }}" name="slug" value="{{ c.slug }}" aria-label="Slug"></td>
+            <td><select class="input" form="cat-{{ c.id }}" name="icon" aria-label="Icon">{% for i in icons %}<option {{ 'selected' if i == c.icon }}>{{ i }}</option>{% endfor %}</select></td>
+            <td><input class="input" form="cat-{{ c.id }}" name="description" value="{{ c.description }}" aria-label="Description" style="min-width:220px"></td>
+            <td class="num"><a href="/admin/products?category={{ c.slug }}">{{ n }}</a></td>
+            <td class="nowrap">
+              <button class="btn btn-sm" form="cat-{{ c.id }}">Save</button>
+              <button class="btn btn-sm btn-danger" form="cat-del-{{ c.id }}" {{ 'disabled title=Move products out first' if n }} aria-label="Delete {{ c.name }}">{{ icon("trash", 14) }}</button>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% for c, n in rows %}
+      <form id="cat-{{ c.id }}" method="post" action="/admin/categories">{{ csrf() }}<input type="hidden" name="id" value="{{ c.id }}"></form>
+      <form id="cat-del-{{ c.id }}" method="post" action="/admin/categories/{{ c.id }}/delete" data-confirm="Delete category “{{ c.name }}”?">{{ csrf() }}</form>
+    {% endfor %}
+  </section>
+  <section class="card">
+    <div class="card-head"><h2>New category</h2></div>
+    <form class="card-body" method="post" action="/admin/categories">
+      {{ csrf() }}
+      <label class="field"><span>Name</span><input name="name" required maxlength="80"></label>
+      <label class="field"><span>Slug <small>optional</small></span><input name="slug" class="mono" maxlength="80"></label>
+      <label class="field"><span>Description</span><textarea name="description" rows="3" maxlength="300"></textarea></label>
+      <div class="fields-2">
+        <label class="field"><span>Icon</span><select name="icon">{% for i in icons %}<option>{{ i }}</option>{% endfor %}</select></label>
+        <label class="field"><span>Order</span><input name="sort_order" type="number" value="{{ rows|length }}"></label>
+      </div>
+      <button class="btn btn-primary">{{ icon("plus", 16) }} Add category</button>
+    </form>
+  </section>
+</div>
+{% endblock %}

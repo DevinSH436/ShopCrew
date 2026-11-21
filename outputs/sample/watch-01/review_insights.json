@@ -1,0 +1,29 @@
+{
+  "average_rating": 3.42,
+  "sentiment_breakdown": {
+    "positive": 50.0,
+    "neutral": 16.7,
+    "negative": 33.3
+  },
+  "top_praises": [
+    "Notifications come through instantly, very handy in meetings",
+    "Bluetooth calling works really well, I take calls while cooking",
+    "Sleep tracking is surprisingly detailed and accurate",
+    "Lots of watch faces to choose from, I change it every day"
+  ],
+  "top_complaints": [
+    "Battery drains fast if you use calling, barely 2 days",
+    "GPS is only connected GPS, need my phone for runs",
+    "SpO2 readings are inconsistent",
+    "Charger is proprietary and the magnet is weak"
+  ],
+  "customer_phrases": [
+    "notifications come through instantly",
+    "bluetooth calling works really well",
+    "sleep tracking is surprisingly detailed and",
+    "lots of watch faces to choose",
+    "looks premium",
+    "heart rate readings match my gym"
+  ],
+  "summary": "36 reviews average 3.42/5 with 50% positive and 33% negative. Customers keep coming back to: notifications come through instantly, very handy in meetings. The most common complaint is: battery drains fast if you use calling, barely 2 days, which the listing and campaign should address directly."
+}

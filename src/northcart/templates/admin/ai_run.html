@@ -1,0 +1,261 @@
+{% extends "admin/base.html" %}
+{% from "admin/_macros.html" import icon, pill, csrf with context %}
+{% block title %}AI run #{{ run.id }}{% endblock %}
+{% block content %}
+{% set p = run.product %}
+<div class="crumbs"><a href="/admin/ai">AI Crew</a> › Run #{{ run.id }}</div>
+<div class="page-head">
+  <div class="row" style="align-items:center">
+    <img src="{{ p.thumb }}" alt="" width="56" height="56" style="border-radius:10px;border:1px solid #e4e7ee;background:#f4f5f8">
+    <div>
+      <h1 style="margin:0">{{ p.name|truncate(70) }}</h1>
+      <div class="run-meta">
+        <span>Status: <b data-run-status>{{ pill(run.status, run.status|capitalize) }}</b></span>
+        <span>Mode: <b>{{ run.process|capitalize }}</b></span>
+        <span>Model: <b class="mono">{{ run.model }}</b></span>
+        <span>Elapsed: <b data-elapsed>{{ ('%dm %02ds'|format(duration // 60, duration % 60)) if duration else '0m 00s' }}</b></span>
+      </div>
+    </div>
+  </div>
+  <div class="actions">
+    <a href="/admin/products/{{ p.id }}" class="btn">Edit product</a>
+    <form method="post" action="/admin/ai/run">{{ csrf() }}<input type="hidden" name="product_id" value="{{ p.id }}"><input type="hidden" name="process" value="{{ run.process }}"><button class="btn btn-ai">{{ icon("ai", 16) }} Run again</button></form>
+  </div>
+</div>
+
+<section class="agents" aria-label="Agent progress" data-agents>
+  {% for key, name, desc in stages %}
+  {% set done = key in (run.stages_done or []) or run.status == 'done' %}
+  {% set working = run.status == 'running' and run.current_stage == key and not done %}
+  <div class="agent {{ 'done' if done else 'working' if working else 'failed' if run.status == 'failed' and run.current_stage == key else '' }}" data-stage="{{ key }}">
+    <div class="a-icon" aria-hidden="true">{{ '✓' if done else icons[key] }}</div>
+    <span class="a-state" data-state>{{ 'Done' if done else 'Working…' if working else 'Failed' if run.status == 'failed' and run.current_stage == key else 'Waiting' }}</span>
+    <h3>{{ name }}</h3>
+    <p>{{ desc }}</p>
+  </div>
+  {% endfor %}
+</section>
+
+{% if run.status in ('queued', 'running') %}
+<div class="alert alert-info" data-wait-note>
+  {% if run.status == 'queued' and queued_ahead %}{{ queued_ahead }} run(s) ahead of this one. {% endif %}
+  The agents run one after another, and each one waits for the previous agent's findings. On a local model this takes a few minutes, and the page updates by itself.
+</div>
+{% endif %}
+{% if run.status == 'failed' %}
+<div class="alert alert-error"><b>The run failed.</b> {{ run.error }}{% if not ai.ok %}<br>{{ ai.detail }}{% endif %}</div>
+{% endif %}
+
+<section class="card" {% if run.status == 'done' %}style="display:none"{% endif %} data-console-card>
+  <div class="card-head"><h2>Live log</h2><span class="muted small">CrewAI event stream</span></div>
+  <pre class="console" data-console aria-live="polite">{% for line in (run.log or [])[-40:] %}{{ line }}
+{% endfor %}</pre>
+</section>
+
+{% if run.status == 'done' and r %}
+{% set ins = r.review_insights %}{% set pr = r.pricing_report %}{% set seo = r.seo_copy %}{% set cp = r.campaign_plan %}
+
+<section class="card" id="apply" style="margin-bottom:16px">
+  <div class="card-head"><h2>Apply to the store</h2><span class="muted small">Nothing changes on the store until you apply it</span></div>
+  <div class="card-body grid grid-3">
+    {% for target, ico, title, text in [
+      ("seo", "¶", "SEO copy", "Replace the title tag, meta description, highlights and description."),
+      ("price", "$", "Recommended price", "Change $" ~ p.price|usd ~ " → $" ~ pr.recommended_price|round|int|usd ~ "."),
+      ("insights", "⭐", "“Customers say” box", "Show the review summary, praises and complaints on the product page."),
+    ] %}
+    <div class="apply-card">
+      <span class="apply-ico" aria-hidden="true">{{ ico }}</span>
+      <div>
+        <h3>{{ title }}</h3>
+        <p>{{ text }}</p>
+        {% if target in (run.applied or []) %}<span class="pill pill-done">✓ Applied</span>
+        {% else %}<form method="post" action="/admin/ai/runs/{{ run.id }}/apply" data-confirm="Apply the {{ title }} to the live product?">{{ csrf() }}<input type="hidden" name="target" value="{{ target }}"><button class="btn btn-sm btn-primary">Apply</button></form>{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<div class="grid grid-2">
+  <section class="card">
+    <div class="card-head"><h2>⭐ Review insights</h2><span class="stars-txt">★ {{ '%.2f'|format(ins.average_rating) }}</span></div>
+    <div class="card-body">
+      {% set sb = ins.sentiment_breakdown %}
+      <div class="sentiment" role="img" aria-label="Sentiment: {{ sb.positive }}% positive, {{ sb.neutral }}% neutral, {{ sb.negative }}% negative">
+        {% if sb.positive %}<span class="s-pos" style="width:{{ sb.positive }}%">{{ sb.positive|round|int }}%</span>{% endif %}
+        {% if sb.neutral %}<span class="s-neu" style="width:{{ sb.neutral }}%">{{ sb.neutral|round|int }}%</span>{% endif %}
+        {% if sb.negative %}<span class="s-neg" style="width:{{ sb.negative }}%">{{ sb.negative|round|int }}%</span>{% endif %}
+      </div>
+      <p class="small muted" style="margin-top:4px">Positive · Neutral · Negative</p>
+      <p>{{ ins.summary }}</p>
+      <h3>Top praises</h3>
+      <div class="chips" style="margin-bottom:10px">{% for x in ins.top_praises %}<span class="chip chip-good">{{ x }}</span>{% endfor %}</div>
+      <h3>Top complaints</h3>
+      <div class="chips" style="margin-bottom:10px">{% for x in ins.top_complaints %}<span class="chip chip-bad">{{ x }}</span>{% endfor %}</div>
+      <h3>Customers' own words</h3>
+      <div class="chips">{% for x in ins.customer_phrases %}<span class="chip">“{{ x }}”</span>{% endfor %}</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h2>$ Pricing</h2>{{ pill('ok' if pr.position in ('cheapest', 'below_avg') else 'low', pr.position|replace('_', ' ')|capitalize) }}</div>
+    <div class="card-body">
+      {% set top = [pr.competitor_max, pr.our_price, pr.recommended_price]|max %}
+      <div class="price-ladder">
+        {% for label, val, cls in [("Our price", pr.our_price, "ours"), ("Recommended", pr.recommended_price, "rec"), ("Market low", pr.competitor_min, ""), ("Market avg", pr.competitor_avg, ""), ("Market high", pr.competitor_max, "")] %}
+        <div class="pl-row {{ cls }}"><span class="{{ 'strong' if cls }}">{{ label }}</span><div class="pl-bar" style="width:{{ (val * 100 / top)|round(1) }}%"></div><span class="right strong">${{ val|round|int|usd }}</span></div>
+        {% endfor %}
+      </div>
+      <p style="margin-top:14px">{{ pr.reasoning }}</p>
+      <div class="chart-box sm"><canvas id="compChart" aria-label="Competitor prices" role="img"></canvas></div>
+    </div>
+  </section>
+</div>
+
+<section class="card" style="margin-top:16px">
+  <div class="card-head"><h2>¶ SEO copy</h2><span class="muted small">{{ seo.title|length }}/70 title · {{ seo.meta_description|length }}/160 meta · {{ seo.long_description.split()|length }} words</span></div>
+  <div class="card-body grid grid-2">
+    <div>
+      <p class="label">Google preview</p>
+      <div class="serp">
+        <div class="s-url">northcart.in <span>› p › {{ p.slug|truncate(40) }}</span></div>
+        <div class="s-title">{{ seo.title }}</div>
+        <p class="s-desc">{{ seo.meta_description }}</p>
+      </div>
+      <p class="label" style="margin-top:14px">Keywords</p>
+      <div class="chips">{% for k in seo.keywords %}<span class="chip">{{ k }}</span>{% endfor %}</div>
+    </div>
+    <div>
+      <p class="label">Bullet points</p>
+      <ul style="margin:0 0 12px;padding-left:18px">{% for b in seo.bullet_points %}<li>{{ b }}</li>{% endfor %}</ul>
+      <p class="label">Description</p>
+      <p class="small">{{ seo.long_description }}</p>
+    </div>
+  </div>
+</section>
+
+<section class="card" style="margin-top:16px">
+  <div class="card-head"><h2>↗ Launch campaign</h2>
+    <a class="btn btn-sm" href="/admin/coupons/new?code=LAUNCH{{ p.id }}&kind=percent&value=5&description={{ ('Launch offer: ' ~ cp.offer)|truncate(190)|urlencode }}">{{ icon("coupons", 16) }} Create coupon from offer</a></div>
+  <div class="card-body">
+    <div class="grid grid-2">
+      <dl class="kv">
+        <dt>Audience</dt><dd>{{ cp.target_audience }}</dd>
+        <dt>Positioning</dt><dd>{{ cp.positioning_statement }}</dd>
+        <dt>Key message</dt><dd class="strong">{{ cp.key_message }}</dd>
+        <dt>Offer</dt><dd>{{ cp.offer }}</dd>
+        <dt>Complaints</dt><dd>{{ cp.how_we_address_complaints }}</dd>
+      </dl>
+      <div class="ad-mock">
+        <div class="ad-tag">Sponsored</div>
+        <div class="small">northcart.in</div>
+        <div class="ad-h">{{ cp.google_ad.headline }}</div>
+        <div class="small">{{ cp.google_ad.description }}</div>
+      </div>
+    </div>
+    <div class="grid grid-2" style="margin-top:16px">
+      <div class="insta">
+        <div class="insta-head"><span class="avatar">h</span>northcart.store</div>
+        <img src="/art/{{ p.slug }}.svg?v=1" alt="">
+        <div class="insta-cap"><b>northcart.store</b> {{ cp.instagram_caption }}</div>
+      </div>
+      <div class="email-mock">
+        <div class="e-head"><b>From:</b> {{ settings.store_name }} &lt;hello@northcart.test&gt;<br><b>Subject:</b> {{ cp.email.subject }}</div>
+        <div class="e-body">{{ cp.email.body }}</div>
+      </div>
+    </div>
+    <h3 style="margin-top:18px">7-day schedule</h3>
+    <div class="table-wrap no-max">
+      <table class="table">
+        <thead><tr><th>Day</th><th>Channel</th><th>Action</th></tr></thead>
+        <tbody>{% for s in cp['7_day_schedule'] %}<tr><td class="strong">Day {{ s.day }}</td><td class="nowrap">{{ s.channel }}</td><td>{{ s.action }}</td></tr>{% endfor %}</tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="grid grid-2" style="margin-top:16px">
+  <section class="card">
+    <div class="card-head"><h2>Guardrail notes</h2></div>
+    <div class="card-body">
+      {% if r.notes %}<ul class="small" style="margin:0;padding-left:18px">{% for n in r.notes %}<li>{{ n }}</li>{% endfor %}</ul>
+      {% else %}<p class="muted" style="margin:0">No corrections needed. All numbers matched the computed values and no unsupported claims were found.</p>{% endif %}
+    </div>
+  </section>
+  <section class="card">
+    <div class="card-head"><h2>Usage</h2></div>
+    <div class="card-body">
+      <dl class="kv small">
+        <dt>Duration</dt><dd>{{ '%.1f'|format(r.duration_s) }} s</dd>
+        <dt>Tokens</dt><dd>{{ r.cost.total_tokens|usd }} ({{ r.cost.prompt_tokens|usd }} in / {{ r.cost.completion_tokens|usd }} out)</dd>
+        <dt>LLM calls</dt><dd>{{ r.cost.requests }}</dd>
+        <dt>Cost</dt><dd>{{ '$%.4f'|format(r.cost.usd) if r.cost.usd is not none else '$0 (local model)' }}</dd>
+        <dt>Output folder</dt><dd class="mono" style="word-break:break-all">{{ run.out_dir }}</dd>
+      </dl>
+    </div>
+  </section>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if run.status == 'done' and r %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+(() => {
+  if (!window.Chart) return;
+  const rows = {{ competitors|map(attribute='competitor')|list|tojson }};
+  const prices = {{ competitors|map(attribute='price')|list|tojson }};
+  const ours = {{ run.product.price|tojson }}, rec = {{ r.pricing_report.recommended_price|tojson }};
+  const labels = [...rows, "Northcart (now)", "Recommended"];
+  const data = [...prices, ours, rec];
+  const colors = [...rows.map(() => "#94a3b8"), "#ff9f1c", "#0b8a4a"];
+  Chart.defaults.font.family = "'DM Sans', system-ui, sans-serif";
+  new Chart(document.getElementById("compChart"), {
+    type: "bar",
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: 6, maxBarThickness: 22 }] },
+    options: { indexAxis: "y", maintainAspectRatio: false, plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: (c) => " $" + Number(c.raw).toLocaleString("en-US") } } },
+      scales: { x: { min: Math.floor(Math.min(...data) * 0.85), grid: { color: "#eef0f4" }, ticks: { callback: (v) => "$" + Number(v).toLocaleString("en-US") } }, y: { grid: { display: false } } } },
+  });
+})();
+</script>
+{% elif run.status in ('queued', 'running') %}
+<script>
+(() => {
+  const url = "/admin/ai/runs/{{ run.id }}/status.json";
+  const icons = {{ icons|tojson }};
+  const consoleEl = document.querySelector("[data-console]");
+  const elapsedEl = document.querySelector("[data-elapsed]");
+  let elapsed = {{ duration or 0 }}, last = Date.now();
+  const fmt = (s) => `${Math.floor(s / 60)}m ${String(Math.floor(s % 60)).padStart(2, "0")}s`;
+  setInterval(() => { elapsedEl.textContent = fmt(elapsed + (Date.now() - last) / 1000); }, 1000);
+  const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+  const cls = (l) => /ERROR|failed/.test(l) ? "l-err" : /completed|run_finished/.test(l) ? "l-done" : / tool /.test(l) ? "l-tool" : "";
+  async function poll() {
+    try {
+      const d = await (await fetch(url, { headers: { Accept: "application/json" } })).json();
+      elapsed = d.elapsed; last = Date.now();
+      const statusEl = document.querySelector("[data-run-status]");
+      if (statusEl) statusEl.innerHTML = `<span class="pill pill-${esc(d.status)}">${esc(d.status[0].toUpperCase() + d.status.slice(1))}</span>`;
+      document.querySelectorAll("[data-stage]").forEach((card) => {
+        const key = card.dataset.stage;
+        const done = d.stages_done.includes(key);
+        const working = d.status === "running" && d.current_stage === key && !done;
+        card.className = "agent " + (done ? "done" : working ? "working" : "");
+        card.querySelector(".a-icon").textContent = done ? "✓" : icons[key];
+        card.querySelector("[data-state]").textContent = done ? "Done" : working ? "Working…" : "Waiting";
+      });
+      const atBottom = consoleEl.scrollHeight - consoleEl.scrollTop - consoleEl.clientHeight < 40;
+      consoleEl.innerHTML = d.log.map((l) => `<span class="${cls(l)}">${esc(l)}</span>`).join("\n");
+      if (atBottom) consoleEl.scrollTop = consoleEl.scrollHeight;
+      if (d.status === "done" || d.status === "failed") { location.reload(); return; }
+    } catch { /* network blip: keep polling */ }
+    setTimeout(poll, 2000);
+  }
+  consoleEl.scrollTop = consoleEl.scrollHeight;
+  poll();
+})();
+</script>
+{% endif %}
+{% endblock %}

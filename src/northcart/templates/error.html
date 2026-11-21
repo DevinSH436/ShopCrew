@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Page not found' if status == 404 else 'Something went wrong' }} · {{ settings.store_name }}{% endblock %}
+{% block content %}
+<section class="panel error-page">
+  <div class="error-code">{{ status }}</div>
+  <h1>{% if status == 404 %}Looks like this page went out of stock{% elif status == 403 %}You can't open this page{% else %}Something went wrong{% endif %}</h1>
+  <p class="muted">{% if status == 404 %}The link may be broken or the product may have been removed.{% else %}{{ detail }}{% endif %}</p>
+  <div class="row" style="justify-content:center">
+    <a href="/" class="btn btn-primary">Go to the home page</a>
+    <a href="/deals" class="btn btn-secondary">See today's deals</a>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "admin/base.html" %}
+{% from "admin/_macros.html" import icon, pill, pager, empty, csrf with context %}
+{% block title %}Products{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Products</h1><p>{{ pg.total }} product{{ 's' if pg.total != 1 }}{{ ' match your filters' if filters }}</p></div>
+  <div class="actions"><a href="/admin/products/new" class="btn btn-primary">{{ icon("plus", 16) }} Add product</a></div>
+</div>
+
+<section class="card">
+  <nav class="tabs" aria-label="Product status">
+    {% for key, label in [("", "All"), ("active", "Active"), ("inactive", "Hidden"), ("low", "Low stock"), ("out", "Out of stock")] %}
+      <a href="{{ qs(status=key or None, page=None) }}" class="{{ 'active' if (filters.status or '') == key }}">{{ label }}</a>
+    {% endfor %}
+  </nav>
+  <form class="filters" method="get">
+    {% if filters.status %}<input type="hidden" name="status" value="{{ filters.status }}">{% endif %}
+    <label class="field grow"><span>Search</span><input class="input" type="search" name="q" value="{{ filters.q or '' }}" placeholder="Name, SKU or brand"></label>
+    <label class="field"><span>Category</span>
+      <select class="input" name="category"><option value="">All categories</option>
+        {% for c in cats %}<option value="{{ c.slug }}" {{ 'selected' if filters.category == c.slug }}>{{ c.name }}</option>{% endfor %}
+      </select>
+    </label>
+    <label class="field"><span>Sort</span>
+      <select class="input" name="sort">
+        {% for k, label in [("newest", "Newest"), ("name", "Name A–Z"), ("price", "Price: high first"), ("stock", "Stock: low first"), ("sold", "Best selling"), ("rating", "Top rated")] %}
+        <option value="{{ k }}" {{ 'selected' if filters.sort == k }}>{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+    <button class="btn btn-dark">Apply</button>
+  </form>
+
+  {% if products %}
+  <form method="post" action="/admin/products/bulk" data-bulk>
+    {{ csrf() }}
+    <input type="hidden" name="next" value="{{ request.url.path }}{{ qs() if filters else '' }}">
+    <div class="bulk-bar">
+      <strong><span data-bulk-count>0</span> selected</strong>
+      <button class="btn btn-sm" name="action" value="activate">Show on store</button>
+      <button class="btn btn-sm" name="action" value="deactivate">Hide</button>
+      <button class="btn btn-sm" name="action" value="feature">Feature</button>
+      <button class="btn btn-sm" name="action" value="unfeature">Unfeature</button>
+    </div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr>
+          <th><input type="checkbox" data-check-all aria-label="Select all products"></th>
+          <th></th><th>Product</th><th>Category</th><th class="num">Price</th><th class="num">Stock</th><th class="num">Rating</th><th class="num">Sold</th><th>Live</th>
+        </tr></thead>
+        <tbody>
+        {% for p in products %}
+          <tr>
+            <td><input type="checkbox" name="ids" value="{{ p.id }}" data-check aria-label="Select {{ p.name }}"></td>
+            <td><img class="thumb" src="{{ p.thumb }}" alt="" loading="lazy"></td>
+            <td>
+              <a href="/admin/products/{{ p.id }}" class="cell-title">{{ p.name }}</a>
+              <div class="sub"><span class="mono">{{ p.sku }}</span> · {{ p.brand }}{% if p.is_featured %} · <span class="text-amber">★ Featured</span>{% endif %}</div>
+            </td>
+            <td class="nowrap">{{ p.category.name }}</td>
+            <td class="num"><b>${{ p.price|usd }}</b>{% if p.mrp > p.price %}<div class="sub"><s>${{ p.mrp|usd }}</s> · {{ p.discount_pct }}% off</div>{% endif %}</td>
+            <td class="num"><span class="stock {{ 'stock-out' if p.stock <= 0 else 'stock-low' if p.is_low_stock else 'stock-ok' }}">{{ p.stock }}</span></td>
+            <td class="num">{% if p.rating_count %}<span class="stars-txt">★ {{ '%.1f'|format(p.rating_avg) }}</span><div class="sub">{{ p.rating_count }}</div>{% else %}–{% endif %}</td>
+            <td class="num">{{ p.sold_count|compact }}</td>
+            <td><label class="check"><input type="checkbox" {{ 'checked' if p.is_active }} data-toggle-url="/admin/products/{{ p.id }}/toggle" aria-label="Show {{ p.name }} on the store"></label></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </form>
+  {{ pager(pg, qs) }}
+  {% else %}
+    {{ empty("No products found", "Try another search, or add your first product.", "/admin/products/new", "Add product") }}
+  {% endif %}
+</section>
+{% endblock %}

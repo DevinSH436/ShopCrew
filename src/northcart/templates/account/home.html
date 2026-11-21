@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import breadcrumb, status_pill %}
+{% block title %}Your account · {{ settings.store_name }}{% endblock %}
+{% block content %}
+{{ breadcrumb([("Home", "/"), ("Your account", None)]) }}
+<div class="account-hero">
+  <span class="avatar avatar-lg" aria-hidden="true">{{ user.name[:1] }}</span>
+  <div><h1>Hello, {{ user.first_name }}</h1><p class="muted">{{ user.email }} · Member since {{ user.created_at|date('%B %Y') }}</p></div>
+</div>
+<div class="account-tiles">
+  <a href="/account/orders" class="account-tile"><span class="tile-icon">📦</span><span><strong>Your orders</strong><span>Track, return, cancel or buy again · {{ counts.orders }} order{{ 's' if counts.orders != 1 }}</span></span></a>
+  <a href="/account/profile" class="account-tile"><span class="tile-icon">🔐</span><span><strong>Login &amp; security</strong><span>Edit name, mobile number and password</span></span></a>
+  <a href="/account/addresses" class="account-tile"><span class="tile-icon">📍</span><span><strong>Your addresses</strong><span>{{ counts.addresses }} saved · edit delivery addresses</span></span></a>
+  <a href="/wishlist" class="account-tile"><span class="tile-icon">♡</span><span><strong>Your wishlist</strong><span>{{ counts.wishlist }} saved item{{ 's' if counts.wishlist != 1 }}</span></span></a>
+  <a href="/pages/help" class="account-tile"><span class="tile-icon">💬</span><span><strong>Customer service</strong><span>Help centre, returns and contact</span></span></a>
+  <a href="/cart" class="account-tile"><span class="tile-icon">🛒</span><span><strong>Your cart</strong><span>{{ cart_count }} item{{ 's' if cart_count != 1 }} waiting</span></span></a>
+  {% if user.is_admin %}<a href="/admin" class="account-tile tile-admin"><span class="tile-icon">📊</span><span><strong>Seller dashboard</strong><span>Orders, products, customers and AI crew</span></span></a>{% endif %}
+</div>
+{% if recent %}
+<section class="panel">
+  <div class="shelf-head"><h2>Recent orders</h2><a href="/account/orders">View all ›</a></div>
+  <ul class="recent-orders">
+    {% for o in recent %}
+    <li>
+      <a href="/account/orders/{{ o.number }}" class="recent-order">
+        <span class="ro-thumbs">{% for i in o.items[:3] %}{% if i.product %}<img src="{{ i.product.thumb }}" alt="" width="48" height="48">{% endif %}{% endfor %}</span>
+        <span class="ro-info"><strong>{{ o.number }}</strong><span class="small muted">{{ o.created_at|date }} · ${{ o.total|usd }}</span></span>
+        {{ status_pill(o.status, o.status_label) }}
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+{% endblock %}

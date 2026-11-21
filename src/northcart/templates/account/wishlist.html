@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import breadcrumb, stars %}
+{% block title %}Your wishlist · {{ settings.store_name }}{% endblock %}
+{% block content %}
+{{ breadcrumb([("Your account", "/account"), ("Wishlist", None)]) }}
+<h1>Your wishlist <span class="muted">({{ items|length }})</span></h1>
+{% if items %}
+<ul class="wish-list">
+  {% for w in items %}{% set p = w.product %}
+  <li class="panel wish-row">
+    <a href="/p/{{ p.slug }}"><img src="{{ p.thumb }}" alt="" width="140" height="140"></a>
+    <div class="wish-info">
+      <a href="/p/{{ p.slug }}" class="cart-name">{{ p.name }}</a>
+      <p class="small muted">by {{ p.brand }}</p>
+      {% if p.rating_count %}<p>{{ stars(p.rating_avg) }} <span class="small">{{ p.rating_count }}</span></p>{% endif %}
+      <p><strong class="wish-price">${{ p.price|usd }}</strong> {% if p.mrp > p.price %}<s class="small muted">${{ p.mrp|usd }}</s> <span class="text-green small">{{ p.discount_pct }}% off</span>{% endif %}</p>
+      <p class="small muted">Added {{ w.created_at|date }}</p>
+    </div>
+    <div class="wish-actions">
+      {% if p.in_stock %}
+      <form method="post" action="/cart/add" data-add-to-cart><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="product_id" value="{{ p.id }}"><button class="btn btn-cart btn-sm btn-block">Add to cart</button></form>
+      {% else %}<span class="stock-out">Currently unavailable</span>{% endif %}
+      <form method="post" action="/wishlist/toggle"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="product_id" value="{{ p.id }}"><input type="hidden" name="next" value="/wishlist"><button class="btn btn-secondary btn-sm btn-block">Remove</button></form>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<div class="panel empty-state">
+  <div class="empty-icon" aria-hidden="true">♡</div>
+  <h2>Your wishlist is empty</h2>
+  <p class="muted">Tap the heart on any product to save it here for later.</p>
+  <a href="/deals" class="btn btn-primary">Explore deals</a>
+</div>
+{% endif %}
+{% endblock %}

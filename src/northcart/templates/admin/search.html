@@ -1,0 +1,33 @@
+{% extends "admin/base.html" %}
+{% from "admin/_macros.html" import pill, empty with context %}
+{% block title %}Search{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Search results</h1><p>{{ 'for “' ~ q ~ '”' if q else 'Type in the search bar above.' }}</p></div></div>
+{% if q and not (orders or products or customers) %}
+  <section class="card">{{ empty("Nothing found", "Try an order number like HT-2611-123456, a product name, SKU, or a customer's email.") }}</section>
+{% endif %}
+{% if orders %}
+<section class="card">
+  <div class="card-head"><h2>Orders</h2></div>
+  <div class="table-wrap no-max"><table class="table"><tbody>
+  {% for o in orders %}<tr><td><a class="mono strong" href="/admin/orders/{{ o.number }}">{{ o.number }}</a></td><td>{{ o.ship_name }}</td><td class="nowrap">{{ o.created_at|date }}</td><td class="num">${{ o.total|usd }}</td><td>{{ pill(o.status) }}</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endif %}
+{% if products %}
+<section class="card">
+  <div class="card-head"><h2>Products</h2></div>
+  <div class="table-wrap no-max"><table class="table"><tbody>
+  {% for p in products %}<tr><td><img class="thumb" src="{{ p.thumb }}" alt=""></td><td><a href="/admin/products/{{ p.id }}" class="strong">{{ p.name }}</a><div class="sub mono">{{ p.sku }}</div></td><td class="num">${{ p.price|usd }}</td><td class="num">{{ p.stock }} in stock</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endif %}
+{% if customers %}
+<section class="card">
+  <div class="card-head"><h2>Customers</h2></div>
+  <div class="table-wrap no-max"><table class="table"><tbody>
+  {% for u in customers %}<tr><td><a href="/admin/customers/{{ u.id }}" class="strong">{{ u.name }}</a></td><td>{{ u.email }}</td><td>{{ u.phone }}</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endif %}
+{% endblock %}

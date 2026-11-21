@@ -1,0 +1,23 @@
+.env
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+dist/
+build/
+*.egg-info/
+outputs/*
+!outputs/.gitkeep
+!outputs/sample/
+.DS_Store
+.idea/
+.vscode/
+store.db
+store.db-*
+media/
+
+# Local-only files
+.claude/
+outputs/sample/ollama-qwen3.5-4b/
+store-preview.db*

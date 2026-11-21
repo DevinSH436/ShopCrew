@@ -1,0 +1,64 @@
+[
+  {
+    "id": "earbuds-01",
+    "name": "PulseBeat Pro Wireless Earbuds",
+    "category": "Audio / True Wireless Earbuds",
+    "our_price": 36,
+    "current_description": "Wireless earbuds with good sound and long battery. Bluetooth 5.3.",
+    "features": [
+      "Up to 40 hours total playtime with charging case (8 h per charge)",
+      "10-minute fast charge gives 2 hours of playback",
+      "Bluetooth 5.3 with one-tap pairing",
+      "Quad-mic ENC for clear calls",
+      "40 ms low-latency game mode",
+      "IPX5 sweat and splash resistance",
+      "Touch controls and voice assistant support"
+    ]
+  },
+  {
+    "id": "watch-01",
+    "name": "FitPulse Active Smartwatch",
+    "category": "Wearables / Smartwatch",
+    "our_price": 57,
+    "current_description": "Smartwatch with AMOLED display and health tracking.",
+    "features": [
+      "1.83\" AMOLED display, 600 nits peak brightness",
+      "Bluetooth calling with built-in mic and speaker",
+      "24x7 heart rate, SpO2 and sleep tracking",
+      "100+ sports modes",
+      "Up to 7 days battery life (2 days with heavy calling)",
+      "IP68 water and dust resistance",
+      "Customisable watch faces"
+    ]
+  },
+  {
+    "id": "bottle-01",
+    "name": "HydroSteel Insulated Water Bottle 1L",
+    "category": "Home & Kitchen / Drinkware",
+    "our_price": 12,
+    "current_description": "Steel water bottle that keeps drinks hot and cold.",
+    "features": [
+      "Double-wall vacuum insulation: 24 h cold, 12 h hot",
+      "Food-grade 18/8 stainless steel, BPA-free",
+      "Leak-proof screw lid with carry loop",
+      "1 litre capacity",
+      "Powder-coated, sweat-free exterior",
+      "Fits most car cup holders"
+    ]
+  },
+  {
+    "id": "backpack-01",
+    "name": "UrbanTrek 30L Laptop Backpack",
+    "category": "Bags / Laptop Backpack",
+    "our_price": 26,
+    "current_description": "Laptop backpack with many pockets and USB port.",
+    "features": [
+      "30 L capacity with padded sleeve for laptops up to 15.6\"",
+      "Water-resistant polyester fabric",
+      "External USB charging port (power bank not included)",
+      "Hidden anti-theft back pocket",
+      "Breathable padded shoulder straps and back panel",
+      "Luggage trolley strap"
+    ]
+  }
+]

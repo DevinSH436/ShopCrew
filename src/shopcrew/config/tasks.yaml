@@ -1,0 +1,95 @@
+review_task:
+  description: >
+    TASK: Review analysis.
+    Product ID: {product_id} ({product_name}).
+
+    1. Call the review_loader tool with product_id "{product_id}".
+    2. Copy average_rating and the positive/neutral/negative percentages EXACTLY from the
+       tool's stats. Do not recalculate them.
+    3. Find the 3-5 most praised features and the 3-5 most common complaints, ranked by
+       how many reviews mention them. Phrase each as a short, specific statement.
+    4. Collect 5-8 short phrases customers actually wrote (quote them verbatim, 2-6 words
+       each, e.g. "battery life is insane"). The SEO Writer will reuse these.
+    5. Write a 2-3 sentence summary a busy store owner can act on.
+  expected_output: >
+    A ReviewInsights JSON object: average_rating, sentiment_breakdown (positive, neutral,
+    negative as percentages), top_praises, top_complaints, customer_phrases, summary.
+  agent: review_analyst
+
+pricing_task:
+  description: >
+    TASK: Pricing analysis.
+    Product ID: {product_id} ({product_name}). All prices are in US dollars (USD).
+
+    1. Call the competitor_prices tool with product_id "{product_id}".
+    2. Copy our_price, competitor_min, competitor_max, competitor_avg and position EXACTLY
+       from the tool's stats. Do not recalculate them.
+    3. Recommend a price. Guidelines: if we are the cheapest, we may have room to raise
+       the price while staying cheapest; if below average, a small increase can still
+       undercut the market; if above average or most expensive, either move towards the
+       average or explain why a premium is justified. Use a charm price ending in 49 or 99.
+       Consider which competitors are out of stock.
+    4. Explain your reasoning in 2-4 sentences, citing the actual numbers.
+  expected_output: >
+    A PricingReport JSON object: our_price, competitor_min, competitor_max, competitor_avg,
+    position (cheapest | below_avg | above_avg | most_expensive), recommended_price,
+    reasoning.
+  agent: price_tracker
+
+seo_task:
+  description: >
+    TASK: SEO copywriting.
+    Product ID: {product_id} ({product_name}).
+
+    You have the Review Analyst's insights in your context. Call the product_info tool
+    with product_id "{product_id}" to get the real feature list.
+
+    Rules:
+    - Lead with the top praises from the review insights.
+    - Reuse several customer_phrases word-for-word in the description and keywords.
+    - Only mention features that appear in the product_info feature list. Never claim a
+      feature customers complain is missing (for example, do not claim noise
+      cancellation if reviews say it lacks it).
+    - title: at most 70 characters. meta_description: at most 160 characters.
+    - bullet_points: exactly 5.
+    - long_description: 150-250 words. Write 3 paragraphs of about 70 words each:
+      (1) the top praise in customers' words, (2) the key features, (3) who it is for
+      and a call to action. Count the words before answering.
+    - keywords: 5-10 search terms US shoppers would type.
+    - Your final answer is the JSON object itself. SEOCopy is a schema, not a tool.
+  expected_output: >
+    An SEOCopy JSON object: title, meta_description, bullet_points (5), long_description,
+    keywords.
+  agent: seo_writer
+  context:
+    - review_task
+
+marketing_task:
+  description: >
+    TASK: Launch campaign.
+    Product ID: {product_id} ({product_name}).
+
+    You have the review insights, the pricing report and the SEO copy in your context.
+    Build ONE coherent campaign from them:
+    - key_message must combine the top customer praise with our price position
+      (e.g. "longest battery life at a better price" when reviews praise battery life
+      and we are below the competitor average).
+    - offer must follow the pricing position: cheapest -> no discount needed, add value
+      instead; below_avg -> a light launch promo; above_avg -> a bundle or value-add that
+      justifies the price; most_expensive -> justify the premium or use a targeted,
+      time-limited discount towards the recommended price.
+    - Reuse customer phrases and SEO keywords in the ad copy.
+    - google_ad.headline: at most 30 characters. google_ad.description: at most 90.
+      email.subject: at most 80 characters.
+    - 7_day_schedule: exactly 7 entries, one for each day 1-7, each with channel and action.
+    - how_we_address_complaints: tackle the top complaints honestly and concretely.
+    - Only promise features the product actually has.
+  expected_output: >
+    A CampaignPlan JSON object: target_audience, positioning_statement, key_message,
+    offer, instagram_caption, google_ad (headline, description), email (subject, body),
+    7_day_schedule (list of day, channel, action), how_we_address_complaints.
+  agent: marketer
+  context:
+    - review_task
+    - pricing_task
+    - seo_task

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import product_row, product_card with context %}
+{% block title %}Order placed · {{ settings.store_name }}{% endblock %}
+{% block content %}
+<section class="panel success">
+  <div class="success-check" aria-hidden="true">
+    <svg viewBox="0 0 52 52" width="72" height="72"><circle cx="26" cy="26" r="24" fill="none" stroke="#0b8a4a" stroke-width="3" class="success-circle"/><path d="M15 27l7 7 15-15" fill="none" stroke="#0b8a4a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" class="success-tick"/></svg>
+  </div>
+  <div class="success-copy">
+    <h1>Order placed, thank you!</h1>
+    <p>Confirmation will be sent to <strong>{{ user.email }}</strong>.</p>
+    <dl class="success-facts">
+      <div><dt>Order number</dt><dd><strong>{{ order.number }}</strong></dd></div>
+      <div><dt>Arriving</dt><dd><strong class="text-green">{{ order.expected_delivery|date('%A, %d %B') }}</strong></dd></div>
+      <div><dt>Payment</dt><dd>{{ order.payment_label }}{% if order.payment_status == 'paid' %} · <span class="text-green">Paid</span>{% else %} · Pay ${{ order.total|usd }} on delivery{% endif %}</dd></div>
+      <div><dt>Deliver to</dt><dd>{{ order.ship_name }}, {{ order.ship_city }} {{ order.ship_pincode }}</dd></div>
+    </dl>
+    <ul class="success-items">
+      {% for item in order.items %}
+      <li>{% if item.product %}<img src="{{ item.product.thumb }}" alt="" width="64" height="64">{% endif %}<span>{{ item.name }}<br><span class="small muted">Qty {{ item.quantity }}</span></span><strong>${{ item.line_total|usd }}</strong></li>
+      {% endfor %}
+    </ul>
+    <p class="success-total">Order total: <strong>${{ order.total|usd }}</strong>{% if order.mrp_total > order.total %} <span class="text-green small">(you saved ${{ (order.mrp_total - order.total + order.shipping_fee + order.cod_fee)|usd }})</span>{% endif %}</p>
+    <div class="row">
+      <a href="/account/orders/{{ order.number }}" class="btn btn-primary">Track your order</a>
+      <a href="/" class="btn btn-secondary">Continue shopping</a>
+    </div>
+  </div>
+</section>
+{{ product_row("Customers who bought these also bought", recs, csrf_token) }}
+{% endblock %}

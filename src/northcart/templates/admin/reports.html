@@ -1,0 +1,67 @@
+{% extends "admin/base.html" %}
+{% from "admin/_macros.html" import icon, empty with context %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Reports</h1><p>Excludes cancelled and returned orders. Dates are in IST.</p></div>
+  <form class="row" method="get">
+    <input type="hidden" name="tab" value="{{ tab }}">
+    <label class="field" style="margin:0"><span>From</span><input class="input" type="date" name="from" value="{{ start }}"></label>
+    <label class="field" style="margin:0"><span>To</span><input class="input" type="date" name="to" value="{{ end }}"></label>
+    <button class="btn btn-dark" style="align-self:flex-end">Update</button>
+  </form>
+</div>
+
+{% set t = report.totals %}
+<section class="kpis">
+  <div class="card kpi kpi-accent"><p class="label">Net sales</p><div class="value">${{ t.net|usd }}</div></div>
+  <div class="card kpi"><p class="label">Gross (items)</p><div class="value">${{ t.gross|usd }}</div></div>
+  <div class="card kpi"><p class="label">Discounts</p><div class="value">${{ t.discount|usd }}</div></div>
+  <div class="card kpi"><p class="label">Orders</p><div class="value">{{ t.orders|usd }}</div></div>
+  <div class="card kpi"><p class="label">Units</p><div class="value">{{ t.units|usd }}</div></div>
+</section>
+
+<section class="card">
+  <nav class="tabs" aria-label="Report">
+    {% for key, label in [("sales", "Daily sales"), ("category", "By category"), ("product", "By product"), ("gst", "GST summary")] %}
+      <a href="?tab={{ key }}&from={{ start }}&to={{ end }}" class="{{ 'active' if tab == key }}">{{ label }}</a>
+    {% endfor %}
+  </nav>
+  {% if tab == "gst" %}
+    <div class="filters"><p class="muted small" style="margin:0;flex:1">Delivered orders by delivery month. Prices include 18% GST; intra-state (Maharashtra) splits into CGST + SGST, other states pay IGST.</p>
+      <a class="btn" href="/admin/reports/gst.csv">{{ icon("download", 16) }} Download CSV</a></div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th>Month</th><th class="num">Orders</th><th class="num">Gross (incl. GST)</th><th class="num">Taxable value</th><th class="num">CGST</th><th class="num">SGST</th><th class="num">IGST</th></tr></thead>
+        <tbody>{% for m in gst %}<tr><td class="strong">{{ m.month }}</td><td class="num">{{ m.orders }}</td><td class="num">${{ m.gross|usd }}</td><td class="num">${{ m.taxable|usd(true) }}</td><td class="num">${{ m.cgst|usd(true) }}</td><td class="num">${{ m.sgst|usd(true) }}</td><td class="num">${{ m.igst|usd(true) }}</td></tr>
+        {% else %}<tr><td colspan="7" class="muted">No delivered orders yet.</td></tr>{% endfor %}</tbody>
+      </table>
+    </div>
+  {% else %}
+    {% set view = {"sales": "daily", "category": "category", "product": "product"}[tab] if tab in ("sales", "category", "product") else "daily" %}
+    <div class="filters"><span class="spacer"></span><a class="btn" href="/admin/reports/sales.csv?view={{ view }}&from={{ start }}&to={{ end }}">{{ icon("download", 16) }} Download CSV</a></div>
+    {% if tab == "category" %}
+      {% set top = (report.categories|map(attribute='revenue')|max) if report.categories else 1 %}
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>Category</th><th class="num">Units</th><th class="num">Revenue</th><th style="width:40%">Share</th></tr></thead>
+        <tbody>{% for c in report.categories %}<tr><td class="strong">{{ c.name }}</td><td class="num">{{ c.units }}</td><td class="num">${{ c.revenue|usd }}</td><td><div class="bar-track"><div class="bar-fill" style="width:{{ (c.revenue * 100 / top)|round(1) }}%"></div></div></td></tr>
+        {% else %}<tr><td colspan="4" class="muted">No sales in this range.</td></tr>{% endfor %}</tbody>
+      </table></div>
+    {% elif tab == "product" %}
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>#</th><th>Product</th><th class="num">Units</th><th class="num">Revenue</th></tr></thead>
+        <tbody>{% for pr in report.products %}<tr><td>{{ loop.index }}</td><td>{% if pr.product %}<a href="/admin/products/{{ pr.product.id }}">{{ pr.name }}</a>{% else %}{{ pr.name }}{% endif %}</td><td class="num">{{ pr.units }}</td><td class="num">${{ pr.revenue|usd }}</td></tr>
+        {% else %}<tr><td colspan="4" class="muted">No sales in this range.</td></tr>{% endfor %}</tbody>
+      </table></div>
+    {% else %}
+      {% if report.rows %}
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>Date</th><th class="num">Orders</th><th class="num">Units</th><th class="num">Gross</th><th class="num">Discount</th><th class="num">Shipping &amp; COD</th><th class="num">Net</th></tr></thead>
+        <tbody>{% for r in report.rows|reverse %}<tr><td class="nowrap">{{ r.date.strftime('%a, %d %b %Y') }}</td><td class="num">{{ r.orders }}</td><td class="num">{{ r.units }}</td><td class="num">${{ r.gross|usd }}</td><td class="num">{{ '−$' ~ r.discount|usd if r.discount else '–' }}</td><td class="num">${{ r.shipping|usd }}</td><td class="num strong">${{ r.net|usd }}</td></tr>{% endfor %}</tbody>
+        <tfoot><tr><th>Total</th><th class="num">{{ t.orders }}</th><th class="num">{{ t.units }}</th><th class="num">${{ t.gross|usd }}</th><th class="num">−${{ t.discount|usd }}</th><th class="num">${{ t.shipping|usd }}</th><th class="num">${{ t.net|usd }}</th></tr></tfoot>
+      </table></div>
+      {% else %}{{ empty("No sales in this range", "Pick a different date range.") }}{% endif %}
+    {% endif %}
+  {% endif %}
+</section>
+{% endblock %}

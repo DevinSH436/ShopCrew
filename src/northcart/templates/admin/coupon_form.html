@@ -1,0 +1,32 @@
+{% extends "admin/base.html" %}
+{% from "admin/_macros.html" import csrf, field_error with context %}
+{% block title %}{{ 'Edit ' ~ coupon.code if coupon else 'New coupon' }}{% endblock %}
+{% block content %}
+<div class="crumbs"><a href="/admin/coupons">Coupons</a> › {{ coupon.code if coupon else 'New' }}</div>
+<div class="page-head"><div><h1>{{ 'Edit coupon' if coupon else 'New coupon' }}</h1>{% if coupon %}<p>Used {{ coupon.used_count }} time{{ 's' if coupon.used_count != 1 }}</p>{% endif %}</div></div>
+<form class="card" method="post" action="{{ '/admin/coupons/' ~ coupon.id if coupon else '/admin/coupons/new' }}" style="max-width:760px">
+  {{ csrf() }}
+  <div class="card-body">
+    {% if errors %}<div class="alert alert-error">Please fix the highlighted fields.</div>{% endif %}
+    <div class="fields-2">
+      <label class="field{{ ' has-error' if errors.code }}"><span>Code</span><input name="code" value="{{ v.code }}" class="mono" style="text-transform:uppercase" maxlength="30" required placeholder="HOLIDAY20">{{ field_error(errors, 'code') }}</label>
+      <label class="field"><span>Description <small>shown to customers</small></span><input name="description" value="{{ v.description }}" maxlength="200"></label>
+    </div>
+    <div class="fields-3">
+      <label class="field"><span>Type</span><select name="kind"><option value="percent" {{ 'selected' if v.kind == 'percent' }}>Percent off</option><option value="flat" {{ 'selected' if v.kind == 'flat' }}>Flat $ off</option></select></label>
+      <label class="field{{ ' has-error' if errors.value }}"><span>Value</span><input name="value" type="number" min="1" value="{{ v.value }}" required>{{ field_error(errors, 'value') }}</label>
+      <label class="field"><span>Max discount ($) <small>0 = no cap</small></span><input name="max_discount" type="number" min="0" value="{{ v.max_discount }}"></label>
+    </div>
+    <div class="fields-3">
+      <label class="field"><span>Minimum order ($)</span><input name="min_order" type="number" min="0" value="{{ v.min_order }}"></label>
+      <label class="field"><span>Usage limit <small>0 = unlimited</small></span><input name="usage_limit" type="number" min="0" value="{{ v.usage_limit }}"></label>
+      <label class="field{{ ' has-error' if errors.expires_at }}"><span>Expires on <small>optional</small></span><input name="expires_at" type="date" value="{{ v.expires_at }}">{{ field_error(errors, 'expires_at') }}</label>
+    </div>
+    <label class="check"><input type="checkbox" name="is_active" {{ 'checked' if v.is_active }}> Active</label>
+  </div>
+  <div class="sticky-actions">
+    <a href="/admin/coupons" class="btn">Cancel</a>
+    <button class="btn btn-primary">{{ 'Save coupon' if coupon else 'Create coupon' }}</button>
+  </div>
+</form>
+{% endblock %}

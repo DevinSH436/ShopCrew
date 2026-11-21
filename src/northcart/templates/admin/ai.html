@@ -1,0 +1,82 @@
+{% extends "admin/base.html" %}
+{% from "admin/_macros.html" import icon, pill, empty, csrf with context %}
+{% block title %}AI Crew{% endblock %}
+{% block content %}
+<section class="ai-hero">
+  <div>
+    <h1>{{ icon("ai", 24) }} AI Crew</h1>
+    <p>Four AI agents work on one product together. They read every customer review, compare competitor prices, rewrite the listing in your customers' own words, then plan a launch campaign from all three. Everything runs locally, so no customer data leaves this machine.</p>
+  </div>
+  <div class="right">
+    <span class="model-chip {{ 'ok' if ai.ok else 'bad' }}">{{ 'Ollama' if ai.provider in ('ollama', 'ollama_chat') else ai.provider|capitalize }} · {{ ai.model.split('/', 1)[-1] }} {{ 'connected' if ai.ok else 'offline' }}</span>
+    {% if ai.detail %}<p class="small" style="margin-top:8px">{{ ai.detail }}</p>{% endif %}
+  </div>
+</section>
+
+{% if not ai.ok %}
+<div class="alert alert-warn">
+  <b>The model isn't reachable.</b> {{ ai.detail }}. Runs will fail until it is. To try the crew without a model, set <code>MODEL=mock</code> in <code>.env</code> and restart.
+</div>
+{% endif %}
+
+<section class="agents" aria-label="The agents">
+  {% set icons = {"review_task": "⭐", "pricing_task": "$", "seo_task": "¶", "marketing_task": "↗"} %}
+  {% for key, name, desc in stages %}
+  <div class="agent">
+    <div class="a-icon" aria-hidden="true">{{ icons[key] }}</div>
+    <span class="a-state">Step {{ loop.index }}</span>
+    <h3>{{ name }}</h3>
+    <p>{{ desc }}</p>
+  </div>
+  {% endfor %}
+</section>
+
+<div class="grid grid-main-r">
+  <section class="card">
+    <div class="card-head"><h2>Run history</h2><span class="muted small">Last 30 runs</span></div>
+    {% if runs %}
+    <div class="table-wrap no-max">
+      <table class="table">
+        <thead><tr><th>#</th><th>Product</th><th>Mode</th><th>Model</th><th>Status</th><th class="num">Time</th><th>Started</th><th>Applied</th></tr></thead>
+        <tbody>
+        {% for r in runs %}
+          {% set d = duration(r) %}
+          <tr>
+            <td><a href="/admin/ai/runs/{{ r.id }}" class="strong">#{{ r.id }}</a></td>
+            <td><a href="/admin/ai/runs/{{ r.id }}">{{ r.product.name|truncate(40) }}</a></td>
+            <td class="small">{{ r.process|capitalize }}</td>
+            <td class="small mono">{{ r.model }}</td>
+            <td>{{ pill(r.status, r.status|capitalize) }}</td>
+            <td class="num">{{ ('%dm %02ds'|format(d // 60, d % 60)) if d else '–' }}</td>
+            <td class="nowrap small">{{ r.started_at|ago }}</td>
+            <td class="small">{{ (r.applied or [])|join(', ') or '–' }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}{{ empty("No runs yet", "Pick a product on the right and start your first crew run.") }}{% endif %}
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h2>Start a run</h2></div>
+    <form class="card-body" method="post" action="/admin/ai/run">
+      {{ csrf() }}
+      <label class="field"><span>Product</span>
+        <select name="product_id" required>
+          <option value="">Choose a product…</option>
+          {% for p in products %}<option value="{{ p.id }}" {{ 'selected' if selected == p.id }}>{{ p.name|truncate(60) }}</option>{% endfor %}
+        </select>
+        <small>Only products with reviews and competitor prices are listed.</small>
+      </label>
+      <fieldset class="field" style="border:0;padding:0;margin:0 0 14px">
+        <legend class="label">Process</legend>
+        <label class="check" style="margin-bottom:6px"><input type="radio" name="process" value="sequential" checked> <span><b>Sequential</b>: agents run one after another, passing results forward</span></label>
+        <label class="check"><input type="radio" name="process" value="hierarchical"> <span><b>Hierarchical</b>: a Store Manager agent delegates to the specialists</span></label>
+      </fieldset>
+      <button class="btn btn-ai btn-lg" style="width:100%">{{ icon("ai", 18) }} Run the crew</button>
+      <p class="hint" style="margin-top:10px">On a local {{ ai.model.split('/', 1)[-1] }} a full run takes about 3–5 minutes. You can leave the page; the run keeps going.</p>
+    </form>
+  </section>
+</div>
+{% endblock %}

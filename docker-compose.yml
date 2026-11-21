@@ -1,0 +1,44 @@
+services:
+  shopcrew:
+    build: .
+    image: shopcrew:latest
+    container_name: shopcrew
+    ports:
+      - "8501:8501"
+    # .env is optional: without it the dashboard runs in offline demo mode.
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      # Lets MODEL=ollama/... reach Ollama running on the host machine.
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL_DOCKER:-http://host.docker.internal:11434}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./outputs:/app/outputs
+    restart: unless-stopped
+
+  # The Northcart storefront + admin panel. Data lives in the named volumes below.
+  store:
+    image: shopcrew:latest
+    depends_on: [shopcrew]
+    container_name: northcart-store
+    command: ["uvicorn", "northcart.web.app:app", "--host", "0.0.0.0", "--port", "8000"]
+    ports:
+      - "8000:8000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL_DOCKER:-http://host.docker.internal:11434}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - store-data:/app/var
+      - store-media:/app/media
+      - ./outputs:/app/outputs
+    restart: unless-stopped
+
+volumes:
+  store-data:
+  store-media:

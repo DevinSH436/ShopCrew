@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import breadcrumb %}
+{% block title %}Login &amp; security · {{ settings.store_name }}{% endblock %}
+{% block content %}
+{{ breadcrumb([("Your account", "/account"), ("Login & security", None)]) }}
+<h1>Login &amp; security</h1>
+<div class="narrow">
+  <section class="panel">
+    <h2>Personal details</h2>
+    <form method="post" action="/account/profile">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="action" value="profile">
+      <label class="field"><span>Name</span><input name="name" autocomplete="name" required value="{{ user.name }}">{% if errors.name %}<span class="field-error">{{ errors.name }}</span>{% endif %}</label>
+      <label class="field"><span>Email</span><input value="{{ user.email }}" disabled><small>Email can't be changed in this demo.</small></label>
+      <label class="field"><span>Mobile number</span><input name="phone" inputmode="tel" required value="{{ user.phone }}">{% if errors.phone %}<span class="field-error">{{ errors.phone }}</span>{% endif %}</label>
+      <button class="btn btn-primary" type="submit">Save changes</button>
+    </form>
+  </section>
+  <section class="panel">
+    <h2>Change password</h2>
+    <form method="post" action="/account/profile">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="action" value="password">
+      <label class="field"><span>Current password</span><input type="password" name="current" autocomplete="current-password" required>{% if errors.current %}<span class="field-error">{{ errors.current }}</span>{% endif %}</label>
+      <label class="field"><span>New password</span><input type="password" name="new" autocomplete="new-password" minlength="8" required>{% if errors.new %}<span class="field-error">{{ errors.new }}</span>{% endif %}</label>
+      <label class="field"><span>Re-enter new password</span><input type="password" name="confirm" autocomplete="new-password" required>{% if errors.confirm %}<span class="field-error">{{ errors.confirm }}</span>{% endif %}</label>
+      <button class="btn btn-secondary" type="submit">Change password</button>
+    </form>
+  </section>
+</div>
+{% endblock %}

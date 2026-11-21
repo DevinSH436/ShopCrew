@@ -1,0 +1,866 @@
+[
+  {
+    "product_id": "earbuds-01",
+    "rating": 4,
+    "text": "Battery life is insane, I charge the case maybe once a week. Only issue: mic is bad in windy conditions.",
+    "date": "2026-10-19"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 3,
+    "text": "Sound is decent, nothing extraordinary but fine for daily use. Works as expected. Battery is great, ANC would have been nice.",
+    "date": "2026-11-06"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 5,
+    "text": "Pairing was instant, they connect as soon as I open the case.",
+    "date": "2026-06-01"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 3,
+    "text": "Okay product, touch controls take some getting used to. Sound is decent, nothing extraordinary but fine for daily use.",
+    "date": "2026-06-17"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 5,
+    "text": "Battery life is insane, I charge the case maybe once a week. Bass is punchy and the sound is very clear for this price.",
+    "date": "2026-10-06"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 5,
+    "text": "Game mode actually works, no delay in BGMI.",
+    "date": "2026-08-15"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 2,
+    "text": "Fit is not great for small ears, they keep falling out while running.",
+    "date": "2026-07-20"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 4,
+    "text": "Fast charging is a lifesaver, 10 minutes and I am good for my commute. Best battery life I have had in budget earbuds, easily lasts my whole work day.",
+    "date": "2026-06-09"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 2,
+    "text": "No active noise cancellation, so they are useless in the subway.",
+    "date": "2026-10-28"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 5,
+    "text": "Pairing was instant, they connect as soon as I open the case.",
+    "date": "2026-10-20"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 4,
+    "text": "Very comfortable fit, I wear them for hours at the gym without pain.",
+    "date": "2026-09-22"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 3,
+    "text": "Sound is decent, nothing extraordinary but fine for daily use.",
+    "date": "2026-07-01"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 3,
+    "text": "Good earbuds overall but the case is a bit bulky for small pockets. Okay product, touch controls take some getting used to.",
+    "date": "2026-09-06"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 1,
+    "text": "Mic is bad in windy conditions.",
+    "date": "2026-05-23"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 5,
+    "text": "Battery life is insane, I charge the case maybe once a week.",
+    "date": "2026-08-04"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 5,
+    "text": "Pairing was instant, they connect as soon as I open the case.",
+    "date": "2026-08-05"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 2,
+    "text": "Mic is bad in windy conditions.",
+    "date": "2026-09-08"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 5,
+    "text": "Value for money, sounds better than earbuds costing double. Survived a lot of sweaty workouts, no issues so far.",
+    "date": "2026-07-28"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 2,
+    "text": "Case hinge feels cheap and loose after two months.",
+    "date": "2026-10-10"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 4,
+    "text": "Best battery life I have had in budget earbuds, easily lasts my whole work day. Only issue: left earbud disconnects randomly once in a while.",
+    "date": "2026-05-24"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 4,
+    "text": "Best battery life I have had in budget earbuds, easily lasts my whole work day. Fast charging is a lifesaver, 10 minutes and I am good for my commute.",
+    "date": "2026-07-18"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 4,
+    "text": "Value for money, sounds better than earbuds costing double.",
+    "date": "2026-06-30"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 3,
+    "text": "Works as expected. Battery is great, ANC would have been nice. Sound is decent, nothing extraordinary but fine for daily use.",
+    "date": "2026-07-26"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 5,
+    "text": "Battery life is insane, I charge the case maybe once a week.",
+    "date": "2026-10-18"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 2,
+    "text": "No active noise cancellation, so they are useless in the subway.",
+    "date": "2026-10-06"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 5,
+    "text": "Bass is punchy and the sound is very clear for this price.",
+    "date": "2026-07-12"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 5,
+    "text": "Game mode actually works, no delay in BGMI. Only issue: fit is not great for small ears, they keep falling out while running.",
+    "date": "2026-10-25"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 5,
+    "text": "Very comfortable fit, I wear them for hours at the gym without pain. Only issue: case hinge feels cheap and loose after two months.",
+    "date": "2026-06-27"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 5,
+    "text": "Value for money, sounds better than earbuds costing double.",
+    "date": "2026-05-22"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 5,
+    "text": "Call quality is surprisingly good, people can hear me even on the road. Fast charging is a lifesaver, 10 minutes and I am good for my commute.",
+    "date": "2026-07-05"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 4,
+    "text": "Pairing was instant, they connect as soon as I open the case.",
+    "date": "2026-06-17"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 4,
+    "text": "Survived a lot of sweaty workouts, no issues so far. Only issue: mic is bad in windy conditions.",
+    "date": "2026-10-30"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 5,
+    "text": "Battery life is insane, I charge the case maybe once a week.",
+    "date": "2026-09-04"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 3,
+    "text": "Good earbuds overall but the case is a bit bulky for small pockets.",
+    "date": "2026-06-21"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 4,
+    "text": "Pairing was instant, they connect as soon as I open the case. Very comfortable fit, I wear them for hours at the gym without pain. Only issue: touch controls are too sensitive, music pauses when i adjust them.",
+    "date": "2026-05-30"
+  },
+  {
+    "product_id": "earbuds-01",
+    "rating": 4,
+    "text": "Fast charging is a lifesaver, 10 minutes and I am good for my commute. Survived a lot of sweaty workouts, no issues so far.",
+    "date": "2026-11-01"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 3,
+    "text": "Nice watch but the app could be more polished. Good display, but sports modes are more than I will ever use.",
+    "date": "2026-08-20"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 2,
+    "text": "Battery drains fast if you use calling, barely 2 days.",
+    "date": "2026-09-27"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 4,
+    "text": "Sleep tracking is surprisingly detailed and accurate.",
+    "date": "2026-09-12"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 2,
+    "text": "Battery drains fast if you use calling, barely 2 days.",
+    "date": "2026-11-02"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 3,
+    "text": "Nice watch but the app could be more polished.",
+    "date": "2026-10-03"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 4,
+    "text": "Notifications come through instantly, very handy in meetings. Bluetooth calling works really well, I take calls while cooking.",
+    "date": "2026-10-03"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 5,
+    "text": "Heart rate readings match my gym equipment closely. Sleep tracking is surprisingly detailed and accurate.",
+    "date": "2026-05-20"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 1,
+    "text": "SpO2 readings are inconsistent.",
+    "date": "2026-09-27"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 5,
+    "text": "The AMOLED display is gorgeous and super bright even in sunlight.",
+    "date": "2026-10-31"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 5,
+    "text": "Notifications come through instantly, very handy in meetings. Only issue: spo2 readings are inconsistent.",
+    "date": "2026-10-25"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 2,
+    "text": "Battery drains fast if you use calling, barely 2 days.",
+    "date": "2026-05-26"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 2,
+    "text": "App keeps disconnecting from my phone and I have to re-pair.",
+    "date": "2026-06-19"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 4,
+    "text": "Bluetooth calling works really well, I take calls while cooking. Looks premium, people think it is a much more expensive watch.",
+    "date": "2026-09-23"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 3,
+    "text": "Decent for the price, step count sometimes overcounts. Nice watch but the app could be more polished.",
+    "date": "2026-08-05"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 5,
+    "text": "Lots of watch faces to choose from, I change it every day. Looks premium, people think it is a much more expensive watch.",
+    "date": "2026-10-27"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 5,
+    "text": "Bluetooth calling works really well, I take calls while cooking.",
+    "date": "2026-10-12"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 1,
+    "text": "Battery drains fast if you use calling, barely 2 days. GPS is only connected GPS, need my phone for runs.",
+    "date": "2026-09-03"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 5,
+    "text": "Lots of watch faces to choose from, I change it every day.",
+    "date": "2026-06-26"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 5,
+    "text": "Bluetooth calling works really well, I take calls while cooking. Notifications come through instantly, very handy in meetings. Only issue: battery drains fast if you use calling, barely 2 days.",
+    "date": "2026-06-26"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 5,
+    "text": "Lots of watch faces to choose from, I change it every day.",
+    "date": "2026-09-23"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 3,
+    "text": "Decent for the price, step count sometimes overcounts. Good display, but sports modes are more than I will ever use.",
+    "date": "2026-09-11"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 1,
+    "text": "Battery drains fast if you use calling, barely 2 days. Charger is proprietary and the magnet is weak.",
+    "date": "2026-09-05"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 5,
+    "text": "Strap is comfortable even when I wear it all night.",
+    "date": "2026-09-08"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 5,
+    "text": "Notifications come through instantly, very handy in meetings. Lots of watch faces to choose from, I change it every day.",
+    "date": "2026-10-17"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 5,
+    "text": "Sleep tracking is surprisingly detailed and accurate.",
+    "date": "2026-06-18"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 4,
+    "text": "Heart rate readings match my gym equipment closely.",
+    "date": "2026-11-04"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 2,
+    "text": "GPS is only connected GPS, need my phone for runs.",
+    "date": "2026-08-16"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 3,
+    "text": "Good display, but sports modes are more than I will ever use.",
+    "date": "2026-09-15"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 2,
+    "text": "GPS is only connected GPS, need my phone for runs.",
+    "date": "2026-09-30"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 3,
+    "text": "Decent for the price, step count sometimes overcounts.",
+    "date": "2026-09-07"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 5,
+    "text": "Bluetooth calling works really well, I take calls while cooking.",
+    "date": "2026-09-19"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 5,
+    "text": "Notifications come through instantly, very handy in meetings. Sleep tracking is surprisingly detailed and accurate.",
+    "date": "2026-09-17"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 5,
+    "text": "Looks premium, people think it is a much more expensive watch. Notifications come through instantly, very handy in meetings.",
+    "date": "2026-10-28"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 1,
+    "text": "Price is high compared to similar watches on sale. Charger is proprietary and the magnet is weak.",
+    "date": "2026-05-25"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 1,
+    "text": "SpO2 readings are inconsistent.",
+    "date": "2026-10-16"
+  },
+  {
+    "product_id": "watch-01",
+    "rating": 2,
+    "text": "Price is high compared to similar watches on sale. GPS is only connected GPS, need my phone for runs.",
+    "date": "2026-11-05"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 5,
+    "text": "Matte finish looks great and does not sweat. Tea stays hot till evening, great for long train journeys.",
+    "date": "2026-07-07"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 5,
+    "text": "Sturdy build, survived multiple drops with just a small dent.",
+    "date": "2026-11-14"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 4,
+    "text": "Sturdy build, survived multiple drops with just a small dent. Tea stays hot till evening, great for long train journeys. Only issue: got a dent on delivery, packaging was poor.",
+    "date": "2026-06-08"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 5,
+    "text": "Completely leak-proof, I throw it in my laptop bag without worry. Fits perfectly in my car cup holder.",
+    "date": "2026-05-28"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 4,
+    "text": "Matte finish looks great and does not sweat. Fits perfectly in my car cup holder.",
+    "date": "2026-09-26"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 4,
+    "text": "Matte finish looks great and does not sweat.",
+    "date": "2026-08-29"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 4,
+    "text": "Keeps water ice cold for a full day, even in Phoenix summer. Tea stays hot till evening, great for long train journeys. Only issue: got a dent on delivery, packaging was poor.",
+    "date": "2026-07-18"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 4,
+    "text": "Sturdy build, survived multiple drops with just a small dent. No metallic taste at all, very happy with it.",
+    "date": "2026-10-02"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 3,
+    "text": "Does the job. Mouth is a bit narrow for ice cubes.",
+    "date": "2026-09-15"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 3,
+    "text": "Good bottle, a little heavy when full.",
+    "date": "2026-11-08"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 5,
+    "text": "Best purchase for office, I drink more water now.",
+    "date": "2026-06-06"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 4,
+    "text": "Matte finish looks great and does not sweat. Sturdy build, survived multiple drops with just a small dent. Only issue: paint started chipping near the base after a month.",
+    "date": "2026-10-18"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 3,
+    "text": "Good bottle, a little heavy when full. Fine quality, colour slightly different from the photo.",
+    "date": "2026-11-02"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 4,
+    "text": "Completely leak-proof, I throw it in my laptop bag without worry.",
+    "date": "2026-05-28"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 4,
+    "text": "Fits perfectly in my car cup holder. Matte finish looks great and does not sweat.",
+    "date": "2026-07-08"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 4,
+    "text": "Best purchase for office, I drink more water now. Completely leak-proof, I throw it in my laptop bag without worry.",
+    "date": "2026-09-12"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 2,
+    "text": "Got a dent on delivery, packaging was poor. Lid is hard to open with wet hands.",
+    "date": "2026-06-07"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 5,
+    "text": "Best purchase for office, I drink more water now. Keeps water ice cold for a full day, even in Phoenix summer. Only issue: got a dent on delivery, packaging was poor.",
+    "date": "2026-08-25"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 2,
+    "text": "Paint started chipping near the base after a month.",
+    "date": "2026-09-16"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 4,
+    "text": "Tea stays hot till evening, great for long train journeys. Only issue: lid is hard to open with wet hands.",
+    "date": "2026-08-22"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 4,
+    "text": "Matte finish looks great and does not sweat.",
+    "date": "2026-08-07"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 1,
+    "text": "Paint started chipping near the base after a month. Got a dent on delivery, packaging was poor.",
+    "date": "2026-07-15"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 5,
+    "text": "Fits perfectly in my car cup holder. Tea stays hot till evening, great for long train journeys.",
+    "date": "2026-07-30"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 4,
+    "text": "Sturdy build, survived multiple drops with just a small dent.",
+    "date": "2026-07-13"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 5,
+    "text": "Fits perfectly in my car cup holder. Best purchase for office, I drink more water now.",
+    "date": "2026-07-18"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 1,
+    "text": "Paint started chipping near the base after a month.",
+    "date": "2026-10-24"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 4,
+    "text": "Tea stays hot till evening, great for long train journeys. Matte finish looks great and does not sweat. Only issue: got a dent on delivery, packaging was poor.",
+    "date": "2026-08-09"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 5,
+    "text": "Best purchase for office, I drink more water now. Tea stays hot till evening, great for long train journeys.",
+    "date": "2026-08-09"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 5,
+    "text": "Matte finish looks great and does not sweat.",
+    "date": "2026-06-29"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 5,
+    "text": "Fits perfectly in my car cup holder.",
+    "date": "2026-06-01"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 5,
+    "text": "Keeps water ice cold for a full day, even in Phoenix summer.",
+    "date": "2026-06-08"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 5,
+    "text": "Tea stays hot till evening, great for long train journeys.",
+    "date": "2026-09-20"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 4,
+    "text": "No metallic taste at all, very happy with it. Matte finish looks great and does not sweat. Only issue: paint started chipping near the base after a month.",
+    "date": "2026-10-04"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 1,
+    "text": "Paint started chipping near the base after a month.",
+    "date": "2026-08-27"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 4,
+    "text": "Matte finish looks great and does not sweat. Only issue: mouth is too narrow to clean properly without a brush.",
+    "date": "2026-10-19"
+  },
+  {
+    "product_id": "bottle-01",
+    "rating": 3,
+    "text": "Does the job. Mouth is a bit narrow for ice cubes.",
+    "date": "2026-08-18"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 4,
+    "text": "Survived heavy Seattle rain, everything inside stayed dry. Lots of compartments, everything has a place. Only issue: usb port cable came out from inside after a few weeks.",
+    "date": "2026-07-12"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 5,
+    "text": "Survived heavy Seattle rain, everything inside stayed dry. Trolley strap makes airport travel easy.",
+    "date": "2026-07-26"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 5,
+    "text": "Looks professional, perfect for office and college. Trolley strap makes airport travel easy.",
+    "date": "2026-06-16"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 5,
+    "text": "Shoulder straps are comfortable even with a heavy load.",
+    "date": "2026-07-22"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 5,
+    "text": "Trolley strap makes airport travel easy. Looks professional, perfect for office and college.",
+    "date": "2026-07-11"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 2,
+    "text": "Stitching on the handle came loose quickly.",
+    "date": "2026-08-16"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 2,
+    "text": "Side pocket cannot hold a 1 litre bottle. Fabric smells strongly of chemicals when new.",
+    "date": "2026-06-25"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 5,
+    "text": "Shoulder straps are comfortable even with a heavy load.",
+    "date": "2026-07-12"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 4,
+    "text": "Shoulder straps are comfortable even with a heavy load. Survived heavy Seattle rain, everything inside stayed dry.",
+    "date": "2026-07-12"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 4,
+    "text": "Lots of compartments, everything has a place. Trolley strap makes airport travel easy. Only issue: stitching on the handle came loose quickly.",
+    "date": "2026-08-28"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 3,
+    "text": "Decent quality. Water bottle side pocket is a bit tight. Okay for the price, zips could be smoother.",
+    "date": "2026-07-29"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 1,
+    "text": "Fabric smells strongly of chemicals when new. Side pocket cannot hold a 1 litre bottle.",
+    "date": "2026-05-19"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 4,
+    "text": "Looks professional, perfect for office and college. Only issue: stitching on the handle came loose quickly.",
+    "date": "2026-08-26"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 5,
+    "text": "Anti-theft pocket is very useful in crowded buses.",
+    "date": "2026-09-05"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 3,
+    "text": "Okay for the price, zips could be smoother.",
+    "date": "2026-09-26"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 5,
+    "text": "Survived heavy Seattle rain, everything inside stayed dry. Laptop sleeve is well padded, my 15.6 inch laptop fits perfectly. Only issue: fabric smells strongly of chemicals when new.",
+    "date": "2026-10-13"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 5,
+    "text": "Lots of compartments, everything has a place. Looks professional, perfect for office and college.",
+    "date": "2026-10-13"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 4,
+    "text": "Trolley strap makes airport travel easy.",
+    "date": "2026-07-17"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 4,
+    "text": "Survived heavy Seattle rain, everything inside stayed dry.",
+    "date": "2026-07-15"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 5,
+    "text": "Laptop sleeve is well padded, my 15.6 inch laptop fits perfectly. Shoulder straps are comfortable even with a heavy load. Only issue: zipper broke within three months of daily use.",
+    "date": "2026-10-07"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 5,
+    "text": "Looks professional, perfect for office and college. Only issue: usb port cable came out from inside after a few weeks.",
+    "date": "2026-06-12"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 4,
+    "text": "Shoulder straps are comfortable even with a heavy load. USB port is handy for charging the phone on the go.",
+    "date": "2026-07-24"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 5,
+    "text": "USB port is handy for charging the phone on the go.",
+    "date": "2026-10-20"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 1,
+    "text": "Stitching on the handle came loose quickly. Fabric smells strongly of chemicals when new.",
+    "date": "2026-05-29"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 5,
+    "text": "Shoulder straps are comfortable even with a heavy load. Only issue: usb port cable came out from inside after a few weeks.",
+    "date": "2026-07-22"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 3,
+    "text": "Decent quality. Water bottle side pocket is a bit tight.",
+    "date": "2026-09-16"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 5,
+    "text": "Looks professional, perfect for office and college. Survived heavy Seattle rain, everything inside stayed dry. Only issue: stitching on the handle came loose quickly.",
+    "date": "2026-09-08"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 3,
+    "text": "Okay for the price, zips could be smoother. Good bag but slightly smaller than I expected for 30 litres.",
+    "date": "2026-10-16"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 4,
+    "text": "Anti-theft pocket is very useful in crowded buses. Only issue: stitching on the handle came loose quickly.",
+    "date": "2026-08-28"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 4,
+    "text": "Looks professional, perfect for office and college.",
+    "date": "2026-08-29"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 3,
+    "text": "Decent quality. Water bottle side pocket is a bit tight. Okay for the price, zips could be smoother.",
+    "date": "2026-10-25"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 4,
+    "text": "USB port is handy for charging the phone on the go. Survived heavy Seattle rain, everything inside stayed dry.",
+    "date": "2026-11-08"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 5,
+    "text": "Lots of compartments, everything has a place. USB port is handy for charging the phone on the go.",
+    "date": "2026-10-01"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 4,
+    "text": "Trolley strap makes airport travel easy.",
+    "date": "2026-07-26"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 4,
+    "text": "Trolley strap makes airport travel easy. Lots of compartments, everything has a place.",
+    "date": "2026-08-21"
+  },
+  {
+    "product_id": "backpack-01",
+    "rating": 5,
+    "text": "Laptop sleeve is well padded, my 15.6 inch laptop fits perfectly.",
+    "date": "2026-05-21"
+  }
+]

@@ -1,0 +1,29 @@
+{
+  "average_rating": 3.86,
+  "sentiment_breakdown": {
+    "positive": 75.0,
+    "neutral": 11.1,
+    "negative": 13.9
+  },
+  "top_praises": [
+    "Matte finish looks great and does not sweat",
+    "Tea stays hot till evening, great for long train journeys",
+    "Fits perfectly in my car cup holder",
+    "Sturdy build, survived multiple drops with just a small dent"
+  ],
+  "top_complaints": [
+    "Got a dent on delivery, packaging was poor",
+    "Paint started chipping near the base after a month",
+    "Lid is hard to open with wet hands",
+    "Mouth is too narrow to clean properly without a brush"
+  ],
+  "customer_phrases": [
+    "matte finish looks great and does",
+    "tea stays hot till evening",
+    "fits perfectly in my car cup",
+    "sturdy build",
+    "best purchase for office",
+    "completely leak-proof"
+  ],
+  "summary": "36 reviews average 3.86/5 with 75% positive and 14% negative. Customers keep coming back to: matte finish looks great and does not sweat. The most common complaint is: got a dent on delivery, packaging was poor, which the listing and campaign should address directly."
+}

@@ -1,0 +1,212 @@
+{% extends "admin/base.html" %}
+{% from "admin/_macros.html" import icon, pill, delta, empty with context %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Good {{ 'morning' if now().hour < 12 else 'afternoon' if now().hour < 17 else 'evening' }}, {{ user.first_name }}</h1>
+    <p>Here's how {{ settings.store_name }} is doing in the last {{ days }} days.</p>
+  </div>
+  <div class="actions">
+    <nav class="seg" aria-label="Period">
+      {% for d in (7, 30, 90) %}<a href="?days={{ d }}" class="{{ 'active' if d == days }}">{{ d }} days</a>{% endfor %}
+    </nav>
+    <a href="/admin/reports" class="btn btn-sm">{{ icon("reports", 16) }} Reports</a>
+  </div>
+</div>
+
+<section class="kpis" aria-label="Key numbers">
+  <div class="card kpi kpi-accent">
+    <p class="label">Revenue</p>
+    <div class="value">${{ kpis.revenue.value|usd }}</div>
+    <div class="foot">{{ delta(kpis.revenue.delta) }} vs previous {{ days }} days</div>
+  </div>
+  <div class="card kpi">
+    <p class="label">Orders</p>
+    <div class="value">{{ kpis.orders.value|usd }}</div>
+    <div class="foot">{{ delta(kpis.orders.delta) }} {{ kpis.cancelled.value }} cancelled/returned</div>
+  </div>
+  <div class="card kpi">
+    <p class="label">Avg. order value</p>
+    <div class="value">${{ kpis.aov.value|usd }}</div>
+    <div class="foot">{{ delta(kpis.aov.delta) }}</div>
+  </div>
+  <div class="card kpi">
+    <p class="label">Units sold</p>
+    <div class="value">{{ kpis.units.value|usd }}</div>
+    <div class="foot">{{ delta(kpis.units.delta) }}</div>
+  </div>
+  <div class="card kpi">
+    <p class="label">New customers</p>
+    <div class="value">{{ kpis.customers.value|usd }}</div>
+    <div class="foot">{{ delta(kpis.customers.delta) }}</div>
+  </div>
+</section>
+
+<div class="grid grid-main">
+  <section class="card">
+    <div class="card-head"><h2>Revenue &amp; orders</h2><span class="muted small">Daily, IST · excludes cancelled &amp; returned</span></div>
+    <div class="card-body"><div class="chart-box"><canvas id="revChart" aria-label="Revenue per day chart" role="img"></canvas></div></div>
+  </section>
+  <section class="card">
+    <div class="card-head"><h2>Orders by status</h2><a href="/admin/orders" class="small">View all</a></div>
+    <div class="card-body"><div class="chart-box sm"><canvas id="statusChart" aria-label="Orders by status chart" role="img"></canvas></div></div>
+  </section>
+</div>
+
+<div class="grid grid-main" style="margin-top:16px">
+  <section class="card">
+    <div class="card-head"><h2>Sales by category</h2></div>
+    <div class="card-body"><div class="chart-box sm"><canvas id="catChart" aria-label="Sales by category chart" role="img"></canvas></div></div>
+  </section>
+  <section class="card">
+    <div class="card-head"><h2>Payment methods</h2></div>
+    {% set ptotal = payments.values()|sum %}
+    <ul class="list-plain">
+      {% for m, n in payments|dictsort(by='value', reverse=true) %}
+      <li>
+        <span style="width:120px">{{ PAYMENT_METHODS.get(m, m) }}</span>
+        <div class="bar-track" style="flex:1"><div class="bar-fill" style="width:{{ (n * 100 / ptotal)|round(1) if ptotal else 0 }}%"></div></div>
+        <span class="strong nowrap">{{ (n * 100 / ptotal)|round|int if ptotal else 0 }}%</span>
+      </li>
+      {% else %}<li class="muted">No orders yet.</li>{% endfor %}
+    </ul>
+  </section>
+</div>
+
+<div class="grid grid-main" style="margin-top:16px">
+  <section class="card">
+    <div class="card-head"><h2>Recent orders</h2><a href="/admin/orders" class="small">All orders →</a></div>
+    <div class="table-wrap no-max">
+      <table class="table">
+        <thead><tr><th>Order</th><th>Customer</th><th>Placed</th><th class="num">Total</th><th>Status</th></tr></thead>
+        <tbody>
+        {% for o in recent %}
+          <tr>
+            <td><a href="/admin/orders/{{ o.number }}" class="strong mono">{{ o.number }}</a></td>
+            <td>{{ o.ship_name }}<div class="sub">{{ o.ship_city }}</div></td>
+            <td class="nowrap">{{ o.created_at|ago }}</td>
+            <td class="num">${{ o.total|usd }}</td>
+            <td>{{ pill(o.status) }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="card-stack">
+    <section class="card">
+      <div class="card-head"><h2>{{ icon("ai", 18) }} AI insights</h2><a href="/admin/ai" class="small">Open AI Crew →</a></div>
+      <div class="card-body">
+        {% if latest_run and latest_run.result %}
+          {% set ins = latest_run.result.review_insights %}
+          <p class="small muted">Latest crew run on <a href="/admin/ai/runs/{{ latest_run.id }}">{{ latest_run.product.name }}</a> · {{ latest_run.finished_at|ago }}</p>
+          <p>{{ ins.summary|truncate(220) }}</p>
+          <p class="small"><b>Price advice:</b> ${{ latest_run.result.pricing_report.recommended_price|round|int|usd }} ({{ latest_run.result.pricing_report.position|replace('_', ' ') }})</p>
+        {% else %}
+          <p>Four AI agents (running locally on <b>{{ ai.model }}</b>) can read every review, compare competitor prices, rewrite your listing and plan a launch campaign.</p>
+          <a href="/admin/ai" class="btn btn-ai btn-sm">{{ icon("ai", 16) }} Run the AI crew</a>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>{{ icon("alert", 18) }} Low stock</h2><a href="/admin/inventory?filter=low" class="small">Inventory →</a></div>
+      {% if low %}
+      <ul class="list-plain">
+        {% for p in low %}
+        <li>
+          <img src="{{ p.thumb }}" alt="" width="36" height="36" style="border-radius:6px;background:#f4f5f8">
+          <a href="/admin/products/{{ p.id }}" style="flex:1" class="small">{{ p.name|truncate(42) }}</a>
+          <span class="stock {{ 'stock-out' if p.stock <= 0 else 'stock-low' }}">{{ p.stock }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}<div class="card-body muted">Everything is well stocked.</div>{% endif %}
+    </section>
+  </div>
+</div>
+
+<div class="grid grid-2" style="margin-top:16px">
+  <section class="card">
+    <div class="card-head"><h2>Top products</h2><span class="muted small">by revenue</span></div>
+    <div class="table-wrap no-max">
+      <table class="table">
+        <thead><tr><th>Product</th><th class="num">Units</th><th class="num">Revenue</th></tr></thead>
+        <tbody>
+        {% for t in top %}
+          <tr>
+            <td>{% if t.product %}<a href="/admin/products/{{ t.product.id }}">{{ t.name|truncate(50) }}</a>{% else %}{{ t.name }}{% endif %}</td>
+            <td class="num">{{ t.units }}</td>
+            <td class="num">${{ t.revenue|usd }}</td>
+          </tr>
+        {% else %}<tr><td colspan="3" class="muted">No sales in this period.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  <section class="card">
+    <div class="card-head"><h2>Reviews needing attention</h2><a href="/admin/reviews?rating=1" class="small">All reviews →</a></div>
+    {% if bad_reviews %}
+    <ul class="list-plain">
+      {% for r in bad_reviews %}
+      <li style="align-items:flex-start">
+        <span class="stars-txt">{{ '★' * r.rating }}{{ '☆' * (5 - r.rating) }}</span>
+        <div style="flex:1">
+          <div class="small strong">{{ r.product.name|truncate(48) }}</div>
+          <div class="small muted">“{{ r.body|truncate(110) }}” · {{ r.author_name }}, {{ r.created_at|ago }}</div>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}{{ empty("No unhappy reviews", "Nothing rated 2★ or lower.") }}{% endif %}
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+(() => {
+  if (!window.Chart) return;
+  Chart.defaults.font.family = "'DM Sans', system-ui, sans-serif";
+  Chart.defaults.color = "#616b7d";
+  const series = {{ series|tojson }};
+  const usd = (v) => "$" + Number(v).toLocaleString("en-US");
+  const ctx = document.getElementById("revChart").getContext("2d");
+  const grad = ctx.createLinearGradient(0, 0, 0, 280);
+  grad.addColorStop(0, "rgba(255,159,28,.35)"); grad.addColorStop(1, "rgba(255,159,28,0)");
+  new Chart(ctx, {
+    data: { labels: series.labels, datasets: [
+      { type: "line", label: "Revenue", data: series.revenue, borderColor: "#f08a00", backgroundColor: grad, fill: true, tension: .35, pointRadius: 0, pointHoverRadius: 4, borderWidth: 2.5, yAxisID: "y" },
+      { type: "bar", label: "Orders", data: series.orders, backgroundColor: "rgba(20,33,61,.14)", borderRadius: 4, yAxisID: "y1" },
+    ] },
+    options: { maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
+      plugins: { legend: { position: "bottom", labels: { usePointStyle: true, boxWidth: 8 } },
+        tooltip: { callbacks: { label: (c) => c.dataset.label === "Revenue" ? " Revenue: " + usd(c.raw) : " Orders: " + c.raw } } },
+      scales: { x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } },
+        y: { grid: { color: "#eef0f4" }, ticks: { callback: (v) => v >= 1000 ? "$" + (v / 1000) + "K" : "$" + v } },
+        y1: { position: "right", grid: { display: false }, ticks: { precision: 0 } } } },
+  });
+
+  const labels = {{ ORDER_STATUS_LABELS|tojson }};
+  const st = {{ by_status|tojson }};
+  const colors = { placed: "#2563eb", confirmed: "#60a5fa", packed: "#6d3fd1", shipped: "#ff9f1c", out_for_delivery: "#f59e0b", delivered: "#0b8a4a", cancelled: "#cc2e3d", return_requested: "#eab308", returned: "#9b1d2a" };
+  const keys = Object.keys(st);
+  new Chart(document.getElementById("statusChart"), {
+    type: "doughnut",
+    data: { labels: keys.map((k) => labels[k] || k), datasets: [{ data: keys.map((k) => st[k]), backgroundColor: keys.map((k) => colors[k] || "#9ca3af"), borderWidth: 2, borderColor: "#fff" }] },
+    options: { maintainAspectRatio: false, cutout: "64%", plugins: { legend: { position: "right", labels: { usePointStyle: true, boxWidth: 8 } } } },
+  });
+
+  const cats = {{ by_category|tojson }};
+  new Chart(document.getElementById("catChart"), {
+    type: "bar",
+    data: { labels: cats.map((c) => c.name), datasets: [{ label: "Revenue", data: cats.map((c) => c.revenue), backgroundColor: "#14213d", borderRadius: 6, maxBarThickness: 26 }] },
+    options: { indexAxis: "y", maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => " " + usd(c.raw) } } },
+      scales: { x: { grid: { color: "#eef0f4" }, ticks: { callback: (v) => "$" + (v / 1000) + "K" } }, y: { grid: { display: false } } } },
+  });
+})();
+</script>
+{% endblock %}

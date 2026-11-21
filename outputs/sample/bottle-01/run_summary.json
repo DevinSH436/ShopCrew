@@ -1,0 +1,141 @@
+{
+  "product": {
+    "id": "bottle-01",
+    "name": "HydroSteel Insulated Water Bottle 1L",
+    "category": "Home & Kitchen / Drinkware",
+    "our_price": 12.0,
+    "current_description": "Steel water bottle that keeps drinks hot and cold.",
+    "features": [
+      "Double-wall vacuum insulation: 24 h cold, 12 h hot",
+      "Food-grade 18/8 stainless steel, BPA-free",
+      "Leak-proof screw lid with carry loop",
+      "1 litre capacity",
+      "Powder-coated, sweat-free exterior",
+      "Fits most car cup holders"
+    ]
+  },
+  "process": "sequential",
+  "model": "mock",
+  "duration_s": 0.22,
+  "cost": {
+    "model": "mock",
+    "prompt_tokens": 15345,
+    "completion_tokens": 1679,
+    "total_tokens": 17024,
+    "requests": 8,
+    "usd": 0.0
+  },
+  "notes": [],
+  "review_insights": {
+    "average_rating": 3.86,
+    "sentiment_breakdown": {
+      "positive": 75.0,
+      "neutral": 11.1,
+      "negative": 13.9
+    },
+    "top_praises": [
+      "Matte finish looks great and does not sweat",
+      "Tea stays hot till evening, great for long train journeys",
+      "Fits perfectly in my car cup holder",
+      "Sturdy build, survived multiple drops with just a small dent"
+    ],
+    "top_complaints": [
+      "Got a dent on delivery, packaging was poor",
+      "Paint started chipping near the base after a month",
+      "Lid is hard to open with wet hands",
+      "Mouth is too narrow to clean properly without a brush"
+    ],
+    "customer_phrases": [
+      "matte finish looks great and does",
+      "tea stays hot till evening",
+      "fits perfectly in my car cup",
+      "sturdy build",
+      "best purchase for office",
+      "completely leak-proof"
+    ],
+    "summary": "36 reviews average 3.86/5 with 75% positive and 14% negative. Customers keep coming back to: matte finish looks great and does not sweat. The most common complaint is: got a dent on delivery, packaging was poor, which the listing and campaign should address directly."
+  },
+  "pricing_report": {
+    "our_price": 12.0,
+    "competitor_min": 12.99,
+    "competitor_max": 16.99,
+    "competitor_avg": 14.79,
+    "position": "cheapest",
+    "recommended_price": 12.0,
+    "reasoning": "We are the cheapest at $12, 19% under the $14.79 average and below the lowest competitor ($12.99). We can stay the cheapest option and compete on value instead of cutting further. HomeNest is out of stock."
+  },
+  "seo_copy": {
+    "title": "HydroSteel Insulated Water Bottle 1L | Double-wall vacuum insulation",
+    "meta_description": "HydroSteel Insulated Water Bottle 1L: double-wall vacuum insulation. Rated 3.86/5 by real buyers - \"matte finish looks great and does\". Shop now at $12.",
+    "bullet_points": [
+      "Double-wall vacuum insulation: 24 h cold, 12 h hot",
+      "Food-grade 18/8 stainless steel, BPA-free",
+      "Leak-proof screw lid with carry loop",
+      "1 litre capacity",
+      "Powder-coated, sweat-free exterior"
+    ],
+    "long_description": "Meet the HydroSteel Insulated Water Bottle 1L, the drinkware customers can't stop talking about. Buyers rate it 3.86 out of 5, and the reason comes up again and again: matte finish looks great and does not sweat. In their own words: \"matte finish looks great and does\". It offers double-wall vacuum insulation: 24 h cold, 12 h hot. It offers food-grade 18/8 stainless steel, BPA-free. It offers leak-proof screw lid with carry loop. It offers 1 litre capacity. It offers powder-coated, sweat-free exterior. It offers fits most car cup holders. Another shopper put it simply: \"tea stays hot till evening\". Whether you use it every day or only on the weekend, the HydroSteel Insulated Water Bottle 1L is built to keep up with real everyday routines, from long commutes to hot summers. At $12, it is priced to make the decision easy. Every order ships with a simple setup guide and our support team is one message away if you need help getting started. Add the HydroSteel Insulated Water Bottle 1L to your cart today and see why so many buyers recommend it to friends and family. Check the feature list above, compare it with what you pay elsewhere, and you will see why this is one of the most reviewed products in its category on our store. If it is not right for you, our hassle-free returns make trying it risk-free.",
+    "keywords": [
+      "hydrosteel insulated water bottle 1l",
+      "drinkware",
+      "best drinkware 2026",
+      "drinkware under $500",
+      "matte finish looks great and does",
+      "tea stays hot till evening",
+      "fits perfectly in my car cup"
+    ]
+  },
+  "campaign_plan": {
+    "target_audience": "Office-goers, travellers and fitness enthusiasts who carry water all day",
+    "positioning_statement": "For office-goers, travellers and fitness enthusiasts, the HydroSteel Insulated Water Bottle 1L is the drinkware that real buyers love because \"matte finish looks great and does\" - at the lowest price online.",
+    "key_message": "Matte finish looks great and does not sweat - at the lowest price online.",
+    "offer": "No discount needed: we are already the lowest price ($12 vs $12.99 elsewhere). Add value instead with free shipping and a free gift-wrap option during launch week.",
+    "instagram_caption": "\"matte finish looks great and does\" - that's what our customers say. Matte finish looks great and does not sweat. Rated 3.86/5. $12 with free shipping. Link in bio. #HydroSteel #LaunchWeek",
+    "google_ad": {
+      "headline": "HydroSteel - Lowest Price",
+      "description": "Matte finish looks great and does not sweat. Rated 3.86/5. Shop now."
+    },
+    "email": {
+      "subject": "Matte finish looks great and does - meet the HydroSteel Insulated Water Bottle",
+      "body": "Hi there,\n\nOur customers rate the HydroSteel Insulated Water Bottle 1L 3.86/5, and one line keeps coming up: \"matte finish looks great and does\".\n\n- Double-wall vacuum insulation: 24 h cold, 12 h hot\n- Food-grade 18/8 stainless steel, BPA-free\n- Leak-proof screw lid with carry loop\n\nNo discount needed: we are already the lowest price ($12 vs $12.99 elsewhere). Add value instead with free shipping and a free gift-wrap option during launch week.\n\nShop now and see for yourself.\n\nTeam ShopCrew"
+    },
+    "7_day_schedule": [
+      {
+        "day": 1,
+        "channel": "Instagram",
+        "action": "Launch reel built around \"matte finish looks great and does\""
+      },
+      {
+        "day": 2,
+        "channel": "Email",
+        "action": "Send launch email with the offer to subscribers"
+      },
+      {
+        "day": 3,
+        "channel": "Google Ads",
+        "action": "Start search ads on 'best drinkware 2026'"
+      },
+      {
+        "day": 4,
+        "channel": "Instagram Stories",
+        "action": "Share 3 real customer reviews as stories"
+      },
+      {
+        "day": 5,
+        "channel": "WhatsApp",
+        "action": "Broadcast the offer to past buyers"
+      },
+      {
+        "day": 6,
+        "channel": "YouTube Shorts",
+        "action": "Post an honest FAQ video on the top complaint"
+      },
+      {
+        "day": 7,
+        "channel": "Email + Instagram",
+        "action": "Last-chance reminder before the offer ends"
+      }
+    ],
+    "how_we_address_complaints": "\"Got a dent on delivery, packaging was poor\": we answer this upfront in the FAQ and the day-6 video, show how to avoid or fix it, and point buyers to our easy returns. \"Paint started chipping near the base after a month\": we answer this upfront in the FAQ and the day-6 video, show how to avoid or fix it, and point buyers to our easy returns."
+  }
+}

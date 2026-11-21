@@ -1,0 +1,63 @@
+{% extends "admin/base.html" %}
+{% from "admin/_macros.html" import pill, csrf, empty with context %}
+{% block title %}{{ customer.name }}{% endblock %}
+{% block content %}
+<div class="crumbs"><a href="/admin/customers">Customers</a> › {{ customer.name }}</div>
+<div class="page-head">
+  <div class="row" style="align-items:center">
+    <span class="avatar" style="width:52px;height:52px;font-size:1.3rem">{{ customer.name[:1] }}</span>
+    <div>
+      <h1 style="margin:0">{{ customer.name }} {% if customer.is_admin %}{{ pill('staff', 'Staff') }}{% endif %} {{ pill('active', 'Active') if customer.is_active else pill('blocked', 'Blocked') }}</h1>
+      <p>{{ customer.email }}{% if customer.phone %} · {{ customer.phone }}{% endif %} · customer since {{ customer.created_at|date('%b %Y') }}</p>
+    </div>
+  </div>
+  {% if customer.id != user.id %}
+  <div class="actions">
+    <form method="post" action="/admin/customers/{{ customer.id }}/toggle-admin" data-confirm="{{ 'Remove staff access for' if customer.is_admin else 'Give staff access to' }} {{ customer.name }}?">{{ csrf() }}<button class="btn">{{ 'Remove staff access' if customer.is_admin else 'Make staff' }}</button></form>
+    <form method="post" action="/admin/customers/{{ customer.id }}/toggle-active" data-confirm="{{ 'Block' if customer.is_active else 'Unblock' }} {{ customer.name }}?">{{ csrf() }}<button class="btn {{ 'btn-danger' if customer.is_active }}">{{ 'Block account' if customer.is_active else 'Unblock account' }}</button></form>
+  </div>
+  {% endif %}
+</div>
+
+<section class="kpis" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+  <div class="card kpi"><p class="label">Lifetime spend</p><div class="value">${{ spend|usd }}</div></div>
+  <div class="card kpi"><p class="label">Orders</p><div class="value">{{ order_count }}</div></div>
+  <div class="card kpi"><p class="label">Avg. order</p><div class="value">${{ aov|usd }}</div></div>
+</section>
+
+<div class="grid grid-main-r">
+  <section class="card">
+    <div class="card-head"><h2>Orders</h2></div>
+    {% if orders %}
+    <div class="table-wrap no-max">
+      <table class="table">
+        <thead><tr><th>Order</th><th>Date</th><th class="num">Items</th><th class="num">Total</th><th>Status</th></tr></thead>
+        <tbody>
+        {% for o in orders %}
+          <tr><td><a class="mono strong" href="/admin/orders/{{ o.number }}">{{ o.number }}</a></td><td class="nowrap">{{ o.created_at|date }}</td><td class="num">{{ o.item_count }}</td><td class="num">${{ o.total|usd }}</td><td>{{ pill(o.status) }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}{{ empty("No orders yet") }}{% endif %}
+  </section>
+  <div class="card-stack">
+    <section class="card">
+      <div class="card-head"><h2>Addresses</h2></div>
+      <div class="card-body">
+        {% for a in addresses %}
+          <p class="small"><b>{{ a.full_name }}</b> {% if a.is_default %}{{ pill('ok', 'Default') }}{% endif %} <span class="muted">({{ a.kind }})</span><br>{{ a.one_line() }}<br>📞 {{ a.phone }}</p>
+        {% else %}<p class="muted">No saved addresses.</p>{% endfor %}
+      </div>
+    </section>
+    <section class="card">
+      <div class="card-head"><h2>Reviews</h2></div>
+      <div class="card-body">
+        {% for r in reviews %}
+          <p class="small"><span class="stars-txt">{{ '★' * r.rating }}</span> on <a href="/admin/products/{{ r.product.id }}">{{ r.product.name|truncate(40) }}</a><br><span class="muted">“{{ r.body|truncate(100) }}”</span></p>
+        {% else %}<p class="muted">No reviews written.</p>{% endfor %}
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Sign in · {{ settings.store_name }}{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <section class="panel auth-card">
+    <h1>Sign in</h1>
+    {% if error %}<div class="alert alert-error" role="alert">{{ error }}</div>{% endif %}
+    <form method="post" action="/login" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="next" value="{{ next }}">
+      <label class="field"><span>Email</span><input type="email" name="email" autocomplete="email" required autofocus value="{{ email }}"></label>
+      <label class="field"><span class="row-between">Password <a href="/pages/help" class="small">Forgot password?</a></span>
+        <span class="pw-wrap"><input type="password" name="password" autocomplete="current-password" required data-pw><button type="button" class="pw-toggle" data-pw-toggle aria-label="Show password">Show</button></span>
+      </label>
+      <button class="btn btn-primary btn-block btn-lg" type="submit">Sign in</button>
+    </form>
+    <p class="small muted legal">By continuing, you agree to {{ settings.store_name }}'s <a href="/pages/terms">Terms of Use</a> and <a href="/pages/privacy">Privacy Policy</a>.</p>
+    <div class="demo-box">
+      <strong>Demo store sign-in</strong>
+      <p class="small">Customer: <code>{{ demo.email }}</code> / <code>{{ demo.password }}</code></p>
+      <button type="button" class="btn btn-secondary btn-sm" data-demo-fill data-email="{{ demo.email }}" data-password="{{ demo.password }}">Fill demo customer</button>
+      <p class="small muted">Store admins: use the ADMIN_EMAIL / ADMIN_PASSWORD from your .env file.</p>
+    </div>
+  </section>
+  <div class="auth-divider"><span>New to {{ settings.store_name }}?</span></div>
+  <a href="/register{% if next and next != '/' %}?next={{ next|urlencode }}{% endif %}" class="btn btn-secondary btn-block auth-alt">Create your {{ settings.store_name }} account</a>
+</div>
+{% endblock %}

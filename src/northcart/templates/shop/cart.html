@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import product_card, product_row, mini_card with context %}
+{% block title %}Shopping Cart · {{ settings.store_name }}{% endblock %}
+{% block content %}
+<div class="cart-layout">
+  <section class="panel cart-main">
+    {% if summary.lines %}
+    <div class="row-between cart-head">
+      <h1>Shopping Cart</h1>
+      <span class="muted small hide-xs">Price</span>
+    </div>
+    {% if summary.has_unavailable %}<div class="alert alert-warn">Some items have less stock than the quantity in your cart. Please update them before checkout.</div>{% endif %}
+    <ul class="cart-lines">
+      {% for line in summary.lines %}{% set p = line.product %}
+      <li class="cart-line">
+        <a href="/p/{{ p.slug }}" class="cart-img"><img src="{{ p.thumb }}" alt="" width="140" height="140"></a>
+        <div class="cart-info">
+          <a href="/p/{{ p.slug }}" class="cart-name">{{ p.name }}</a>
+          {% if not p.in_stock %}<p class="stock-out">Out of stock</p>
+          {% elif line.quantity > p.stock %}<p class="stock-low">Only {{ p.stock }} available</p>
+          {% elif p.is_low_stock %}<p class="stock-low">Only {{ p.stock }} left in stock</p>
+          {% else %}<p class="stock-in small">In stock</p>{% endif %}
+          {% if p.price >= settings.free_shipping_threshold %}<p class="small muted">Eligible for FREE delivery</p>{% endif %}
+          <p class="small muted">Sold by {{ store.company_name }}</p>
+          <div class="cart-actions">
+            <form method="post" action="/cart/update" data-qty-form>
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <input type="hidden" name="line_id" value="{{ line.id }}">
+              <label class="qty-pill">Qty:
+                <select name="quantity">
+                  {% for n in range(1, [[p.stock, line.quantity]|max, 10]|min + 1) %}<option value="{{ n }}" {% if n == line.quantity %}selected{% endif %}>{{ n }}</option>{% endfor %}
+                </select>
+              </label>
+              <noscript><button class="btn btn-secondary btn-sm">Update</button></noscript>
+            </form>
+            <form method="post" action="/cart/remove"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="line_id" value="{{ line.id }}"><button class="link-btn">Delete</button></form>
+            <form method="post" action="/cart/save"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="line_id" value="{{ line.id }}"><button class="link-btn">Save for later</button></form>
+            <a href="/search?category={{ p.category.slug }}" class="small">See more like this</a>
+          </div>
+        </div>
+        <div class="cart-price">
+          {% if p.discount_pct %}<span class="deal-pct-sm">{{ p.discount_pct }}% off</span>{% endif %}
+          <strong>${{ (p.price * line.quantity)|usd }}</strong>
+          {% if p.mrp > p.price %}<s class="small muted">${{ (p.mrp * line.quantity)|usd }}</s>{% endif %}
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    <p class="cart-subtotal-line">Subtotal ({{ summary.item_count }} item{{ 's' if summary.item_count != 1 }}): <strong>${{ summary.subtotal|usd }}</strong></p>
+    {% else %}
+    <div class="empty-cart">
+      <svg viewBox="0 0 120 100" width="160" aria-hidden="true"><path d="M10 15h18l12 50h52l12-36H34" fill="none" stroke="#c9cfda" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="80" r="7" fill="#ff9f1c"/><circle cx="84" cy="80" r="7" fill="#ff9f1c"/></svg>
+      <div>
+        <h1>Your cart is empty</h1>
+        <p class="muted">Looks like you haven't added anything yet. Explore today's deals and best sellers.</p>
+        <div class="row">
+          <a href="/deals" class="btn btn-primary">Shop today's deals</a>
+          {% if not user %}<a href="/login?next=/cart" class="btn btn-secondary">Sign in to see your cart</a>{% endif %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </section>
+
+  {% if summary.lines %}
+  <aside class="cart-side">
+    <div class="panel">
+      {% set threshold = settings.free_shipping_threshold %}
+      {% if summary.free_shipping_gap %}
+        <p class="ship-progress-text">Add <strong>${{ summary.free_shipping_gap|usd }}</strong> more for <strong>FREE delivery</strong></p>
+        <div class="ship-progress" role="progressbar" aria-valuemin="0" aria-valuemax="{{ threshold }}" aria-valuenow="{{ threshold - summary.free_shipping_gap }}"><span style="width: {{ ((threshold - summary.free_shipping_gap) / threshold * 100)|round(1) }}%"></span></div>
+      {% else %}
+        <p class="ship-ok">✓ Your order qualifies for <strong>FREE delivery</strong>.</p>
+      {% endif %}
+      <dl class="summary-list">
+        <dt>Price ({{ summary.item_count }} item{{ 's' if summary.item_count != 1 }})</dt><dd>${{ summary.mrp_total|usd }}</dd>
+        {% if summary.mrp_total > summary.subtotal %}<dt>Discount</dt><dd class="text-green">− ${{ (summary.mrp_total - summary.subtotal)|usd }}</dd>{% endif %}
+        {% if summary.coupon %}<dt>Coupon ({{ summary.coupon.code }})</dt><dd class="text-green">− ${{ summary.coupon_discount|usd }}</dd>{% endif %}
+        <dt>Delivery</dt><dd>{% if summary.shipping_fee %}${{ summary.shipping_fee }}{% else %}<span class="text-green">FREE</span>{% endif %}</dd>
+        <dt class="total">Total</dt><dd class="total">${{ summary.total|usd }}</dd>
+      </dl>
+      {% if summary.savings > 0 %}<p class="savings">You save ${{ summary.savings|usd }} on this order</p>{% endif %}
+      <a href="/checkout" class="btn btn-primary btn-block btn-lg {{ 'disabled' if summary.has_unavailable }}" {% if summary.has_unavailable %}aria-disabled="true"{% endif %}>Proceed to Buy ({{ summary.item_count }} item{{ 's' if summary.item_count != 1 }})</a>
+      <p class="small muted secure-note">🔒 Safe and secure payments. 100% authentic products.</p>
+    </div>
+    <div class="panel coupon-box">
+      <h2 class="h-sm">Apply coupon</h2>
+      {% if summary.coupon %}
+        <div class="coupon-applied"><span><strong>{{ summary.coupon.code }}</strong> applied<br><span class="small muted">{{ summary.coupon.description }}</span></span>
+          <form method="post" action="/cart/coupon"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="code" value=""><button class="link-btn">Remove</button></form></div>
+      {% else %}
+        {% if coupon_code and summary.coupon_error %}<p class="field-error">{{ summary.coupon_error }}</p>{% endif %}
+        <form method="post" action="/cart/coupon" class="coupon-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <label class="visually-hidden" for="coupon">Coupon code</label>
+          <input id="coupon" name="code" class="input" placeholder="Enter coupon code" value="{{ coupon_code }}" autocapitalize="characters">
+          <button class="btn btn-secondary" type="submit">Apply</button>
+        </form>
+        <p class="small muted">Try <button type="button" class="code-chip" data-fill-coupon="WELCOME10">WELCOME10</button> or <button type="button" class="code-chip" data-fill-coupon="FLAT10">FLAT10</button></p>
+      {% endif %}
+    </div>
+  </aside>
+  {% endif %}
+</div>
+
+{% if summary.saved %}
+<section class="panel saved-later">
+  <h2>Saved for later ({{ summary.saved|length }} item{{ 's' if summary.saved|length != 1 }})</h2>
+  <div class="saved-grid">
+    {% for line in summary.saved %}{% set p = line.product %}
+    <div class="saved-item">
+      <a href="/p/{{ p.slug }}"><img src="{{ p.thumb }}" alt="" width="160" height="160"></a>
+      <a href="/p/{{ p.slug }}" class="saved-name">{{ p.name }}</a>
+      <strong>${{ p.price|usd }}</strong>
+      {% if p.in_stock %}<span class="stock-in small">In stock</span>{% else %}<span class="stock-out">Out of stock</span>{% endif %}
+      <form method="post" action="/cart/save"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="line_id" value="{{ line.id }}"><button class="btn btn-secondary btn-sm btn-block" {% if not p.in_stock %}disabled{% endif %}>Move to cart</button></form>
+      <form method="post" action="/cart/remove"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="line_id" value="{{ line.id }}"><button class="link-btn small">Delete</button></form>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{{ product_row("Customers also bought", recs, csrf_token, "/search?sort=popular") }}
+{% endblock %}

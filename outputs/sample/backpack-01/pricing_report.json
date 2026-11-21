@@ -1,0 +1,9 @@
+{
+  "our_price": 26.0,
+  "competitor_min": 22.99,
+  "competitor_max": 26.99,
+  "competitor_avg": 24.59,
+  "position": "above_avg",
+  "recommended_price": 24.0,
+  "reasoning": "At $26 we are 6% above the $24.59 average. Moving to the average removes price as an objection, or the price can be held if a bundle adds clear value. ClickCart is out of stock."
+}

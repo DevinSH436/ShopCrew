@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import breadcrumb, status_pill %}
+{% block title %}Order {{ order.number }} · {{ settings.store_name }}{% endblock %}
+{% block content %}
+{{ breadcrumb([("Your account", "/account"), ("Your orders", "/account/orders"), ("Order " ~ order.number, None)]) }}
+<div class="row-between">
+  <div><h1>Order details</h1><p class="muted">Ordered on {{ order.created_at|datetime }} · Order # <strong>{{ order.number }}</strong></p></div>
+  <div class="row">
+    <a href="/account/orders/{{ order.number }}/invoice" class="btn btn-secondary btn-sm" target="_blank" rel="noopener">Download invoice</a>
+    <form method="post" action="/account/orders/{{ order.number }}/buy-again"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="btn btn-primary btn-sm">Buy again</button></form>
+  </div>
+</div>
+
+<section class="panel tracking">
+  <div class="row-between">
+    <h2>
+      {% if order.status == 'delivered' %}Delivered on {{ order.delivered_at|date('%A, %d %B') }}
+      {% elif order.status == 'cancelled' %}This order was cancelled
+      {% elif order.status == 'returned' %}Returned · refund initiated
+      {% elif order.status == 'return_requested' %}Return requested
+      {% else %}Arriving {{ order.expected_delivery|date('%A, %d %B') }}{% endif %}
+    </h2>
+    {{ status_pill(order.status, order.status_label) }}
+  </div>
+  <ol class="timeline {{ 'timeline-stopped' if order.status in ('cancelled', 'returned', 'return_requested') }}">
+    {% for s in steps %}
+    <li class="{{ 'done' if s.done }} {{ 'current' if s.current }} step-{{ s.status }}">
+      <span class="dot" aria-hidden="true"></span>
+      <span class="t-label">{{ s.label }}</span>
+      {% if s.at %}<span class="t-when">{{ s.at|datetime }}</span>{% endif %}
+      {% if s.note and s.done and s.note != s.label %}<span class="t-note">{{ s.note }}</span>{% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+  {% if order.tracking_number %}
+  <p class="shipment">Shipped with <strong>{{ order.courier }}</strong> · Tracking ID (AWB) <code>{{ order.tracking_number }}</code></p>
+  {% endif %}
+</section>
+
+<div class="order-detail-grid">
+  <section class="panel">
+    <h2 class="h-sm">Items in this order</h2>
+    <ul class="oc-items">
+      {% for i in order.items %}
+      <li>
+        {% if i.product %}<a href="/p/{{ i.product.slug }}"><img src="{{ i.product.thumb }}" alt="" width="90" height="90"></a>{% endif %}
+        <div>
+          {% if i.product %}<a href="/p/{{ i.product.slug }}" class="oc-name">{{ i.name }}</a>{% else %}<span class="oc-name">{{ i.name }}</span>{% endif %}
+          <p class="small muted">SKU {{ i.sku }} · Qty {{ i.quantity }}</p>
+          <p><strong>${{ i.line_total|usd }}</strong>{% if i.mrp > i.price %} <s class="small muted">${{ (i.mrp * i.quantity)|usd }}</s>{% endif %}</p>
+          {% if i.product and order.status == 'delivered' %}<a href="/p/{{ i.product.slug }}?write=1#reviews" class="btn btn-secondary btn-sm">Write a product review</a>{% endif %}
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  <div>
+    <section class="panel">
+      <h2 class="h-sm">Shipping address</h2>
+      <p><strong>{{ order.ship_name }}</strong><br>{{ order.ship_line1 }}{% if order.ship_line2 %}<br>{{ order.ship_line2 }}{% endif %}<br>{{ order.ship_city }}, {{ order.ship_state }} {{ order.ship_pincode }}<br>Phone: {{ order.ship_phone }}</p>
+    </section>
+    <section class="panel">
+      <h2 class="h-sm">Payment</h2>
+      <p>{{ order.payment_label }} {{ status_pill(order.payment_status, order.payment_status|title) }}</p>
+      {% if order.payment_ref %}<p class="small muted">Transaction ID {{ order.payment_ref }}</p>{% endif %}
+      <dl class="summary-list">
+        <dt>Items total (MRP)</dt><dd>${{ order.mrp_total|usd }}</dd>
+        {% if order.mrp_total > order.subtotal %}<dt>Product discount</dt><dd class="text-green">− ${{ (order.mrp_total - order.subtotal)|usd }}</dd>{% endif %}
+        {% if order.discount %}<dt>Coupon {{ order.coupon_code }}</dt><dd class="text-green">− ${{ order.discount|usd }}</dd>{% endif %}
+        <dt>Delivery</dt><dd>{% if order.shipping_fee %}${{ order.shipping_fee }}{% else %}FREE{% endif %}</dd>
+        {% if order.cod_fee %}<dt>COD fee</dt><dd>${{ order.cod_fee }}</dd>{% endif %}
+        <dt class="total">Grand total</dt><dd class="total">${{ order.total|usd }}</dd>
+      </dl>
+    </section>
+    {% if order.can_cancel %}
+    <section class="panel" id="cancel">
+      <h2 class="h-sm">Cancel this order</h2>
+      <form method="post" action="/account/orders/{{ order.number }}/cancel" data-confirm="Cancel order {{ order.number }}?">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label class="field"><span>Reason for cancellation</span>
+          <select name="reason">{% for r in cancel_reasons %}<option>{{ r }}</option>{% endfor %}</select></label>
+        <button class="btn btn-danger" type="submit">Cancel order</button>
+        {% if order.payment_status == 'paid' %}<p class="small muted">${{ order.total|usd }} will be refunded to your {{ order.payment_label }}.</p>{% endif %}
+      </form>
+    </section>
+    {% endif %}
+    {% if can_return %}
+    <section class="panel" id="return">
+      <h2 class="h-sm">Return items</h2>
+      <form method="post" action="/account/orders/{{ order.number }}/return" data-confirm="Request a return for this order?">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label class="field"><span>Why are you returning this?</span>
+          <select name="reason">{% for r in return_reasons %}<option>{{ r }}</option>{% endfor %}</select></label>
+        <button class="btn btn-secondary" type="submit">Request return</button>
+        <p class="small muted">Free pickup from your delivery address. Refund after quality check.</p>
+      </form>
+    </section>
+    {% endif %}
+    <section class="panel">
+      <h2 class="h-sm">Need help?</h2>
+      <p class="small">Call {{ store.support_phone }} or <a href="/pages/contact">contact us</a> with your order number.</p>
+    </section>
+  </div>
+</div>
+{% endblock %}

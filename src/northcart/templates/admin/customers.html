@@ -1,0 +1,44 @@
+{% extends "admin/base.html" %}
+{% from "admin/_macros.html" import pill, pager, empty with context %}
+{% block title %}Customers{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Customers</h1><p>{{ pg.total }} account{{ 's' if pg.total != 1 }}</p></div></div>
+<section class="card">
+  <nav class="tabs" aria-label="Customer type">
+    {% for key, label in [("", "All"), ("staff", "Staff"), ("blocked", "Blocked")] %}
+      <a href="{{ qs(type=key or None, page=None) }}" class="{{ 'active' if (filters.type or '') == key }}">{{ label }}</a>
+    {% endfor %}
+  </nav>
+  <form class="filters" method="get">
+    {% if filters.type %}<input type="hidden" name="type" value="{{ filters.type }}">{% endif %}
+    <label class="field grow"><span>Search</span><input class="input" type="search" name="q" value="{{ filters.q or '' }}" placeholder="Name, email or phone"></label>
+    <label class="field"><span>Sort</span>
+      <select class="input" name="sort">
+        {% for k, label in [("", "Newest"), ("spend", "Top spenders"), ("orders", "Most orders"), ("name", "Name A–Z")] %}<option value="{{ k }}" {{ 'selected' if (filters.sort or '') == k }}>{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+    <button class="btn btn-dark">Apply</button>
+  </form>
+  {% if rows %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Customer</th><th>Phone</th><th class="num">Orders</th><th class="num">Total spend</th><th>Last order</th><th>Joined</th><th>Status</th></tr></thead>
+      <tbody>
+      {% for u, orders, spend, last in rows %}
+        <tr>
+          <td><a href="/admin/customers/{{ u.id }}" class="strong">{{ u.name }}</a><div class="sub">{{ u.email }}</div></td>
+          <td class="nowrap">{{ u.phone or '–' }}</td>
+          <td class="num">{{ orders or 0 }}</td>
+          <td class="num">${{ (spend or 0)|usd }}</td>
+          <td class="nowrap">{{ last|ago if last else '–' }}</td>
+          <td class="nowrap">{{ u.created_at|date }}</td>
+          <td>{% if u.is_admin %}{{ pill('staff', 'Staff') }} {% endif %}{{ pill('active', 'Active') if u.is_active else pill('blocked', 'Blocked') }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {{ pager(pg, qs) }}
+  {% else %}{{ empty("No customers found", "Try another search.") }}{% endif %}
+</section>
+{% endblock %}

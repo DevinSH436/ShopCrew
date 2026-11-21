@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import breadcrumb %}
+{% macro fill(text) -%}
+{{ text|replace('{store}', settings.store_name)|replace('{company}', store.company_name)|replace('{address}', store.company_address)|replace('{phone}', store.support_phone)|replace('{email}', store.support_email)|replace('{gstin}', store.gstin)|replace('{free_ship}', settings.free_shipping_threshold|string)|replace('{ship_fee}', settings.shipping_fee|string)|replace('{cod_fee}', settings.cod_fee|string)|replace('{returns}', settings.return_window_days|string) }}
+{%- endmacro %}
+{% block title %}{{ fill(page.title) }} · {{ settings.store_name }}{% endblock %}
+{% block content %}
+{{ breadcrumb([("Home", "/"), (fill(page.title), None)]) }}
+<div class="info-layout">
+  <nav class="info-nav panel" aria-label="Help and policies">
+    <h2 class="h-sm">Help &amp; information</h2>
+    {% for key, pg in pages.items() %}<a href="/pages/{{ key }}" class="{{ 'active' if key == slug }}" {% if key == slug %}aria-current="page"{% endif %}>{{ fill(pg.title) }}</a>{% endfor %}
+  </nav>
+  <article class="panel info-body">
+    <h1>{{ fill(page.title) }}</h1>
+    <p class="lead">{{ fill(page.lead) }}</p>
+    {% if page.faq %}
+    <div class="faq">
+      {% for q, a in page.faq %}
+      <details {% if loop.first %}open{% endif %}><summary>{{ q }}</summary><p>{{ fill(a) }}</p></details>
+      {% endfor %}
+    </div>
+    <div class="help-cards">
+      <a href="/account/orders" class="help-card"><strong>Your orders</strong><span>Track, cancel or return</span></a>
+      <a href="/pages/returns" class="help-card"><strong>Returns &amp; refunds</strong><span>Policy and timelines</span></a>
+      <a href="/account/addresses" class="help-card"><strong>Manage addresses</strong><span>Add or edit</span></a>
+      <a href="/pages/contact" class="help-card"><strong>Contact us</strong><span>Call, email or write</span></a>
+    </div>
+    {% endif %}
+    {% for heading, paras in page.sections %}
+    <section class="info-section">
+      <h2>{{ heading }}</h2>
+      {% if paras|length > 2 %}<ul>{% for para in paras %}<li>{{ fill(para) }}</li>{% endfor %}</ul>
+      {% else %}{% for para in paras %}<p>{{ fill(para) }}</p>{% endfor %}{% endif %}
+    </section>
+    {% endfor %}
+    {% if page.contact %}
+    <section class="info-section">
+      <h2>Send us a message</h2>
+      <form method="post" action="/pages/contact" class="contact-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div class="grid-2">
+          <label class="field"><span>Your name</span><input name="name" required value="{{ user.name if user else '' }}"></label>
+          <label class="field"><span>Email</span><input name="email" type="email" required value="{{ user.email if user else '' }}"></label>
+        </div>
+        <label class="field"><span>Topic</span>
+          <select name="topic"><option>An order I placed</option><option>Returns &amp; refunds</option><option>Payments</option><option>My account</option><option>Something else</option></select>
+        </label>
+        <label class="field"><span>Order number (optional)</span><input name="order" placeholder="HT-2611-123456"></label>
+        <label class="field"><span>Message</span><textarea name="message" rows="5" minlength="10" required></textarea></label>
+        <button class="btn btn-primary" type="submit">Send message</button>
+      </form>
+    </section>
+    {% endif %}
+  </article>
+</div>
+{% endblock %}

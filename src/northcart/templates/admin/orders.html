@@ -1,0 +1,71 @@
+{% extends "admin/base.html" %}
+{% from "admin/_macros.html" import icon, pill, pager, empty, csrf with context %}
+{% block title %}Orders{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Orders</h1><p>{{ all_count|usd }} orders in total · {{ pending_count }} need action</p></div>
+  <div class="actions">
+    <a href="/admin/orders/export.csv{{ qs(page=None) if filters else '' }}" class="btn">{{ icon("download", 16) }} Export CSV</a>
+  </div>
+</div>
+
+<section class="card">
+  <nav class="tabs" aria-label="Order status">
+    <a href="{{ qs(status=None, page=None) }}" class="{{ 'active' if not filters.status }}">All<span class="count">{{ all_count }}</span></a>
+    {% for s in statuses %}
+      <a href="{{ qs(status=s, page=None) }}" class="{{ 'active' if filters.status == s }}">{{ ORDER_STATUS_LABELS[s] }}<span class="count">{{ counts.get(s, 0) }}</span></a>
+    {% endfor %}
+  </nav>
+  <form class="filters" method="get">
+    {% if filters.status %}<input type="hidden" name="status" value="{{ filters.status }}">{% endif %}
+    <label class="field grow"><span>Search</span><input class="input" type="search" name="q" value="{{ filters.q or '' }}" placeholder="Order number, name, phone or email"></label>
+    <label class="field"><span>Payment</span>
+      <select class="input" name="payment">
+        <option value="">Any</option>
+        {% for k, label in PAYMENT_METHODS.items() %}<option value="{{ k }}" {{ 'selected' if filters.payment == k }}>{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+    <label class="field"><span>From</span><input class="input" type="date" name="from" value="{{ filters.get('from', '') }}"></label>
+    <label class="field"><span>To</span><input class="input" type="date" name="to" value="{{ filters.get('to', '') }}"></label>
+    <button class="btn btn-dark" type="submit">Filter</button>
+    {% if filters %}<a href="/admin/orders" class="btn btn-ghost">Clear</a>{% endif %}
+  </form>
+
+  {% if orders %}
+  <form method="post" action="/admin/orders/bulk" data-bulk>
+    {{ csrf() }}
+    <input type="hidden" name="next" value="{{ request.url.path }}{{ qs() if filters else '' }}">
+    <div class="bulk-bar">
+      <strong><span data-bulk-count>0</span> selected</strong>
+      <button class="btn btn-sm" name="action" value="confirmed">Mark confirmed</button>
+      <button class="btn btn-sm" name="action" value="packed">Mark packed</button>
+    </div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr>
+          <th><input type="checkbox" data-check-all aria-label="Select all orders on this page"></th>
+          <th>Order</th><th>Date</th><th>Customer</th><th class="num">Items</th><th class="num">Total</th><th>Payment</th><th>Status</th>
+        </tr></thead>
+        <tbody>
+        {% for o in orders %}
+          <tr>
+            <td><input type="checkbox" name="numbers" value="{{ o.number }}" data-check aria-label="Select {{ o.number }}"></td>
+            <td><a href="/admin/orders/{{ o.number }}" class="strong mono">{{ o.number }}</a></td>
+            <td class="nowrap">{{ o.created_at|date }}<div class="sub">{{ o.created_at|date('%I:%M %p') }}</div></td>
+            <td>{{ o.ship_name }}<div class="sub">{{ o.ship_city }}, {{ o.ship_state }}</div></td>
+            <td class="num">{{ o.item_count }}</td>
+            <td class="num strong">${{ o.total|usd }}</td>
+            <td>{{ pill(o.payment_status, o.payment_status|capitalize) }}<div class="sub">{{ o.payment_label }}</div></td>
+            <td>{{ pill(o.status) }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </form>
+  {{ pager(pg, qs) }}
+  {% else %}
+    {{ empty("No orders match these filters", "Try a different status, date range or search.", "/admin/orders", "Clear filters") }}
+  {% endif %}
+</section>
+{% endblock %}

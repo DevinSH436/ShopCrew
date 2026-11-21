@@ -1,0 +1,142 @@
+{
+  "product": {
+    "id": "watch-01",
+    "name": "FitPulse Active Smartwatch",
+    "category": "Wearables / Smartwatch",
+    "our_price": 57.0,
+    "current_description": "Smartwatch with AMOLED display and health tracking.",
+    "features": [
+      "1.83\" AMOLED display, 600 nits peak brightness",
+      "Bluetooth calling with built-in mic and speaker",
+      "24x7 heart rate, SpO2 and sleep tracking",
+      "100+ sports modes",
+      "Up to 7 days battery life (2 days with heavy calling)",
+      "IP68 water and dust resistance",
+      "Customisable watch faces"
+    ]
+  },
+  "process": "sequential",
+  "model": "mock",
+  "duration_s": 0.21,
+  "cost": {
+    "model": "mock",
+    "prompt_tokens": 15489,
+    "completion_tokens": 1732,
+    "total_tokens": 17221,
+    "requests": 8,
+    "usd": 0.0
+  },
+  "notes": [],
+  "review_insights": {
+    "average_rating": 3.42,
+    "sentiment_breakdown": {
+      "positive": 50.0,
+      "neutral": 16.7,
+      "negative": 33.3
+    },
+    "top_praises": [
+      "Notifications come through instantly, very handy in meetings",
+      "Bluetooth calling works really well, I take calls while cooking",
+      "Sleep tracking is surprisingly detailed and accurate",
+      "Lots of watch faces to choose from, I change it every day"
+    ],
+    "top_complaints": [
+      "Battery drains fast if you use calling, barely 2 days",
+      "GPS is only connected GPS, need my phone for runs",
+      "SpO2 readings are inconsistent",
+      "Charger is proprietary and the magnet is weak"
+    ],
+    "customer_phrases": [
+      "notifications come through instantly",
+      "bluetooth calling works really well",
+      "sleep tracking is surprisingly detailed and",
+      "lots of watch faces to choose",
+      "looks premium",
+      "heart rate readings match my gym"
+    ],
+    "summary": "36 reviews average 3.42/5 with 50% positive and 33% negative. Customers keep coming back to: notifications come through instantly, very handy in meetings. The most common complaint is: battery drains fast if you use calling, barely 2 days, which the listing and campaign should address directly."
+  },
+  "pricing_report": {
+    "our_price": 57.0,
+    "competitor_min": 46.99,
+    "competitor_max": 53.99,
+    "competitor_avg": 50.99,
+    "position": "most_expensive",
+    "recommended_price": 52.0,
+    "reasoning": "At $57 we are the most expensive listing, 12% above the $50.99 average and above the highest competitor ($53.99). Moving between the average and the top of the market keeps a premium feel without losing price-sensitive shoppers. ClickCart is out of stock."
+  },
+  "seo_copy": {
+    "title": "FitPulse Active Smartwatch | 1.83\" AMOLED display",
+    "meta_description": "FitPulse Active Smartwatch: 1.83\" amoled display. Rated 3.42/5 by real buyers - \"notifications come through instantly\". Shop now at $57.",
+    "bullet_points": [
+      "1.83\" AMOLED display, 600 nits peak brightness",
+      "Bluetooth calling with built-in mic and speaker",
+      "24x7 heart rate, SpO2 and sleep tracking",
+      "100+ sports modes",
+      "Up to 7 days battery life (2 days with heavy calling)"
+    ],
+    "long_description": "Meet the FitPulse Active Smartwatch, the smartwatch customers can't stop talking about. Buyers rate it 3.42 out of 5, and the reason comes up again and again: notifications come through instantly, very handy in meetings. In their own words: \"notifications come through instantly\". It offers 1.83\" AMOLED display, 600 nits peak brightness. It offers bluetooth calling with built-in mic and speaker. It offers 24x7 heart rate, SpO2 and sleep tracking. It offers 100+ sports modes. It offers up to 7 days battery life (2 days with heavy calling). It offers iP68 water and dust resistance. It offers customisable watch faces. Another shopper put it simply: \"bluetooth calling works really well\". Whether you use it every day or only on the weekend, the FitPulse Active Smartwatch is built to keep up with real everyday routines, from long commutes to hot summers. At $57, it is priced to make the decision easy. Every order ships with a simple setup guide and our support team is one message away if you need help getting started. Add the FitPulse Active Smartwatch to your cart today and see why so many buyers recommend it to friends and family. Check the feature list above, compare it with what you pay elsewhere, and you will see why this is one of the most reviewed products in its category on our store. If it is not right for you, our hassle-free returns make trying it risk-free.",
+    "keywords": [
+      "fitpulse active smartwatch",
+      "smartwatch",
+      "best smartwatch 2026",
+      "smartwatch under $500",
+      "notifications come through instantly",
+      "bluetooth calling works really well",
+      "sleep tracking is surprisingly detailed and"
+    ]
+  },
+  "campaign_plan": {
+    "target_audience": "Health-conscious young professionals aged 22-40 who want fitness tracking and calls on the wrist",
+    "positioning_statement": "For health-conscious young professionals aged 22-40, the FitPulse Active Smartwatch is the smartwatch that real buyers love because \"notifications come through instantly\" - now at a limited-time launch price.",
+    "key_message": "Notifications come through instantly, very handy in meetings - now at a limited-time launch price.",
+    "offer": "Limited-time 72-hour launch price of $52 (down from $57) to close the gap with competitors, plus free shipping.",
+    "instagram_caption": "\"notifications come through instantly\" - that's what our customers say. Notifications come through instantly, very handy in meetings. Rated 3.42/5. $57 with free shipping. Link in bio. #FitPulse #LaunchWeek",
+    "google_ad": {
+      "headline": "FitPulse - Launch Deal",
+      "description": "Notifications come through instantly, very handy in meetings. Rated 3.42/5. Shop now."
+    },
+    "email": {
+      "subject": "Notifications come through instantly - meet the FitPulse Active Smartwatch",
+      "body": "Hi there,\n\nOur customers rate the FitPulse Active Smartwatch 3.42/5, and one line keeps coming up: \"notifications come through instantly\".\n\n- 1.83\" AMOLED display, 600 nits peak brightness\n- Bluetooth calling with built-in mic and speaker\n- 24x7 heart rate, SpO2 and sleep tracking\n\nLimited-time 72-hour launch price of $52 (down from $57) to close the gap with competitors, plus free shipping.\n\nShop now and see for yourself.\n\nTeam ShopCrew"
+    },
+    "7_day_schedule": [
+      {
+        "day": 1,
+        "channel": "Instagram",
+        "action": "Launch reel built around \"notifications come through instantly\""
+      },
+      {
+        "day": 2,
+        "channel": "Email",
+        "action": "Send launch email with the offer to subscribers"
+      },
+      {
+        "day": 3,
+        "channel": "Google Ads",
+        "action": "Start search ads on 'best smartwatch 2026'"
+      },
+      {
+        "day": 4,
+        "channel": "Instagram Stories",
+        "action": "Share 3 real customer reviews as stories"
+      },
+      {
+        "day": 5,
+        "channel": "WhatsApp",
+        "action": "Broadcast the offer to past buyers"
+      },
+      {
+        "day": 6,
+        "channel": "YouTube Shorts",
+        "action": "Post an honest FAQ video on the top complaint"
+      },
+      {
+        "day": 7,
+        "channel": "Email + Instagram",
+        "action": "Last-chance reminder before the offer ends"
+      }
+    ],
+    "how_we_address_complaints": "\"Battery drains fast if you use calling, barely 2 days\": we answer this upfront in the FAQ and the day-6 video, show how to avoid or fix it, and point buyers to our easy returns. \"GPS is only connected GPS, need my phone for runs\": we answer this upfront in the FAQ and the day-6 video, show how to avoid or fix it, and point buyers to our easy returns."
+  }
+}

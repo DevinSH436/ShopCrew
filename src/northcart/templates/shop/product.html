@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import product_card, product_row, breadcrumb, stars, price, mini_card with context %}
+{% block title %}{{ p.seo_title or p.name }} · {{ settings.store_name }}{% endblock %}
+{% block meta_description %}{{ p.seo_meta or p.short_description }}{% endblock %}
+{% block head %}
+<script type="application/ld+json">
+{{ {
+  "@context": "https://schema.org", "@type": "Product", "name": p.name, "sku": p.sku,
+  "brand": {"@type": "Brand", "name": p.brand}, "description": p.short_description,
+  "image": [request.base_url|string ~ p.thumb.lstrip('/')],
+  "aggregateRating": {"@type": "AggregateRating", "ratingValue": p.rating_avg, "reviewCount": p.rating_count} if p.rating_count else none,
+  "offers": {"@type": "Offer", "priceCurrency": "USD", "price": p.price,
+             "availability": "https://schema.org/InStock" if p.in_stock else "https://schema.org/OutOfStock"}
+}|tojson }}
+</script>
+{% endblock %}
+{% block content %}
+{{ breadcrumb([("Home", "/"), (p.category.name, "/c/" ~ p.category.slug), (p.brand, "/search?brand=" ~ (p.brand|urlencode)), (p.name[:40] ~ ('…' if p.name|length > 40 else ''), None)]) }}
+
+<div class="pdp">
+  <section class="pdp-gallery" aria-label="Product images" data-gallery>
+    <div class="thumbs" role="tablist">
+      {% for url in p.image_urls %}
+      <button type="button" class="thumb {{ 'active' if loop.first }}" data-thumb="{{ url }}" aria-label="Show image {{ loop.index }}"><img src="{{ url }}" alt="" width="64" height="64"></button>
+      {% endfor %}
+    </div>
+    <div class="main-image" data-zoom>
+      <img src="{{ p.thumb }}" alt="{{ p.name }}" width="600" height="600" data-main-image>
+      <button class="wish-btn wish-lg" type="button" data-wishlist="{{ p.id }}" aria-label="Save to wishlist">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.5-9.3C1.1 8.3 3.2 4.5 7 4.5c2.1 0 3.6 1.2 5 3 1.4-1.8 2.9-3 5-3 3.8 0 5.9 3.8 4.5 7.2C19.5 16.4 12 21 12 21z" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+      </button>
+      <span class="zoom-hint">Hover to zoom</span>
+    </div>
+  </section>
+
+  <section class="pdp-info">
+    <a href="/search?brand={{ p.brand|urlencode }}" class="pdp-brand">Visit the {{ p.brand }} Store</a>
+    <h1 class="pdp-title">{{ p.name }}</h1>
+    {% if p.rating_count %}
+    <div class="pdp-rating">
+      <span class="rating-num">{{ '%.1f'|format(p.rating_avg) }}</span>
+      <a href="#reviews">{{ stars(p.rating_avg) }}</a>
+      <a href="#reviews">{{ p.rating_count|usd }} rating{{ 's' if p.rating_count != 1 }}</a>
+    </div>
+    {% endif %}
+    {% if 'bestseller' in (p.tags or []) %}<span class="badge-inline">#1 Best Seller <span class="muted">in {{ p.category.name }}</span></span>{% endif %}
+    {% if sold_month >= 10 %}<p class="bought-month">{{ sold_month|compact }}+ bought in past month</p>{% endif %}
+    <hr>
+    {% if p.discount_pct >= 40 %}<span class="deal-flag">Limited time deal</span>{% endif %}
+    {{ price(p, "lg") }}
+    <p class="tax-note">Inclusive of all taxes</p>
+    {% if emi %}<p class="emi-line"><strong>No-cost EMI</strong> from ${{ emi|usd }}/month on 6 months. <a href="/pages/help">Details</a></p>{% endif %}
+
+    <div class="offers">
+      <h2 class="offers-title">Offers</h2>
+      <div class="offer-list">
+        <div class="offer"><strong>Coupon</strong><span>Extra 10% off up to $15 with <button type="button" class="code-chip" data-copy="WELCOME10" title="Copy code">WELCOME10</button></span></div>
+        <div class="offer"><strong>Bank offer</strong><span>5% instant discount on HDFC &amp; ICICI credit cards, min $30</span></div>
+        <div class="offer"><strong>UPI</strong><span>Flat $2 cashback on your first UPI payment</span></div>
+        {% if p.price >= 75 %}<div class="offer"><strong>Flat $10</strong><span>off with <button type="button" class="code-chip" data-copy="FLAT10">FLAT10</button> on orders above $75</span></div>{% endif %}
+      </div>
+    </div>
+
+    <ul class="service-icons">
+      <li><span aria-hidden="true">↩</span>{{ settings.return_window_days }} days replacement</li>
+      <li><span aria-hidden="true">🚚</span>Free delivery{% if p.price < settings.free_shipping_threshold %} over ${{ settings.free_shipping_threshold }}{% endif %}</li>
+      <li><span aria-hidden="true">$</span>Pay on delivery</li>
+      <li><span aria-hidden="true">✓</span>{{ (p.specs or {}).get('Warranty', '1 year') }} warranty</li>
+      <li><span aria-hidden="true">🔒</span>Secure transaction</li>
+    </ul>
+
+    {% if p.highlights %}
+    <h2 class="sub-h">About this item</h2>
+    <ul class="highlights">{% for h in p.highlights %}<li>{{ h }}</li>{% endfor %}</ul>
+    {% endif %}
+  </section>
+
+  <aside class="buy-box" aria-label="Buy">
+    {{ price(p, "md") }}
+    <p class="delivery-est" data-delivery
+       data-free="{{ 1 if p.price >= settings.free_shipping_threshold else 0 }}"
+       data-fee="{{ settings.shipping_fee }}">
+      {% if p.price >= settings.free_shipping_threshold %}<strong class="text-green">FREE delivery</strong>{% else %}${{ settings.shipping_fee }} delivery{% endif %}
+      <span data-delivery-date>in 2–6 days</span>.
+      <button type="button" class="link-btn" data-pincode-open>Check your PIN code</button>
+    </p>
+    <form class="pin-check" data-pin-check>
+      <label class="visually-hidden" for="pdp-pin">PIN code</label>
+      <input id="pdp-pin" name="pincode" inputmode="numeric" maxlength="6" placeholder="Enter PIN code" pattern="[1-9][0-9]{5}">
+      <button class="btn btn-secondary btn-sm" type="submit">Check</button>
+    </form>
+    <p class="small muted" data-pin-result></p>
+
+    {% if not p.in_stock %}
+      <p class="stock stock-out-lg">Currently unavailable.</p>
+      <p class="small muted">We don't know when or if this item will be back in stock.</p>
+    {% else %}
+      {% if p.is_low_stock %}<p class="stock stock-low-lg">Only {{ p.stock }} left in stock, order soon.</p>
+      {% else %}<p class="stock stock-in">In stock</p>{% endif %}
+      <form method="post" action="/cart/add" data-add-to-cart class="buy-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="product_id" value="{{ p.id }}">
+        <label class="qty-label">Quantity
+          <select name="quantity">{% for n in range(1, [p.stock, 10]|min + 1) %}<option value="{{ n }}">{{ n }}</option>{% endfor %}</select>
+        </label>
+        <button class="btn btn-cart btn-block btn-lg" type="submit">Add to cart</button>
+        <button class="btn btn-buy btn-block btn-lg" type="submit" name="buy_now" value="1">Buy now</button>
+      </form>
+    {% endif %}
+    <dl class="seller-info">
+      <dt>Ships from</dt><dd>{{ settings.store_name }}</dd>
+      <dt>Sold by</dt><dd>{{ store.company_name }}</dd>
+      <dt>Returns</dt><dd>Eligible for return within {{ settings.return_window_days }} days of delivery</dd>
+      <dt>Payment</dt><dd>Secure transaction</dd>
+    </dl>
+    <button type="button" class="btn btn-secondary btn-block btn-sm" data-wishlist="{{ p.id }}">♡ Add to wishlist</button>
+  </aside>
+</div>
+
+{% if together %}
+<section class="panel fbt">
+  <h2>Frequently bought together</h2>
+  <div class="fbt-row">
+    <div class="fbt-items">
+      {% for item in [p] + together %}
+        <a href="/p/{{ item.slug }}" class="fbt-item"><img src="{{ item.thumb }}" alt="{{ item.name }}" width="140" height="140"></a>
+        {% if not loop.last %}<span class="fbt-plus" aria-hidden="true">+</span>{% endif %}
+      {% endfor %}
+    </div>
+    <div class="fbt-total">
+      <p>Total price: <strong>${{ together_total|usd }}</strong></p>
+      <form method="post" action="/cart/add" data-fbt>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn btn-cart" type="submit" data-fbt-ids="{{ ([p] + together)|map(attribute='id')|join(',') }}">Add all {{ together|length + 1 }} to cart</button>
+      </form>
+    </div>
+  </div>
+  <ul class="fbt-list">
+    {% for item in [p] + together %}<li>{% if loop.first %}<strong>This item:</strong> {% endif %}<a href="/p/{{ item.slug }}">{{ item.name }}</a> <strong>${{ item.price|usd }}</strong></li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+<section class="panel pdp-details">
+  <div class="grid-2">
+    <div>
+      <h2>Product description</h2>
+      {% for para in (p.description or p.short_description).split('\n') if para.strip() %}<p>{{ para }}</p>{% endfor %}
+      {% if p.keywords %}<p class="small muted">Tags: {{ p.keywords|join(', ') }}</p>{% endif %}
+    </div>
+    <div>
+      <h2>Product information</h2>
+      <table class="spec-table">
+        <tbody>
+          <tr><th>Brand</th><td>{{ p.brand }}</td></tr>
+          {% for k, v in (p.specs or {}).items() %}<tr><th>{{ k }}</th><td>{{ v }}</td></tr>{% endfor %}
+          <tr><th>Item model number</th><td>{{ p.sku }}</td></tr>
+          <tr><th>Country of origin</th><td>India</td></tr>
+          <tr><th>Customer reviews</th><td>{% if p.rating_count %}{{ stars(p.rating_avg) }} {{ '%.1f'|format(p.rating_avg) }} out of 5 ({{ p.rating_count }}){% else %}No reviews yet{% endif %}</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+{{ product_row("Similar products you might like", related, csrf_token, "/c/" ~ p.category.slug, "More in " ~ p.category.name) }}
+
+<section class="panel reviews" id="reviews">
+  <div class="reviews-layout">
+    <div class="reviews-summary">
+      <h2>Customer reviews</h2>
+      {% if p.rating_count %}
+      <div class="avg-line">{{ stars(p.rating_avg, "lg") }} <strong>{{ '%.1f'|format(p.rating_avg) }} out of 5</strong></div>
+      <p class="muted small">{{ p.rating_count|usd }} global ratings</p>
+      <ul class="histogram">
+        {% for s, n in hist.items() %}
+        {% set pct = (n / hist_total * 100) if hist_total else 0 %}
+        <li><a href="?star={{ s }}#reviews" class="{{ 'active' if star == s }}" aria-label="{{ s }} star: {{ pct|round|int }}%">
+          <span>{{ s }} star</span><span class="bar"><span style="width: {{ pct|round(1) }}%"></span></span><span>{{ pct|round|int }}%</span></a></li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="muted">No reviews yet. Be the first to share your thoughts.</p>
+      {% endif %}
+      <hr>
+      <h3>Review this product</h3>
+      <p class="small muted">Share your thoughts with other customers</p>
+      {% if user %}
+        <button type="button" class="btn btn-secondary btn-block" data-review-open>{{ 'Edit your review' if my_review else 'Write a product review' }}</button>
+      {% else %}
+        <a href="/login?next=/p/{{ p.slug }}%23reviews" class="btn btn-secondary btn-block">Sign in to write a review</a>
+      {% endif %}
+    </div>
+
+    <div class="reviews-main">
+      {% if p.ai_summary %}
+      <div class="ai-box">
+        <div class="ai-head"><h3>Customers say</h3><span class="ai-label" title="Written by our AI Review Analyst from verified customer reviews">✦ AI-generated from customer reviews</span></div>
+        <p>{{ p.ai_summary }}</p>
+        <div class="ai-chips">
+          {% for t in p.ai_praises %}<span class="ai-chip good">✓ {{ t }}</span>{% endfor %}
+          {% for t in p.ai_complaints %}<span class="ai-chip bad">! {{ t }}</span>{% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if user %}
+      <form method="post" action="/reviews" class="review-form" data-review-form {% if not request.query_params.get('write') %}hidden{% endif %}>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="product_id" value="{{ p.id }}">
+        <h3>{{ 'Edit your review' if my_review else 'Create review' }}</h3>
+        <fieldset class="star-input">
+          <legend>Overall rating</legend>
+          {% for s in range(5, 0, -1) %}
+          <input type="radio" id="star{{ s }}" name="rating" value="{{ s }}" {% if my_review and my_review.rating == s %}checked{% endif %} required>
+          <label for="star{{ s }}" title="{{ s }} star{{ 's' if s > 1 }}">★</label>
+          {% endfor %}
+        </fieldset>
+        <label class="field"><span>Add a headline</span><input name="title" maxlength="120" value="{{ my_review.title if my_review else '' }}" placeholder="What's most important to know?"></label>
+        <label class="field"><span>Add a written review</span><textarea name="body" rows="4" minlength="10" required placeholder="What did you like or dislike? How did you use this product?">{{ my_review.body if my_review else '' }}</textarea></label>
+        <div class="row"><button class="btn btn-primary" type="submit">Submit</button><button class="btn btn-ghost" type="button" data-review-cancel>Cancel</button></div>
+      </form>
+      {% endif %}
+
+      <div class="reviews-toolbar">
+        <h3>{% if star %}{{ star }}-star reviews{% else %}Top reviews{% endif %} <span class="muted">({{ review_total }})</span></h3>
+        <form method="get" data-autosubmit action="#reviews">
+          {% if star %}<input type="hidden" name="star" value="{{ star }}">{% endif %}
+          <label class="visually-hidden" for="rsort">Sort reviews</label>
+          <select id="rsort" name="rsort"><option value="helpful" {{ 'selected' if rsort == 'helpful' }}>Most helpful</option><option value="newest" {{ 'selected' if rsort == 'newest' }}>Most recent</option></select>
+        </form>
+        {% if star %}<a href="?#reviews" class="small">Show all reviews</a>{% endif %}
+      </div>
+
+      {% for r in reviews %}
+      <article class="review">
+        <div class="review-author"><span class="avatar" aria-hidden="true">{{ r.author_name[:1] }}</span><strong>{{ r.author_name }}</strong></div>
+        <div class="review-head">{{ stars(r.rating) }} <strong>{{ r.title }}</strong></div>
+        <p class="review-meta">Reviewed in {{ r.author_city or 'India' }} on {{ r.created_at|date('%d %B %Y') }}{% if r.verified_purchase %} · <span class="verified">Verified Purchase</span>{% endif %}</p>
+        <p class="review-body">{{ r.body }}</p>
+        <div class="review-actions">
+          {% if r.helpful_count %}<span class="small muted" data-helpful-count="{{ r.id }}">{{ r.helpful_count }} {{ 'person' if r.helpful_count == 1 else 'people' }} found this helpful</span>{% else %}<span class="small muted" data-helpful-count="{{ r.id }}"></span>{% endif %}
+          <form method="post" action="/reviews/{{ r.id }}/helpful" data-helpful>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="btn btn-secondary btn-sm" type="submit">Helpful</button>
+          </form>
+        </div>
+      </article>
+      {% else %}
+      <p class="muted">No reviews match this filter.</p>
+      {% endfor %}
+
+      {% if rpages > 1 %}
+      <nav class="pagination" aria-label="Review pages">
+        {% set base = '?' ~ ('star=' ~ star ~ '&' if star else '') ~ 'rsort=' ~ rsort ~ '&rpage=' %}
+        {% if rpage > 1 %}<a href="{{ base }}{{ rpage - 1 }}#reviews">‹ Previous</a>{% endif %}
+        <span class="current">Page {{ rpage }} of {{ rpages }}</span>
+        {% if rpage < rpages %}<a href="{{ base }}{{ rpage + 1 }}#reviews">Next ›</a>{% endif %}
+      </nav>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% if recent %}
+<section class="panel">
+  <div class="shelf-head"><h2>Your recently viewed items</h2></div>
+  <div class="mini-row">{% for r in recent %}{{ mini_card(r) }}{% endfor %}</div>
+</section>
+{% endif %}
+{% endblock %}
+{% block scripts %}<script src="/static/js/product.js" defer></script>{% endblock %}

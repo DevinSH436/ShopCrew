@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}Checkout · {{ settings.store_name }}{% endblock %}
+{% block body_class %}checkout-page{% endblock %}
+{% block content %}
+<div class="checkout-head">
+  <h1>Checkout <span class="muted">({{ summary.item_count }} item{{ 's' if summary.item_count != 1 }})</span></h1>
+  <span class="secure-badge">🔒 Secure checkout</span>
+</div>
+
+<div class="checkout-layout">
+  <div class="checkout-steps">
+    <form method="post" action="/checkout/place" id="place-form" data-checkout novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+      <section class="panel step" id="address">
+        <h2><span class="step-num">1</span> Delivery address</h2>
+        {% if addresses %}
+        <div class="address-options">
+          {% for a in addresses %}
+          <label class="address-option">
+            <input type="radio" name="address_id" value="{{ a.id }}" {% if a.id == selected %}checked{% endif %} data-delivery-label="{{ estimates[a.id]|date('%A, %d %b') }}">
+            <span>
+              <strong>{{ a.full_name }}</strong> <span class="pill">{{ a.kind|title }}</span>{% if a.is_default %} <span class="pill pill-active">Default</span>{% endif %}<br>
+              {{ a.one_line() }}<br>
+              <span class="small muted">Phone: {{ a.phone }} · Delivery by <strong>{{ estimates[a.id]|date('%a, %d %b') }}</strong></span>
+            </span>
+          </label>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="muted">You don't have a saved address yet. Add one below to continue.</p>
+        {% endif %}
+        <details class="add-address" {% if not addresses %}open{% endif %}>
+          <summary>+ Add a new address</summary>
+          <p class="small muted">The new address will be saved to your account and selected for this order.</p>
+          {% set form_id = "new-address-form" %}
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}" form="new-address-form">
+          {% include "account/_address_fields.html" %}
+          <button class="btn btn-secondary" type="submit" form="new-address-form">Save and use this address</button>
+        </details>
+      </section>
+
+      <section class="panel step">
+        <h2><span class="step-num">2</span> Payment method</h2>
+        <div class="pay-options" role="radiogroup">
+          <div class="pay-option">
+            <label class="pay-head"><input type="radio" name="payment_method" value="upi" {% if payment == 'upi' %}checked{% endif %}> <span class="pay-title">UPI <span class="small muted">Google Pay, PhonePe, Paytm, BHIM</span></span></label>
+            <div class="pay-body">
+              <label class="field"><span>UPI ID</span><input name="upi_id" placeholder="yourname@okhdfcbank" autocomplete="off" data-validate="upi"></label>
+              <span class="small muted">You'll get a payment request on your UPI app (simulated in this demo).</span>
+            </div>
+          </div>
+          <div class="pay-option">
+            <label class="pay-head"><input type="radio" name="payment_method" value="card" {% if payment == 'card' %}checked{% endif %}> <span class="pay-title">Credit / Debit card <span class="card-brands">VISA · Mastercard · RuPay</span></span></label>
+            <div class="pay-body">
+              <label class="field"><span>Card number</span><input name="card_number" inputmode="numeric" autocomplete="cc-number" placeholder="4111 1111 1111 1111" maxlength="23" data-validate="card"></label>
+              <span class="card-row">
+                <label class="field"><span>Expiry (MM/YY)</span><input name="card_expiry" inputmode="numeric" autocomplete="cc-exp" placeholder="08/29" maxlength="5" data-validate="expiry"></label>
+                <label class="field"><span>CVV</span><input name="card_cvv" inputmode="numeric" autocomplete="cc-csc" placeholder="•••" maxlength="4" type="password"></label>
+              </span>
+              <label class="field"><span>Name on card</span><input name="card_name" autocomplete="cc-name" placeholder="As printed on the card"></label>
+              <span class="small muted">Demo store: use a test number like 4111 1111 1111 1111. Card details are checked and then discarded; nothing is stored.</span>
+            </div>
+          </div>
+          <div class="pay-option">
+            <label class="pay-head"><input type="radio" name="payment_method" value="netbanking" {% if payment == 'netbanking' %}checked{% endif %}> <span class="pay-title">Net banking</span></label>
+            <div class="pay-body">
+              <label class="field"><span>Choose your bank</span>
+                <select name="bank"><option value="">Select bank</option>{% for b in banks %}<option>{{ b }}</option>{% endfor %}</select>
+              </label>
+            </div>
+          </div>
+          <div class="pay-option">
+            <label class="pay-head"><input type="radio" name="payment_method" value="cod" {% if payment == 'cod' %}checked{% endif %}> <span class="pay-title">Cash on delivery <span class="small muted">+${{ settings.cod_fee }} handling fee</span></span></label>
+            <div class="pay-body"><span class="small muted">Pay by cash or UPI when your order arrives. Please keep exact change handy.</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel step">
+        <h2><span class="step-num">3</span> Review items and delivery</h2>
+        <p class="delivery-banner">Arriving <strong data-checkout-date>{% if selected and estimates.get(selected) %}{{ estimates[selected]|date('%A, %d %b') }}{% else %}in 2–6 days{% endif %}</strong> · {% if summary.shipping_fee %}${{ summary.shipping_fee }} delivery{% else %}FREE delivery{% endif %}</p>
+        <ul class="review-items">
+          {% for line in summary.lines %}{% set p = line.product %}
+          <li>
+            <img src="{{ p.thumb }}" alt="" width="72" height="72">
+            <span><a href="/p/{{ p.slug }}">{{ p.name }}</a><br><span class="small muted">Qty {{ line.quantity }} · Sold by {{ store.company_name }}</span></span>
+            <strong>${{ (p.price * line.quantity)|usd }}</strong>
+          </li>
+          {% endfor %}
+        </ul>
+        <a href="/cart" class="small">Change quantities in your cart</a>
+      </section>
+    </form>
+
+    <form method="post" action="/checkout/address" id="new-address-form" hidden></form>
+  </div>
+
+  <aside class="checkout-side">
+    <div class="panel sticky">
+      <button class="btn btn-primary btn-block btn-lg" type="submit" form="place-form" data-place-btn>Place your order</button>
+      <p class="small muted center">By placing your order you agree to {{ settings.store_name }}'s <a href="/pages/terms">terms</a> and <a href="/pages/privacy">privacy policy</a>.</p>
+      <hr>
+      <h2 class="h-sm">Order summary</h2>
+      <dl class="summary-list">
+        <dt>Items ({{ summary.item_count }})</dt><dd>${{ summary.mrp_total|usd }}</dd>
+        {% if summary.mrp_total > summary.subtotal %}<dt>Discount</dt><dd class="text-green">− ${{ (summary.mrp_total - summary.subtotal)|usd }}</dd>{% endif %}
+        {% if summary.coupon %}<dt>Coupon {{ summary.coupon.code }}</dt><dd class="text-green">− ${{ summary.coupon_discount|usd }}</dd>{% endif %}
+        <dt>Delivery</dt><dd>{% if summary.shipping_fee %}${{ summary.shipping_fee }}{% else %}<span class="text-green">FREE</span>{% endif %}</dd>
+        <dt data-cod-row {% if payment != 'cod' %}hidden{% endif %}>COD fee</dt><dd data-cod-row {% if payment != 'cod' %}hidden{% endif %}>${{ settings.cod_fee }}</dd>
+        <dt class="total">Order total</dt>
+        <dd class="total" data-total data-online="{{ summary.total - summary.cod_fee }}" data-cod="{{ cod_total }}">${{ summary.total|usd }}</dd>
+      </dl>
+      {% if summary.savings > 0 %}<p class="savings">You save ${{ summary.savings|usd }}</p>{% endif %}
+      <details class="coupon-details" {% if summary.coupon %}open{% endif %}>
+        <summary>{% if summary.coupon %}Coupon {{ summary.coupon.code }} applied{% else %}Have a coupon?{% endif %}</summary>
+        <form method="post" action="/cart/coupon" class="coupon-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <input type="hidden" name="next" value="/checkout">
+          <label class="visually-hidden" for="ck-coupon">Coupon code</label>
+          <input id="ck-coupon" name="code" class="input" value="{{ coupon_code }}" placeholder="Coupon code">
+          <button class="btn btn-secondary btn-sm">{{ 'Update' if summary.coupon else 'Apply' }}</button>
+        </form>
+      </details>
+    </div>
+  </aside>
+</div>
+
+<div class="processing" data-processing hidden>
+  <div class="processing-box" role="alertdialog" aria-live="assertive" aria-label="Processing payment">
+    <div class="spinner" aria-hidden="true"></div>
+    <h2>Processing your payment…</h2>
+    <p class="muted">Please don't close this window or press back.</p>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="/static/js/checkout.js" defer></script>{% endblock %}

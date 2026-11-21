@@ -1,0 +1,19 @@
+ShopCrew run for backpack-01 (UrbanTrek 30L Laptop Backpack)
+Process: sequential | Model: mock
+Duration: 0.3s
+Tokens: 17,149 (15,455 in / 1,694 out, 8 LLM calls) - estimated cost: $0.0000
+
+[22:44:58] Crew           run_started  UrbanTrek 30L Laptop Backpack | process=sequential | model=mock
+[22:44:58] Review Analyst started      task started
+[22:44:58] Review Analyst tool         Review Analyst used review_loader({"product_id": "backpack-01"})
+[22:44:58] Review Analyst completed    {"average_rating":4.0,"sentiment_breakdown":{"positive":75.0,"neutral":13.9,"negative":11.1},"top_praises":["Survived heavy Mumbai rain, everything inside st...
+[22:44:58] Price Tracker  started      task started
+[22:44:58] Price Tracker  tool         Price Tracker used competitor_prices({"product_id": "backpack-01"})
+[22:44:58] Price Tracker  completed    {"our_price":26.0,"competitor_min":22.99,"competitor_max":26.99,"competitor_avg":24.59,"position":"above_avg","recommended_price":24.0,"reasoning":"At $26 we...
+[22:44:58] SEO Writer     started      task started
+[22:44:58] SEO Writer     tool         SEO Writer used product_info({"product_id": "backpack-01"})
+[22:44:58] SEO Writer     completed    {"title":"UrbanTrek 30L Laptop Backpack | 30 L capacity","meta_description":"UrbanTrek 30L Laptop Backpack: 30 l capacity. Rated 4.0/5 by real buyers - \"sur...
+[22:44:58] Marketer       started      task started
+[22:44:58] Marketer       tool         Marketer used product_info({"product_id": "backpack-01"})
+[22:44:58] Marketer       completed    {"target_audience":"College students and young professionals who commute daily with a laptop","positioning_statement":"For college students and young profess...
+[22:44:58] Crew           run_finished Tokens: 17,149 (15,455 in / 1,694 out, 8 LLM calls) - estimated cost: $0.0000

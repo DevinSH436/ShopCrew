@@ -1,0 +1,142 @@
+{
+  "product": {
+    "id": "earbuds-01",
+    "name": "PulseBeat Pro Wireless Earbuds",
+    "category": "Audio / True Wireless Earbuds",
+    "our_price": 36.0,
+    "current_description": "Wireless earbuds with good sound and long battery. Bluetooth 5.3.",
+    "features": [
+      "Up to 40 hours total playtime with charging case (8 h per charge)",
+      "10-minute fast charge gives 2 hours of playback",
+      "Bluetooth 5.3 with one-tap pairing",
+      "Quad-mic ENC for clear calls",
+      "40 ms low-latency game mode",
+      "IPX5 sweat and splash resistance",
+      "Touch controls and voice assistant support"
+    ]
+  },
+  "process": "sequential",
+  "model": "mock",
+  "duration_s": 0.25,
+  "cost": {
+    "model": "mock",
+    "prompt_tokens": 15517,
+    "completion_tokens": 1702,
+    "total_tokens": 17219,
+    "requests": 8,
+    "usd": 0.0
+  },
+  "notes": [],
+  "review_insights": {
+    "average_rating": 3.86,
+    "sentiment_breakdown": {
+      "positive": 66.7,
+      "neutral": 16.7,
+      "negative": 16.6
+    },
+    "top_praises": [
+      "Battery life is insane, I charge the case maybe once a week",
+      "Pairing was instant, they connect as soon as I open the case",
+      "Fast charging is a lifesaver, 10 minutes and I am good for my commute",
+      "Best battery life I have had in budget earbuds, easily lasts my whole work day"
+    ],
+    "top_complaints": [
+      "Mic is bad in windy conditions",
+      "Fit is not great for small ears, they keep falling out while running",
+      "No active noise cancellation, so they are useless in the metro",
+      "Case hinge feels cheap and loose after two months"
+    ],
+    "customer_phrases": [
+      "battery life is insane",
+      "pairing was instant",
+      "fast charging is a lifesaver",
+      "best battery life i have had",
+      "very comfortable fit",
+      "value for money"
+    ],
+    "summary": "36 reviews average 3.86/5 with 67% positive and 17% negative. Customers keep coming back to: battery life is insane, i charge the case maybe once a week. The most common complaint is: mic is bad in windy conditions, which the listing and campaign should address directly."
+  },
+  "pricing_report": {
+    "our_price": 36.0,
+    "competitor_min": 34.99,
+    "competitor_max": 42.99,
+    "competitor_avg": 39.39,
+    "position": "below_avg",
+    "recommended_price": 37.0,
+    "reasoning": "At $36 we are 9% below the $39.39 market average. A small increase captures margin while still undercutting most listings (range $34.99-$42.99). GadgetHub is out of stock."
+  },
+  "seo_copy": {
+    "title": "PulseBeat Pro Wireless Earbuds | Up to 40 hours total playtime",
+    "meta_description": "PulseBeat Pro Wireless Earbuds: up to 40 hours total playtime. Rated 3.86/5 by real buyers - \"battery life is insane\". Shop now at $36.",
+    "bullet_points": [
+      "Up to 40 hours total playtime with charging case (8 h per charge)",
+      "10-minute fast charge gives 2 hours of playback",
+      "Bluetooth 5.3 with one-tap pairing",
+      "Quad-mic ENC for clear calls",
+      "40 ms low-latency game mode"
+    ],
+    "long_description": "Meet the PulseBeat Pro Wireless Earbuds, the true wireless earbuds customers can't stop talking about. Buyers rate it 3.86 out of 5, and the reason comes up again and again: battery life is insane, i charge the case maybe once a week. In their own words: \"battery life is insane\". It offers up to 40 hours total playtime with charging case (8 h per charge). It offers 10-minute fast charge gives 2 hours of playback. It offers bluetooth 5.3 with one-tap pairing. It offers quad-mic ENC for clear calls. It offers 40 ms low-latency game mode. It offers iPX5 sweat and splash resistance. It offers touch controls and voice assistant support. Another shopper put it simply: \"pairing was instant\". Whether you use it every day or only on the weekend, the PulseBeat Pro Wireless Earbuds is built to keep up with real everyday routines, from long commutes to hot summers. At $36, it is priced to make the decision easy. Every order ships with a simple setup guide and our support team is one message away if you need help getting started. Add the PulseBeat Pro Wireless Earbuds to your cart today and see why so many buyers recommend it to friends and family. Check the feature list above, compare it with what you pay elsewhere, and you will see why this is one of the most reviewed products in its category on our store.",
+    "keywords": [
+      "pulsebeat pro wireless earbuds",
+      "true wireless earbuds",
+      "best true wireless earbuds 2026",
+      "true wireless earbuds under $500",
+      "battery life is insane",
+      "pairing was instant",
+      "fast charging is a lifesaver"
+    ]
+  },
+  "campaign_plan": {
+    "target_audience": "Commuters, students and gym-goers aged 18-35 who want all-day wireless audio without paying flagship prices",
+    "positioning_statement": "For commuters, students and gym-goers aged 18-35, the PulseBeat Pro Wireless Earbuds is the true wireless earbuds that real buyers love because \"battery life is insane\" - at a better price than most stores.",
+    "key_message": "Battery life is insane, I charge the case maybe once a week - at a better price than most stores.",
+    "offer": "Launch week: extra 5% off with code LAUNCH5, on top of a price that is already below the $39.39 market average. Moves to $37 after launch.",
+    "instagram_caption": "\"battery life is insane\" - that's what our customers say. Battery life is insane, I charge the case maybe once a week. Rated 3.86/5. $36 with free shipping. Link in bio. #PulseBeat #LaunchWeek",
+    "google_ad": {
+      "headline": "PulseBeat - Better Price",
+      "description": "Battery life is insane, I charge the case maybe once a week. Rated 3.86/5. Shop now."
+    },
+    "email": {
+      "subject": "Battery life is insane - meet the PulseBeat Pro Wireless Earbuds",
+      "body": "Hi there,\n\nOur customers rate the PulseBeat Pro Wireless Earbuds 3.86/5, and one line keeps coming up: \"battery life is insane\".\n\n- Up to 40 hours total playtime with charging case (8 h per charge)\n- 10-minute fast charge gives 2 hours of playback\n- Bluetooth 5.3 with one-tap pairing\n\nLaunch week: extra 5% off with code LAUNCH5, on top of a price that is already below the $39.39 market average. Moves to $37 after launch.\n\nShop now and see for yourself.\n\nTeam ShopCrew"
+    },
+    "7_day_schedule": [
+      {
+        "day": 1,
+        "channel": "Instagram",
+        "action": "Launch reel built around \"battery life is insane\""
+      },
+      {
+        "day": 2,
+        "channel": "Email",
+        "action": "Send launch email with the offer to subscribers"
+      },
+      {
+        "day": 3,
+        "channel": "Google Ads",
+        "action": "Start search ads on 'best true wireless earbuds 2026'"
+      },
+      {
+        "day": 4,
+        "channel": "Instagram Stories",
+        "action": "Share 3 real customer reviews as stories"
+      },
+      {
+        "day": 5,
+        "channel": "WhatsApp",
+        "action": "Broadcast the offer to past buyers"
+      },
+      {
+        "day": 6,
+        "channel": "YouTube Shorts",
+        "action": "Post an honest FAQ video on the top complaint"
+      },
+      {
+        "day": 7,
+        "channel": "Email + Instagram",
+        "action": "Last-chance reminder before the offer ends"
+      }
+    ],
+    "how_we_address_complaints": "\"Mic is bad in windy conditions\": we answer this upfront in the FAQ and the day-6 video, show how to avoid or fix it, and point buyers to our easy returns. \"Fit is not great for small ears, they keep falling out while running\": we answer this upfront in the FAQ and the day-6 video, show how to avoid or fix it, and point buyers to our easy returns."
+  }
+}

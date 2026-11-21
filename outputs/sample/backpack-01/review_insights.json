@@ -1,0 +1,29 @@
+{
+  "average_rating": 4.0,
+  "sentiment_breakdown": {
+    "positive": 75.0,
+    "neutral": 13.9,
+    "negative": 11.1
+  },
+  "top_praises": [
+    "Survived heavy Mumbai rain, everything inside stayed dry",
+    "Trolley strap makes airport travel easy",
+    "Looks professional, perfect for office and college",
+    "Shoulder straps are comfortable even with a heavy load"
+  ],
+  "top_complaints": [
+    "Stitching on the handle came loose quickly",
+    "Fabric smells strongly of chemicals when new",
+    "Usb port cable came out from inside after a few weeks",
+    "Side pocket cannot hold a 1 litre bottle"
+  ],
+  "customer_phrases": [
+    "survived heavy mumbai rain",
+    "trolley strap makes airport travel easy",
+    "looks professional",
+    "shoulder straps are comfortable even with",
+    "lots of compartments",
+    "usb port is handy for charging"
+  ],
+  "summary": "36 reviews average 4.0/5 with 75% positive and 11% negative. Customers keep coming back to: survived heavy mumbai rain, everything inside stayed dry. The most common complaint is: stitching on the handle came loose quickly, which the listing and campaign should address directly."
+}

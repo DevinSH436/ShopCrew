@@ -1,0 +1,48 @@
+{% extends "admin/base.html" %}
+{% from "admin/_macros.html" import icon, empty with context %}
+{% block title %}Inventory{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Inventory</h1><p>Adjust stock in place. Changes save instantly.</p></div>
+</div>
+<section class="kpis" style="grid-template-columns:repeat(4,minmax(0,1fr))">
+  <div class="card kpi"><p class="label">Units on hand</p><div class="value">{{ units|usd }}</div></div>
+  <div class="card kpi"><p class="label">Stock value (cost)</p><div class="value">${{ stock_value|compact }}</div><div class="foot">Retail value ${{ retail_value|compact }}</div></div>
+  <div class="card kpi"><p class="label">Low stock</p><div class="value text-amber">{{ low_count }}</div></div>
+  <div class="card kpi"><p class="label">Out of stock</p><div class="value text-red">{{ out_count }}</div></div>
+</section>
+<section class="card">
+  <nav class="tabs" aria-label="Stock filter">
+    <a href="/admin/inventory" class="{{ 'active' if not filter }}">All</a>
+    <a href="?filter=low" class="{{ 'active' if filter == 'low' }}">Low stock<span class="count">{{ low_count }}</span></a>
+    <a href="?filter=out" class="{{ 'active' if filter == 'out' }}">Out of stock<span class="count">{{ out_count }}</span></a>
+  </nav>
+  {% if products %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th></th><th>Product</th><th class="num">On hand</th><th class="num">Alert at</th><th class="num">Cost value</th><th>Adjust</th></tr></thead>
+      <tbody>
+      {% for p in products %}
+        <tr>
+          <td><img class="thumb" src="{{ p.thumb }}" alt="" loading="lazy"></td>
+          <td><a href="/admin/products/{{ p.id }}" class="cell-title">{{ p.name }}</a><div class="sub mono">{{ p.sku }} · {{ p.category.name }}</div></td>
+          <td class="num"><span data-stock-value class="stock {{ 'stock-out' if p.stock <= 0 else 'stock-low' if p.is_low_stock else 'stock-ok' }}">{{ p.stock }}</span></td>
+          <td class="num">{{ p.low_stock_threshold }}</td>
+          <td class="num">${{ (p.stock * p.cost_price)|usd }}</td>
+          <td>
+            <div class="row" data-stock="/admin/inventory/{{ p.id }}/stock" style="flex-wrap:nowrap">
+              <button type="button" class="btn btn-sm" data-step="-1" aria-label="Remove one">−1</button>
+              <button type="button" class="btn btn-sm" data-step="1" aria-label="Add one">+1</button>
+              <button type="button" class="btn btn-sm" data-step="10" aria-label="Add ten">+10</button>
+              <input class="input" type="number" min="0" placeholder="Set" data-set style="width:80px;padding:5px 8px" aria-label="New stock for {{ p.name }}">
+              <button type="button" class="btn btn-sm btn-dark" data-set-btn>Set</button>
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}{{ empty("Nothing here", "No products match this filter. Nice!") }}{% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,193 @@
+{% extends "admin/base.html" %}
+{% from "admin/_macros.html" import icon, csrf, field_error with context %}
+{% block title %}{{ product.name if product else 'Add product' }}{% endblock %}
+{% macro f_class(key) %}field{{ ' has-error' if errors.get(key) }}{% endmacro %}
+{% block content %}
+<div class="crumbs"><a href="/admin/products">Products</a> › {{ product.name|truncate(60) if product else 'New' }}</div>
+<div class="page-head">
+  <div>
+    <h1>{{ 'Edit product' if product else 'Add a product' }}</h1>
+    {% if product %}<p>{{ product.sold_count }} sold · ★ {{ '%.1f'|format(product.rating_avg) }} from {{ product.rating_count }} reviews · updated {{ product.updated_at|ago }}</p>{% endif %}
+  </div>
+  <div class="actions">
+    {% if product %}
+      <a href="/p/{{ product.slug }}" target="_blank" class="btn">{{ icon("external", 16) }} View on store</a>
+      <a href="/admin/ai?product={{ product.id }}" class="btn btn-ai">{{ icon("ai", 16) }} Analyse with AI Crew</a>
+    {% endif %}
+  </div>
+</div>
+
+{% if errors %}<div class="alert alert-error" role="alert">Please fix the highlighted fields below.</div>{% endif %}
+
+<form method="post" action="{{ '/admin/products/' ~ product.id if product else '/admin/products/new' }}" enctype="multipart/form-data" data-product-form novalidate>
+  {{ csrf() }}
+  <div class="grid grid-main-r">
+    <div class="card-stack">
+      <section class="card">
+        <div class="card-head"><h2>Basics</h2></div>
+        <div class="card-body">
+          <label class="{{ f_class('name') }}"><span>Product name</span>
+            <input name="name" value="{{ v.name or '' }}" required maxlength="200" placeholder="e.g. PulseBeat Pro Wireless Earbuds with 40H Playtime">
+            {{ field_error(errors, 'name') }}</label>
+          <div class="fields-3">
+            <label class="{{ f_class('brand') }}"><span>Brand</span><input name="brand" value="{{ v.brand or '' }}" required maxlength="80">{{ field_error(errors, 'brand') }}</label>
+            <label class="{{ f_class('sku') }}"><span>SKU</span><input name="sku" value="{{ v.sku or '' }}" required maxlength="40" class="mono">{{ field_error(errors, 'sku') }}</label>
+            <label class="{{ f_class('category_id') }}"><span>Category</span>
+              <select name="category_id" required><option value="">Choose…</option>
+                {% for c in cats %}<option value="{{ c.id }}" {{ 'selected' if v.category_id == c.id }}>{{ c.name }}</option>{% endfor %}
+              </select>{{ field_error(errors, 'category_id') }}</label>
+          </div>
+          <label class="{{ f_class('slug') }}"><span>URL slug <small>northcart/p/<b>{{ v.slug or '…' }}</b></small></span>
+            <input name="slug" value="{{ v.slug or '' }}" maxlength="150" class="mono" placeholder="Generated from the name">{{ field_error(errors, 'slug') }}</label>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2>Description</h2></div>
+        <div class="card-body">
+          <div class="ai-bar">
+            <p>✨ <b>Write with AI.</b> Fill in the name, highlights and specs, then let <b>{{ ai.model }}</b> draft the descriptions and SEO fields. It only uses the facts you give it.</p>
+            <button type="button" class="btn btn-ai btn-sm" data-ai-describe data-model="{{ ai.model }}" {{ 'disabled title="' ~ (ai.detail or 'Model unavailable') ~ '"' if not ai.ok }}>{{ icon("ai", 16) }} Write with AI</button>
+          </div>
+          {% if not ai.ok %}<p class="alert alert-warn small">AI writer unavailable: {{ ai.detail }}</p>{% endif %}
+          <label class="field"><span>Short description <span class="counter" data-counter-for="f-short"></span></span>
+            <input id="f-short" name="short_description" value="{{ v.short_description or '' }}" maxlength="300" data-count="150" placeholder="One line shown on product cards"></label>
+          <label class="field"><span>Full description</span>
+            <textarea name="description" rows="6">{{ v.description or '' }}</textarea></label>
+          <label class="field"><span>Highlights <small>one per line, shown as bullet points</small></span>
+            <textarea name="highlights" rows="5" placeholder="40 hours total playtime&#10;IPX5 sweat resistant">{{ v.highlights or '' }}</textarea></label>
+          <label class="field"><span>Specifications <small>one per line as <code>Key: Value</code></small></span>
+            <textarea name="specs" rows="5" class="mono" placeholder="Bluetooth: 5.3&#10;Warranty: 1 year">{{ v.specs or '' }}</textarea></label>
+          <label class="field"><span>Tags <small>comma separated, e.g. bestseller, new</small></span><input name="tags" value="{{ v.tags or '' }}"></label>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2>Pricing &amp; stock</h2><span class="muted small">Prices include 18% GST</span></div>
+        <div class="card-body">
+          <div class="fields-3">
+            <label class="{{ f_class('price') }}"><span>Selling price ($)</span><input name="price" type="number" min="1" value="{{ v.price if v.price is not none else '' }}" required>{{ field_error(errors, 'price') }}</label>
+            <label class="{{ f_class('mrp') }}"><span>MRP ($)</span><input name="mrp" type="number" min="1" value="{{ v.mrp if v.mrp is not none else '' }}">{{ field_error(errors, 'mrp') }}</label>
+            <label class="field"><span>Cost price ($)</span><input name="cost_price" type="number" min="0" value="{{ v.cost_price if v.cost_price is not none else '' }}"></label>
+          </div>
+          <p class="margin-box" data-margin aria-live="polite"></p>
+          <div class="fields-2">
+            <label class="{{ f_class('stock') }}"><span>Stock on hand</span><input name="stock" type="number" min="0" value="{{ v.stock if v.stock is not none else 0 }}">{{ field_error(errors, 'stock') }}</label>
+            <label class="field"><span>Low-stock alert at</span><input name="low_stock_threshold" type="number" min="0" value="{{ v.low_stock_threshold if v.low_stock_threshold is not none else 10 }}"></label>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2>Search engine listing</h2></div>
+        <div class="card-body">
+          <label class="{{ f_class('seo_title') }}"><span>SEO title <span class="counter" data-counter-for="f-seo-title"></span></span>
+            <input id="f-seo-title" name="seo_title" value="{{ v.seo_title or '' }}" data-count="70" maxlength="90">{{ field_error(errors, 'seo_title') }}</label>
+          <label class="{{ f_class('seo_meta') }}"><span>Meta description <span class="counter" data-counter-for="f-seo-meta"></span></span>
+            <textarea id="f-seo-meta" name="seo_meta" rows="2" data-count="160" maxlength="200">{{ v.seo_meta or '' }}</textarea>{{ field_error(errors, 'seo_meta') }}</label>
+          <label class="field"><span>Keywords <small>comma separated</small></span><input name="keywords" value="{{ v.keywords or '' }}"></label>
+        </div>
+      </section>
+    </div>
+
+    <div class="card-stack">
+      <section class="card">
+        <div class="card-head"><h2>Visibility</h2></div>
+        <div class="card-body">
+          <p><label class="check"><input type="checkbox" name="is_active" {{ 'checked' if v.is_active }}> Live on the store</label></p>
+          <p style="margin:0"><label class="check"><input type="checkbox" name="is_featured" {{ 'checked' if v.is_featured }}> Featured on the home page</label></p>
+        </div>
+      </section>
+
+      <section class="card" id="images">
+        <div class="card-head"><h2>Images</h2></div>
+        <div class="card-body">
+          {% set has_photos = product and product.images %}
+          {% if has_photos %}
+            <div class="img-grid" style="margin-bottom:12px">
+              {% for img in product.images %}
+              <div class="img-tile">
+                <img src="/media/{{ img.path }}" alt="{{ img.alt }}">
+                <button type="submit" form="del-img-{{ img.id }}" aria-label="Delete image {{ loop.index }}">{{ icon("trash", 16) }}</button>
+              </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <img class="art-preview" data-art-preview src="{{ '/art/' ~ product.slug ~ '.svg' if product else '/admin/art-preview?kind=' ~ v.art_kind ~ '&color=' ~ (v.color|urlencode) }}" alt="Generated product artwork preview">
+            <p class="hint" style="margin:8px 0 12px">No photos yet, so the store shows generated artwork. Upload photos to replace it.</p>
+          {% endif %}
+          <label class="drop" data-drop>
+            <input type="file" name="images" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" multiple>
+            {{ icon("download", 22) }}<br><span data-drop-label data-default="Drop photos here or click to upload (PNG, JPG, WebP · max 5 MB)">Drop photos here or click to upload (PNG, JPG, WebP · max 5 MB)</span>
+          </label>
+          <div class="fields-2" style="margin-top:14px">
+            <label class="field"><span>Artwork style</span>
+              <select name="art_kind">{% for k in art_kinds %}<option value="{{ k }}" {{ 'selected' if v.art_kind == k }}>{{ k|capitalize }}</option>{% endfor %}</select></label>
+            <label class="field"><span>Colour</span><input type="color" name="color" value="{{ v.color or '#2563eb' }}" style="width:100%;height:38px;border:1px solid #d4d9e2;border-radius:8px;padding:2px"></label>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="sticky-actions">
+      <a href="/admin/products" class="btn">Cancel</a>
+      <button class="btn btn-primary btn-lg" type="submit">{{ 'Save changes' if product else 'Create product' }}</button>
+    </div>
+  </div>
+</form>
+
+{% if product %}
+<section class="card" id="competitors" style="margin-top:16px">
+  <div class="card-head"><h2>Competitor prices</h2><span class="muted small">Used by the AI Price Tracker</span></div>
+  <div class="table-wrap no-max">
+    <table class="table">
+      <thead><tr><th>Competitor</th><th class="num">Price ($)</th><th>In stock</th><th>Checked</th><th></th></tr></thead>
+      <tbody>
+        {% for c in product.competitor_prices|sort(attribute='price') %}
+        <tr>
+          <td><input class="input" form="comp-{{ c.id }}" name="competitor" value="{{ c.competitor }}" aria-label="Competitor name"></td>
+          <td class="num"><input class="input" form="comp-{{ c.id }}" name="price" type="number" min="1" value="{{ c.price }}" style="max-width:120px;text-align:right" aria-label="Price">
+            <div class="sub {{ 'text-green' if product.price < c.price else 'text-red' if product.price > c.price }}">{{ 'We are $' ~ (c.price - product.price)|abs|usd ~ (' cheaper' if product.price < c.price else ' dearer') if product.price != c.price else 'Same price' }}</div></td>
+          <td><label class="check"><input type="checkbox" form="comp-{{ c.id }}" name="in_stock" {{ 'checked' if c.in_stock }}> In stock</label></td>
+          <td class="nowrap small">{{ c.last_checked|ago }}</td>
+          <td class="nowrap right">
+            <button class="btn btn-sm" form="comp-{{ c.id }}">Save</button>
+            <button class="btn btn-sm btn-danger" form="comp-del-{{ c.id }}" aria-label="Delete {{ c.competitor }}">{{ icon("trash", 14) }}</button>
+          </td>
+        </tr>
+        {% endfor %}
+        <tr>
+          <td><input class="input" form="comp-new" name="competitor" placeholder="e.g. ShopMart" list="comp-names" aria-label="New competitor name">
+            <datalist id="comp-names"><option>MegaStore</option><option>ShopMart</option><option>TechBarn</option><option>GadgetHub</option><option>StyleLane</option><option>GlowBox</option><option>ClickCart</option><option>ValueMart</option></datalist></td>
+          <td class="num"><input class="input" form="comp-new" name="price" type="number" min="1" placeholder="$" style="max-width:120px;text-align:right" aria-label="New competitor price"></td>
+          <td><label class="check"><input type="checkbox" form="comp-new" name="in_stock" checked> In stock</label></td>
+          <td></td>
+          <td class="right"><button class="btn btn-sm btn-dark" form="comp-new">{{ icon("plus", 14) }} Add</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="card" style="margin-top:16px;border-color:#f2c4c9">
+  <div class="card-body row">
+    <div style="flex:1"><h3 style="margin:0">Delete this product</h3>
+      <p class="small muted" style="margin:0">{{ 'It appears in past orders, so it will be hidden from the store instead of deleted.' if has_orders else 'This permanently removes the product, its reviews and images.' }}</p></div>
+    <button class="btn btn-danger" form="del-product">{{ icon("trash", 16) }} {{ 'Hide product' if has_orders else 'Delete product' }}</button>
+  </div>
+</section>
+
+{# Standalone forms referenced by form="…" buttons above (forms can't be nested). #}
+<form id="del-product" method="post" action="/admin/products/{{ product.id }}/delete" data-confirm="{{ 'Hide' if has_orders else 'Permanently delete' }} “{{ product.name }}”?">{{ csrf() }}</form>
+<form id="comp-new" method="post" action="/admin/products/{{ product.id }}/competitors">{{ csrf() }}</form>
+{% for c in product.competitor_prices %}
+<form id="comp-{{ c.id }}" method="post" action="/admin/products/{{ product.id }}/competitors">{{ csrf() }}<input type="hidden" name="id" value="{{ c.id }}"></form>
+<form id="comp-del-{{ c.id }}" method="post" action="/admin/products/{{ product.id }}/competitors/{{ c.id }}/delete" data-confirm="Remove {{ c.competitor }}?">{{ csrf() }}</form>
+{% endfor %}
+{% for img in product.images %}
+<form id="del-img-{{ img.id }}" method="post" action="/admin/products/{{ product.id }}/images/{{ img.id }}/delete" data-confirm="Delete this image?">{{ csrf() }}</form>
+{% endfor %}
+{% endif %}
+{% endblock %}

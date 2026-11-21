@@ -1,0 +1,9 @@
+{
+  "our_price": 12.0,
+  "competitor_min": 12.99,
+  "competitor_max": 16.99,
+  "competitor_avg": 14.79,
+  "position": "cheapest",
+  "recommended_price": 12.0,
+  "reasoning": "We are the cheapest at $12, 19% under the $14.79 average and below the lowest competitor ($12.99). We can stay the cheapest option and compete on value instead of cutting further. HomeNest is out of stock."
+}

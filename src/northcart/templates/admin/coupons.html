@@ -1,0 +1,36 @@
+{% extends "admin/base.html" %}
+{% from "admin/_macros.html" import icon, pill, empty, csrf with context %}
+{% block title %}Coupons{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Coupons</h1><p>Discount codes customers enter at checkout.</p></div>
+  <div class="actions"><a href="/admin/coupons/new" class="btn btn-primary">{{ icon("plus", 16) }} New coupon</a></div>
+</div>
+<section class="card">
+  {% if coupons %}
+  <div class="table-wrap no-max">
+    <table class="table">
+      <thead><tr><th>Code</th><th>Discount</th><th>Conditions</th><th class="num">Used</th><th>Expires</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+      {% for c in coupons %}
+        {% set exp = aware(c.expires_at) %}
+        {% set expired = exp and exp < now %}
+        <tr>
+          <td><a href="/admin/coupons/{{ c.id }}" class="mono strong">{{ c.code }}</a><div class="sub">{{ c.description }}</div></td>
+          <td class="nowrap strong">{{ c.value ~ '% off' if c.kind == 'percent' else '$' ~ c.value|usd ~ ' off' }}</td>
+          <td class="small">{% if c.min_order %}Min order ${{ c.min_order|usd }}{% else %}No minimum{% endif %}{% if c.max_discount %}<br>Up to ${{ c.max_discount|usd }}{% endif %}</td>
+          <td class="num">{{ c.used_count }}{% if c.usage_limit %} / {{ c.usage_limit }}{% endif %}</td>
+          <td class="nowrap">{{ exp|date if exp else 'Never' }}</td>
+          <td>{% if not c.is_active %}{{ pill('inactive', 'Inactive') }}{% elif expired %}{{ pill('expired', 'Expired') }}{% elif c.usage_limit and c.used_count >= c.usage_limit %}{{ pill('expired', 'Used up') }}{% else %}{{ pill('active', 'Active') }}{% endif %}</td>
+          <td class="nowrap">
+            <a href="/admin/coupons/{{ c.id }}" class="btn btn-sm">Edit</a>
+            <form method="post" action="/admin/coupons/{{ c.id }}/delete" class="inline" data-confirm="Delete coupon {{ c.code }}?">{{ csrf() }}<button class="btn btn-sm btn-danger" aria-label="Delete {{ c.code }}">{{ icon("trash", 14) }}</button></form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}{{ empty("No coupons yet", "Create a code like WELCOME10 to reward first-time buyers.", "/admin/coupons/new", "New coupon") }}{% endif %}
+</section>
+{% endblock %}

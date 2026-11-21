@@ -1,0 +1,19 @@
+ShopCrew run for earbuds-01 (PulseBeat Pro Wireless Earbuds)
+Process: sequential | Model: mock
+Duration: 0.3s
+Tokens: 17,219 (15,517 in / 1,702 out, 8 LLM calls) - estimated cost: $0.0000
+
+[22:44:57] Crew           run_started  PulseBeat Pro Wireless Earbuds | process=sequential | model=mock
+[22:44:57] Review Analyst started      task started
+[22:44:58] Review Analyst tool         Review Analyst used review_loader({"product_id": "earbuds-01"})
+[22:44:58] Review Analyst completed    {"average_rating":3.86,"sentiment_breakdown":{"positive":66.7,"neutral":16.7,"negative":16.6},"top_praises":["Battery life is insane, I charge the case maybe...
+[22:44:58] Price Tracker  started      task started
+[22:44:58] Price Tracker  tool         Price Tracker used competitor_prices({"product_id": "earbuds-01"})
+[22:44:58] Price Tracker  completed    {"our_price":36.0,"competitor_min":34.99,"competitor_max":42.99,"competitor_avg":39.39,"position":"below_avg","recommended_price":37.0,"reasoning":"At $36 we...
+[22:44:58] SEO Writer     started      task started
+[22:44:58] SEO Writer     tool         SEO Writer used product_info({"product_id": "earbuds-01"})
+[22:44:58] SEO Writer     completed    {"title":"PulseBeat Pro Wireless Earbuds | Up to 40 hours total playtime","meta_description":"PulseBeat Pro Wireless Earbuds: up to 40 hours total playtime. ...
+[22:44:58] Marketer       started      task started
+[22:44:58] Marketer       tool         Marketer used product_info({"product_id": "earbuds-01"})
+[22:44:58] Marketer       completed    {"target_audience":"Commuters, students and gym-goers aged 18-35 who want all-day wireless audio without paying flagship prices","positioning_statement":"For...
+[22:44:58] Crew           run_finished Tokens: 17,219 (15,517 in / 1,702 out, 8 LLM calls) - estimated cost: $0.0000

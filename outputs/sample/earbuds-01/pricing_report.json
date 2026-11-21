@@ -1,0 +1,9 @@
+{
+  "our_price": 36.0,
+  "competitor_min": 34.99,
+  "competitor_max": 42.99,
+  "competitor_avg": 39.39,
+  "position": "below_avg",
+  "recommended_price": 37.0,
+  "reasoning": "At $36 we are 9% below the $39.39 market average. A small increase captures margin while still undercutting most listings (range $34.99-$42.99). GadgetHub is out of stock."
+}

@@ -1,0 +1,45 @@
+{% extends "admin/base.html" %}
+{% from "admin/_macros.html" import csrf, field_error with context %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Settings</h1><p>Store details shown to customers and printed on invoices.</p></div></div>
+<div class="grid grid-main-r">
+  <form class="card" method="post" action="/admin/settings">
+    {{ csrf() }}
+    <div class="card-head"><h2>Store details</h2></div>
+    <div class="card-body">
+      {% if errors %}<div class="alert alert-error">Please fix the highlighted fields.</div>{% endif %}
+      {% for key, label, hint in fields %}
+      <label class="field{{ ' has-error' if errors.get(key) }}"><span>{{ label }}{% if hint %} <small>{{ hint }}</small>{% endif %}</span>
+        {% if key in ('announcement', 'hero_subtitle', 'company_address') %}<textarea name="{{ key }}" rows="2" maxlength="300">{{ values[key] }}</textarea>
+        {% else %}<input name="{{ key }}" value="{{ values[key] }}" maxlength="300" {{ 'class=mono' if key == 'gstin' }}>{% endif %}
+        {{ field_error(errors, key) }}
+      </label>
+      {% endfor %}
+    </div>
+    <div class="sticky-actions"><button class="btn btn-primary">Save settings</button></div>
+  </form>
+  <div class="card-stack">
+    <section class="card">
+      <div class="card-head"><h2>Checkout rules</h2></div>
+      <div class="card-body">
+        <dl class="kv small">
+          <dt>Free shipping above</dt><dd>${{ settings.free_shipping_threshold|usd }}</dd>
+          <dt>Shipping fee</dt><dd>${{ settings.shipping_fee|usd }}</dd>
+          <dt>COD fee</dt><dd>${{ settings.cod_fee|usd }}</dd>
+          <dt>Return window</dt><dd>{{ settings.return_window_days }} days</dd>
+        </dl>
+        <p class="hint" style="margin:10px 0 0">Set in <code>.env</code> (<code>FREE_SHIPPING_THRESHOLD</code>, <code>SHIPPING_FEE</code>, <code>COD_FEE</code>, <code>RETURN_WINDOW_DAYS</code>).</p>
+      </div>
+    </section>
+    <section class="card">
+      <div class="card-head"><h2>AI model</h2><span class="pill {{ 'pill-ok' if ai.ok else 'pill-failed' }}">{{ 'Connected' if ai.ok else 'Offline' }}</span></div>
+      <div class="card-body">
+        <p class="mono" style="margin-bottom:6px">{{ model }}</p>
+        {% if ai.detail %}<p class="small muted">{{ ai.detail }}</p>{% endif %}
+        <p class="hint" style="margin:0">Change <code>MODEL</code> in <code>.env</code>, e.g. <code>ollama/qwen3.5:4b</code>, <code>anthropic/claude-sonnet-5-5</code> or <code>mock</code>.</p>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}

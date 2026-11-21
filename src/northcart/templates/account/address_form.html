@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import breadcrumb %}
+{% block title %}{{ 'Edit' if address else 'Add a new' }} address · {{ settings.store_name }}{% endblock %}
+{% block content %}
+{{ breadcrumb([("Your account", "/account"), ("Your addresses", "/account/addresses"), ("Edit address" if address else "New address", None)]) }}
+<div class="narrow">
+  <section class="panel">
+    <h1>{{ 'Edit your address' if address else 'Add a new address' }}</h1>
+    {% if errors %}<div class="alert alert-error" role="alert">Please check the highlighted fields.</div>{% endif %}
+    <form method="post" action="{{ '/account/addresses/' ~ address.id ~ '/edit' if address else '/account/addresses/new' }}" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+      {% include "account/_address_fields.html" %}
+      <div class="row">
+        <button class="btn btn-primary" type="submit">{{ 'Save changes' if address else 'Add address' }}</button>
+        <a href="{{ next or '/account/addresses' }}" class="btn btn-ghost">Cancel</a>
+      </div>
+    </form>
+  </section>
+</div>
+{% endblock %}

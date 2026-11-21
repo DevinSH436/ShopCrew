@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import product_card, product_row, cat_icon, mini_card, stars with context %}
+{% block main_class %}home{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="container hero-inner">
+    <div class="hero-copy">
+      <span class="hero-kicker">Festive sale · Ends soon</span>
+      <h1>{{ store.hero_title }}</h1>
+      <p>{{ store.hero_subtitle }}</p>
+      <div class="hero-cta">
+        <a href="/deals" class="btn btn-primary btn-lg">Shop today's deals</a>
+        <a href="/c/audio" class="btn btn-hero-ghost btn-lg">Explore audio</a>
+      </div>
+      <ul class="hero-points">
+        <li>✓ Free delivery above ${{ settings.free_shipping_threshold }}</li>
+        <li>✓ Cash on delivery</li>
+        <li>✓ {{ settings.return_window_days }}-day easy returns</li>
+      </ul>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      {% for p in featured[:3] %}
+      <a href="/p/{{ p.slug }}" class="hero-tile hero-tile-{{ loop.index }}" tabindex="-1">
+        <img src="{{ p.thumb }}" alt="">
+        <span>{% if p.discount_pct %}{{ p.discount_pct }}% off{% else %}${{ p.price|usd }}{% endif %}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<div class="container home-body">
+  <section class="cat-tiles" aria-label="Shop by category">
+    {% for c in categories %}
+    <a href="/c/{{ c.slug }}" class="cat-tile">
+      <span class="cat-tile-media">
+        {% set tp = cat_thumbs.get(c.id) %}
+        {% if tp %}<img src="{{ tp.thumb }}" alt="" loading="lazy">{% endif %}
+        <span class="cat-tile-icon">{{ cat_icon(c.icon, 20) }}</span>
+      </span>
+      <span class="cat-tile-name">{{ c.name }}</span>
+    </a>
+    {% endfor %}
+  </section>
+
+  <section class="trust-bar" aria-label="Why shop with us">
+    <div><strong>Free delivery</strong><span>on orders above ${{ settings.free_shipping_threshold }}</span></div>
+    <div><strong>{{ settings.return_window_days }}-day returns</strong><span>free pickup from your door</span></div>
+    <div><strong>Cash on delivery</strong><span>across 19,000+ PIN codes</span></div>
+    <div><strong>100% secure payments</strong><span>UPI, cards, net banking</span></div>
+  </section>
+
+  {% if deals %}
+  <section class="shelf deals-shelf">
+    <div class="shelf-head">
+      <h2>Today's Deals</h2>
+      <span class="countdown" data-countdown="{{ deal_ends }}">Ends in <b>--:--:--</b></span>
+      <a href="/deals">See all deals ›</a>
+    </div>
+    <div class="shelf-track" data-scroller>
+      {% for p in deals %}
+      <a href="/p/{{ p.slug }}" class="deal-card">
+        <span class="deal-media"><img src="{{ p.thumb }}" alt="" loading="lazy"></span>
+        <span class="deal-badges"><span class="deal-pct">{{ p.discount_pct }}% off</span><span class="deal-tag">Deal of the Day</span></span>
+        <span class="deal-price">${{ p.price|usd }} <s>${{ p.mrp|usd }}</s></span>
+        <span class="deal-name">{{ p.name }}</span>
+        <span class="deal-claimed" style="--claimed: {{ 30 + (p.sold_count * 7) % 60 }}%"><span></span></span>
+      </a>
+      {% endfor %}
+    </div>
+    <button class="shelf-nav prev" type="button" aria-label="Scroll left" data-scroll="-1">‹</button>
+    <button class="shelf-nav next" type="button" aria-label="Scroll right" data-scroll="1">›</button>
+  </section>
+  {% endif %}
+
+  {% if buy_again %}{{ product_row("Buy it again", buy_again, csrf_token, "/account/orders", "Your orders") }}{% endif %}
+
+  <section class="panel featured">
+    <div class="shelf-head"><h2>Featured for you</h2><a href="/search?sort=popular">Shop all ›</a></div>
+    <div class="product-grid">
+      {% for p in featured %}{{ product_card(p, csrf_token) }}{% endfor %}
+    </div>
+  </section>
+
+  {{ product_row("Best sellers", best, csrf_token, "/search?sort=popular") }}
+
+  <section class="promo-split">
+    <a href="/c/home-kitchen" class="promo promo-a">
+      <span class="promo-kicker">Home &amp; Kitchen</span>
+      <strong>Make your kitchen festive-ready</strong>
+      <span>Cast iron, ceramics and kettles from $11</span>
+    </a>
+    <a href="/c/sports-fitness" class="promo promo-b">
+      <span class="promo-kicker">Sports &amp; Fitness</span>
+      <strong>New year, new routine</strong>
+      <span>Yoga mats, dumbbells and shakers up to 50% off</span>
+    </a>
+    <a href="/register" class="promo promo-c">
+      <span class="promo-kicker">New here?</span>
+      <strong>10% off your first order</strong>
+      <span>Use code <b>WELCOME10</b> at checkout</span>
+    </a>
+  </section>
+
+  {{ product_row("Customers' favourites", top_rated, csrf_token, "/search?sort=rating", "Top rated") }}
+
+  <section class="brand-strip" aria-label="Brands">
+    <h2>Shop by brand</h2>
+    <div class="brand-list">
+      {% for name, n in brands %}<a href="/search?brand={{ name|urlencode }}" class="brand-chip"><strong>{{ name }}</strong><span>{{ n }} product{{ 's' if n != 1 }}</span></a>{% endfor %}
+    </div>
+  </section>
+
+  {% if recent %}
+  <section class="panel">
+    <div class="shelf-head"><h2>Your browsing history</h2></div>
+    <div class="mini-row">{% for p in recent %}{{ mini_card(p) }}{% endfor %}</div>
+  </section>
+  {% endif %}
+
+  {% if not user %}
+  <section class="signin-band">
+    <div><strong>See personalised recommendations</strong><span>Sign in to track orders, save your wishlist and buy again in one tap.</span></div>
+    <div class="row"><a href="/login" class="btn btn-primary">Sign in</a><a href="/register" class="btn btn-secondary">Create account</a></div>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

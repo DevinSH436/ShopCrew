@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tax invoice {{ invoice_no }} · {{ settings.store_name }}</title>
+<link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+<style>
+  :root { --ink: #14213d; --line: #d6dae2; --muted: #5d6676; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #eef0f4; color: #161b26; font: 13px/1.45 "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .sheet { max-width: 860px; margin: 24px auto; background: #fff; padding: 36px 40px; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
+  .toolbar { max-width: 860px; margin: 16px auto 0; display: flex; justify-content: space-between; gap: 10px; padding: 0 16px; }
+  .toolbar a, .toolbar button { font: inherit; padding: 8px 16px; border-radius: 999px; border: 1px solid var(--line); background: #fff; cursor: pointer; color: var(--ink); text-decoration: none; }
+  .toolbar button { background: #ff9f1c; border-color: #ff9f1c; font-weight: 700; }
+  header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid var(--ink); padding-bottom: 14px; gap: 20px; }
+  header .logo { color: var(--ink); }
+  h1 { font-size: 20px; margin: 0 0 4px; letter-spacing: .02em; }
+  .muted { color: var(--muted); }
+  .meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 18px 0; }
+  .meta h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 4px; }
+  .meta p { margin: 0; }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  th, td { border: 1px solid var(--line); padding: 7px 8px; text-align: right; vertical-align: top; }
+  th { background: #f4f6f9; font-size: 11px; text-transform: uppercase; letter-spacing: .03em; }
+  td:nth-child(2), th:nth-child(2) { text-align: left; }
+  tfoot td { font-weight: 700; }
+  .totals { margin-left: auto; width: 320px; margin-top: 14px; }
+  .totals div { display: flex; justify-content: space-between; padding: 4px 0; }
+  .totals .grand { border-top: 2px solid var(--ink); margin-top: 6px; padding-top: 8px; font-size: 15px; font-weight: 800; }
+  .sign { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 36px; }
+  .sign .box { text-align: right; }
+  .sign .line { border-top: 1px solid #999; width: 200px; margin-top: 40px; padding-top: 4px; }
+  footer { margin-top: 24px; font-size: 11px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 10px; }
+  .stamp { display: inline-block; border: 2px solid #0b8a4a; color: #0b8a4a; padding: 2px 10px; border-radius: 4px; font-weight: 800; transform: rotate(-4deg); }
+  .stamp.unpaid { border-color: #b45309; color: #b45309; }
+  @media (max-width: 640px) { .sheet { padding: 18px; margin: 10px; } .meta { grid-template-columns: 1fr; } .totals { width: 100%; } table { font-size: 11px; } th, td { padding: 5px; } }
+  @media print { body { background: #fff; } .toolbar { display: none; } .sheet { box-shadow: none; margin: 0; max-width: none; padding: 0; } }
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <a href="/account/orders/{{ order.number }}">‹ Back to order</a>
+  <button type="button" onclick="window.print()">Print / Save as PDF</button>
+</div>
+<main class="sheet">
+  <header>
+    <div>
+      <div class="logo">{% include "partials/logo.svg" %}</div>
+      <p class="muted">{{ store.company_name }}<br>{{ store.company_address }}<br>GSTIN: <strong>{{ store.gstin }}</strong> · State: Maharashtra (27)</p>
+    </div>
+    <div style="text-align:right">
+      <h1>TAX INVOICE</h1>
+      <p class="muted">Original for recipient</p>
+      <p>Invoice no. <strong>{{ invoice_no }}</strong><br>Invoice date {{ order.created_at|date }}<br>Order no. {{ order.number }}</p>
+      {% if order.payment_status == 'paid' %}<span class="stamp">PAID</span>{% elif order.payment_status == 'refunded' %}<span class="stamp unpaid">REFUNDED</span>{% else %}<span class="stamp unpaid">PAY ON DELIVERY</span>{% endif %}
+    </div>
+  </header>
+
+  <section class="meta">
+    <div><h2>Billed &amp; shipped to</h2><p><strong>{{ order.ship_name }}</strong><br>{{ order.ship_line1 }}{% if order.ship_line2 %}<br>{{ order.ship_line2 }}{% endif %}<br>{{ order.ship_city }}, {{ order.ship_state }} {{ order.ship_pincode }}<br>Phone {{ order.ship_phone }}</p></div>
+    <div><h2>Place of supply</h2><p>{{ order.ship_state }}</p><h2 style="margin-top:10px">Payment</h2><p>{{ order.payment_label }}{% if order.payment_ref %}<br><span class="muted">{{ order.payment_ref }}</span>{% endif %}</p></div>
+    <div><h2>Shipment</h2><p>{% if order.courier %}{{ order.courier }}<br>AWB {{ order.tracking_number }}{% else %}Not yet shipped{% endif %}</p><h2 style="margin-top:10px">Tax type</h2><p>{{ 'CGST + SGST (intra-state)' if intra_state else 'IGST (inter-state)' }}</p></div>
+  </section>
+
+  <table>
+    <thead>
+      <tr>
+        <th>#</th><th>Description</th><th>HSN</th><th>Qty</th><th>Unit price</th><th>Taxable value</th>
+        {% if intra_state %}<th>CGST 9%</th><th>SGST 9%</th>{% else %}<th>IGST 18%</th>{% endif %}
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for line in lines %}{% set i = line.item %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ i.name }}<br><span class="muted">SKU {{ i.sku }}</span></td>
+        <td>8518</td>
+        <td>{{ i.quantity }}</td>
+        <td>${{ i.price|usd }}</td>
+        <td>${{ line.taxable|usd(true) }}</td>
+        {% if intra_state %}<td>${{ (line.tax / 2)|usd(true) }}</td><td>${{ (line.tax / 2)|usd(true) }}</td>{% else %}<td>${{ line.tax|usd(true) }}</td>{% endif %}
+        <td>${{ line.gross|usd(true) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="5" style="text-align:right">Total</td>
+        <td>${{ totals.taxable|usd(true) }}</td>
+        {% if intra_state %}<td>${{ (totals.tax / 2)|usd(true) }}</td><td>${{ (totals.tax / 2)|usd(true) }}</td>{% else %}<td>${{ totals.tax|usd(true) }}</td>{% endif %}
+        <td>${{ order.subtotal|usd(true) }}</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <div class="totals">
+    <div><span>Items (incl. GST)</span><span>${{ order.subtotal|usd(true) }}</span></div>
+    {% if order.discount %}<div><span>Coupon {{ order.coupon_code }}</span><span>− ${{ order.discount|usd(true) }}</span></div>{% endif %}
+    <div><span>Shipping</span><span>{% if order.shipping_fee %}${{ order.shipping_fee|usd(true) }}{% else %}FREE{% endif %}</span></div>
+    {% if order.cod_fee %}<div><span>COD handling</span><span>${{ order.cod_fee|usd(true) }}</span></div>{% endif %}
+    <div class="grand"><span>Grand total</span><span>${{ order.total|usd(true) }}</span></div>
+  </div>
+
+  <div class="sign">
+    <p class="muted">Whether tax is payable under reverse charge: No<br>Prices are inclusive of GST. HSN shown is indicative for this demo.</p>
+    <div class="box">For {{ store.company_name }}<div class="line">Authorised signatory</div></div>
+  </div>
+  <footer>This is a computer-generated invoice from a portfolio demo store; no signature is required and no real goods were sold. Questions? {{ store.support_email }} · {{ store.support_phone }}</footer>
+</main>
+</body>
+</html>

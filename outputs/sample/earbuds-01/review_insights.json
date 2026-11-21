@@ -1,0 +1,29 @@
+{
+  "average_rating": 3.86,
+  "sentiment_breakdown": {
+    "positive": 66.7,
+    "neutral": 16.7,
+    "negative": 16.6
+  },
+  "top_praises": [
+    "Battery life is insane, I charge the case maybe once a week",
+    "Pairing was instant, they connect as soon as I open the case",
+    "Fast charging is a lifesaver, 10 minutes and I am good for my commute",
+    "Best battery life I have had in budget earbuds, easily lasts my whole work day"
+  ],
+  "top_complaints": [
+    "Mic is bad in windy conditions",
+    "Fit is not great for small ears, they keep falling out while running",
+    "No active noise cancellation, so they are useless in the metro",
+    "Case hinge feels cheap and loose after two months"
+  ],
+  "customer_phrases": [
+    "battery life is insane",
+    "pairing was instant",
+    "fast charging is a lifesaver",
+    "best battery life i have had",
+    "very comfortable fit",
+    "value for money"
+  ],
+  "summary": "36 reviews average 3.86/5 with 67% positive and 17% negative. Customers keep coming back to: battery life is insane, i charge the case maybe once a week. The most common complaint is: mic is bad in windy conditions, which the listing and campaign should address directly."
+}

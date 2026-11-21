@@ -1,0 +1,141 @@
+{
+  "product": {
+    "id": "backpack-01",
+    "name": "UrbanTrek 30L Laptop Backpack",
+    "category": "Bags / Laptop Backpack",
+    "our_price": 26.0,
+    "current_description": "Laptop backpack with many pockets and USB port.",
+    "features": [
+      "30 L capacity with padded sleeve for laptops up to 15.6\"",
+      "Water-resistant polyester fabric",
+      "External USB charging port (power bank not included)",
+      "Hidden anti-theft back pocket",
+      "Breathable padded shoulder straps and back panel",
+      "Luggage trolley strap"
+    ]
+  },
+  "process": "sequential",
+  "model": "mock",
+  "duration_s": 0.26,
+  "cost": {
+    "model": "mock",
+    "prompt_tokens": 15455,
+    "completion_tokens": 1694,
+    "total_tokens": 17149,
+    "requests": 8,
+    "usd": 0.0
+  },
+  "notes": [],
+  "review_insights": {
+    "average_rating": 4.0,
+    "sentiment_breakdown": {
+      "positive": 75.0,
+      "neutral": 13.9,
+      "negative": 11.1
+    },
+    "top_praises": [
+      "Survived heavy Mumbai rain, everything inside stayed dry",
+      "Trolley strap makes airport travel easy",
+      "Looks professional, perfect for office and college",
+      "Shoulder straps are comfortable even with a heavy load"
+    ],
+    "top_complaints": [
+      "Stitching on the handle came loose quickly",
+      "Fabric smells strongly of chemicals when new",
+      "Usb port cable came out from inside after a few weeks",
+      "Side pocket cannot hold a 1 litre bottle"
+    ],
+    "customer_phrases": [
+      "survived heavy mumbai rain",
+      "trolley strap makes airport travel easy",
+      "looks professional",
+      "shoulder straps are comfortable even with",
+      "lots of compartments",
+      "usb port is handy for charging"
+    ],
+    "summary": "36 reviews average 4.0/5 with 75% positive and 11% negative. Customers keep coming back to: survived heavy mumbai rain, everything inside stayed dry. The most common complaint is: stitching on the handle came loose quickly, which the listing and campaign should address directly."
+  },
+  "pricing_report": {
+    "our_price": 26.0,
+    "competitor_min": 22.99,
+    "competitor_max": 26.99,
+    "competitor_avg": 24.59,
+    "position": "above_avg",
+    "recommended_price": 24.0,
+    "reasoning": "At $26 we are 6% above the $24.59 average. Moving to the average removes price as an objection, or the price can be held if a bundle adds clear value. ClickCart is out of stock."
+  },
+  "seo_copy": {
+    "title": "UrbanTrek 30L Laptop Backpack | 30 L capacity",
+    "meta_description": "UrbanTrek 30L Laptop Backpack: 30 l capacity. Rated 4.0/5 by real buyers - \"survived heavy mumbai rain\". Shop now at $26.",
+    "bullet_points": [
+      "30 L capacity with padded sleeve for laptops up to 15.6\"",
+      "Water-resistant polyester fabric",
+      "External USB charging port (power bank not included)",
+      "Hidden anti-theft back pocket",
+      "Breathable padded shoulder straps and back panel"
+    ],
+    "long_description": "Meet the UrbanTrek 30L Laptop Backpack, the laptop backpack customers can't stop talking about. Buyers rate it 4.0 out of 5, and the reason comes up again and again: survived heavy mumbai rain, everything inside stayed dry. In their own words: \"survived heavy mumbai rain\". It offers 30 L capacity with padded sleeve for laptops up to 15.6\". It offers water-resistant polyester fabric. It offers external USB charging port (power bank not included). It offers hidden anti-theft back pocket. It offers breathable padded shoulder straps and back panel. It offers luggage trolley strap. Another shopper put it simply: \"trolley strap makes airport travel easy\". Whether you use it every day or only on the weekend, the UrbanTrek 30L Laptop Backpack is built to keep up with real everyday routines, from long commutes to hot summers. At $26, it is priced to make the decision easy. Every order ships with a simple setup guide and our support team is one message away if you need help getting started. Add the UrbanTrek 30L Laptop Backpack to your cart today and see why so many buyers recommend it to friends and family. Check the feature list above, compare it with what you pay elsewhere, and you will see why this is one of the most reviewed products in its category on our store. If it is not right for you, our hassle-free returns make trying it risk-free.",
+    "keywords": [
+      "urbantrek 30l laptop backpack",
+      "laptop backpack",
+      "best laptop backpack 2026",
+      "laptop backpack under $500",
+      "survived heavy mumbai rain",
+      "trolley strap makes airport travel easy",
+      "looks professional"
+    ]
+  },
+  "campaign_plan": {
+    "target_audience": "College students and young professionals who commute daily with a laptop",
+    "positioning_statement": "For college students and young professionals, the UrbanTrek 30L Laptop Backpack is the laptop backpack that real buyers love because \"survived heavy mumbai rain\" - with extra value that justifies every dollar.",
+    "key_message": "Survived heavy Mumbai rain, everything inside stayed dry - with extra value that justifies every dollar.",
+    "offer": "Value bundle instead of a price cut: free shipping, easy 30-day returns and a bundled accessory, so $26 beats the $24.59 average on total value.",
+    "instagram_caption": "\"survived heavy mumbai rain\" - that's what our customers say. Survived heavy Mumbai rain, everything inside stayed dry. Rated 4.0/5. $26 with free shipping. Link in bio. #UrbanTrek #LaunchWeek",
+    "google_ad": {
+      "headline": "UrbanTrek - Worth Every Dollar",
+      "description": "Survived heavy Mumbai rain, everything inside stayed dry. Rated 4.0/5. Shop now."
+    },
+    "email": {
+      "subject": "Survived heavy mumbai rain - meet the UrbanTrek 30L Laptop Backpack",
+      "body": "Hi there,\n\nOur customers rate the UrbanTrek 30L Laptop Backpack 4.0/5, and one line keeps coming up: \"survived heavy mumbai rain\".\n\n- 30 L capacity with padded sleeve for laptops up to 15.6\"\n- Water-resistant polyester fabric\n- External USB charging port (power bank not included)\n\nValue bundle instead of a price cut: free shipping, easy 30-day returns and a bundled accessory, so $26 beats the $24.59 average on total value.\n\nShop now and see for yourself.\n\nTeam ShopCrew"
+    },
+    "7_day_schedule": [
+      {
+        "day": 1,
+        "channel": "Instagram",
+        "action": "Launch reel built around \"survived heavy mumbai rain\""
+      },
+      {
+        "day": 2,
+        "channel": "Email",
+        "action": "Send launch email with the offer to subscribers"
+      },
+      {
+        "day": 3,
+        "channel": "Google Ads",
+        "action": "Start search ads on 'best laptop backpack 2026'"
+      },
+      {
+        "day": 4,
+        "channel": "Instagram Stories",
+        "action": "Share 3 real customer reviews as stories"
+      },
+      {
+        "day": 5,
+        "channel": "WhatsApp",
+        "action": "Broadcast the offer to past buyers"
+      },
+      {
+        "day": 6,
+        "channel": "YouTube Shorts",
+        "action": "Post an honest FAQ video on the top complaint"
+      },
+      {
+        "day": 7,
+        "channel": "Email + Instagram",
+        "action": "Last-chance reminder before the offer ends"
+      }
+    ],
+    "how_we_address_complaints": "\"Stitching on the handle came loose quickly\": we answer this upfront in the FAQ and the day-6 video, show how to avoid or fix it, and point buyers to our easy returns. \"Fabric smells strongly of chemicals when new\": we answer this upfront in the FAQ and the day-6 video, show how to avoid or fix it, and point buyers to our easy returns."
+  }
+}

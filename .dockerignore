@@ -1,0 +1,15 @@
+.venv
+.git
+.github
+.env
+.claude
+.pytest_cache
+.ruff_cache
+**/__pycache__
+outputs
+tests
+scripts
+docs
+SPEC.md
+Dockerfile
+docker-compose.yml

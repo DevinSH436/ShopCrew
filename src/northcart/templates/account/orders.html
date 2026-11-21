@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import breadcrumb, status_pill %}
+{% block title %}Your orders · {{ settings.store_name }}{% endblock %}
+{% block content %}
+{{ breadcrumb([("Your account", "/account"), ("Your orders", None)]) }}
+<div class="row-between orders-head">
+  <h1>Your orders</h1>
+  <form method="get" action="/account/orders" class="orders-search" role="search">
+    <input type="hidden" name="status" value="{{ status }}">
+    <label class="visually-hidden" for="oq">Search all orders</label>
+    <input id="oq" name="q" class="input" value="{{ q }}" placeholder="Search by product or order number">
+    <button class="btn btn-buy btn-sm" type="submit">Search orders</button>
+  </form>
+</div>
+<nav class="tabs" aria-label="Filter orders">
+  {% for key, label in [("all", "All orders"), ("progress", "In progress"), ("delivered", "Delivered"), ("cancelled", "Cancelled & returned")] %}
+  <a href="/account/orders?status={{ key }}{% if q %}&q={{ q|urlencode }}{% endif %}" class="{{ 'active' if status == key }}" {% if status == key %}aria-current="page"{% endif %}>{{ label }}</a>
+  {% endfor %}
+</nav>
+<p class="muted small"><strong>{{ total }} order{{ 's' if total != 1 }}</strong>{% if q %} matching “{{ q }}”{% endif %}</p>
+
+{% for o in orders %}
+<article class="order-card">
+  <header class="order-card-head">
+    <div><span class="oc-label">Order placed</span><span>{{ o.created_at|date('%d %B %Y') }}</span></div>
+    <div><span class="oc-label">Total</span><span>${{ o.total|usd }}</span></div>
+    <div class="hide-xs"><span class="oc-label">Ship to</span><span>{{ o.ship_name }}</span></div>
+    <div class="oc-right"><span class="oc-label">Order # {{ o.number }}</span>
+      <span><a href="/account/orders/{{ o.number }}">View order details</a> | <a href="/account/orders/{{ o.number }}/invoice" target="_blank" rel="noopener">Invoice</a></span></div>
+  </header>
+  <div class="order-card-body">
+    <div class="oc-status">
+      <h2 class="h-sm">
+        {% if o.status == 'delivered' %}Delivered {{ o.delivered_at|date('%d %b %Y') }}
+        {% elif o.status == 'cancelled' %}Cancelled
+        {% elif o.status in ('returned', 'return_requested') %}{{ o.status_label }}
+        {% else %}Arriving {{ o.expected_delivery|date('%A, %d %b') }}{% endif %}
+      </h2>
+      {{ status_pill(o.status, o.status_label) }}
+      {% if o.status == 'delivered' and not can_return(o) %}<p class="small muted">Return window closed</p>{% endif %}
+      <ul class="oc-items">
+        {% for i in o.items %}
+        <li>
+          {% if i.product %}<a href="/p/{{ i.product.slug }}"><img src="{{ i.product.thumb }}" alt="" width="90" height="90"></a>{% endif %}
+          <div>
+            {% if i.product %}<a href="/p/{{ i.product.slug }}" class="oc-name">{{ i.name }}</a>{% else %}<span class="oc-name">{{ i.name }}</span>{% endif %}
+            <p class="small muted">Qty {{ i.quantity }} · ${{ i.line_total|usd }}</p>
+            <div class="row">
+              {% if i.product and i.product.in_stock %}
+              <form method="post" action="/cart/add"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="product_id" value="{{ i.product_id }}"><button class="btn btn-cart btn-sm">Buy it again</button></form>
+              {% endif %}
+              {% if i.product and o.status == 'delivered' and i.product_id not in reviewed %}<a href="/p/{{ i.product.slug }}?write=1#reviews" class="btn btn-secondary btn-sm">Write a review</a>{% endif %}
+            </div>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="oc-actions">
+      <a href="/account/orders/{{ o.number }}" class="btn btn-primary btn-sm btn-block">{{ 'Track package' if o.status in ('placed','confirmed','packed','shipped','out_for_delivery') else 'View details' }}</a>
+      {% if o.can_cancel %}<a href="/account/orders/{{ o.number }}#cancel" class="btn btn-secondary btn-sm btn-block">Cancel order</a>{% endif %}
+      {% if can_return(o) %}<a href="/account/orders/{{ o.number }}#return" class="btn btn-secondary btn-sm btn-block">Return items</a>{% endif %}
+      <form method="post" action="/account/orders/{{ o.number }}/buy-again"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="btn btn-secondary btn-sm btn-block">Buy all again</button></form>
+    </div>
+  </div>
+</article>
+{% else %}
+<div class="panel empty-state">
+  <div class="empty-icon" aria-hidden="true">📦</div>
+  <h2>{% if q or status != 'all' %}No orders match{% else %}You haven't placed any orders yet{% endif %}</h2>
+  <p class="muted">{% if q or status != 'all' %}Try a different filter or search.{% else %}When you do, you'll be able to track them here.{% endif %}</p>
+  <a href="/" class="btn btn-primary">Start shopping</a>
+</div>
+{% endfor %}
+
+{% if pages > 1 %}
+<nav class="pagination" aria-label="Order pages">
+  {% for n in range(1, pages + 1) %}
+    {% if n == page %}<span class="current" aria-current="page">{{ n }}</span>{% else %}<a href="/account/orders?status={{ status }}&q={{ q|urlencode }}&page={{ n }}">{{ n }}</a>{% endif %}
+  {% endfor %}
+</nav>
+{% endif %}
+{% endblock %}

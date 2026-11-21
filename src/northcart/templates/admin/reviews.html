@@ -1,0 +1,51 @@
+{% extends "admin/base.html" %}
+{% from "admin/_macros.html" import icon, pill, pager, empty, csrf with context %}
+{% block title %}Reviews{% endblock %}
+{% block content %}
+{% set total_reviews = dist.values()|sum %}
+<div class="page-head"><div><h1>Reviews</h1><p>{{ total_reviews|usd }} reviews. Hidden reviews don't count towards ratings.</p></div></div>
+<section class="card card-pad" style="margin-bottom:16px">
+  <div class="row" style="gap:18px">
+    {% for star in [5, 4, 3, 2, 1] %}
+    {% set n = dist.get(star, 0) %}
+    <a href="{{ qs(rating=star, page=None) }}" style="flex:1;min-width:120px;text-decoration:none;color:inherit">
+      <div class="row small" style="justify-content:space-between"><span class="stars-txt">{{ star }} ★</span><span class="muted">{{ n }}</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:{{ (n * 100 / total_reviews)|round(1) if total_reviews else 0 }}%;background:{{ '#0b8a4a' if star >= 4 else '#f59e0b' if star == 3 else '#cc2e3d' }}"></div></div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+<section class="card">
+  <form class="filters" method="get">
+    <label class="field grow"><span>Search text</span><input class="input" type="search" name="q" value="{{ filters.q or '' }}" placeholder="e.g. battery, delivery"></label>
+    <label class="field"><span>Rating</span><select class="input" name="rating"><option value="">Any</option>{% for s in [5,4,3,2,1] %}<option value="{{ s }}" {{ 'selected' if filters.rating == s|string }}>{{ s }} star</option>{% endfor %}</select></label>
+    <label class="field"><span>Status</span><select class="input" name="status"><option value="">Any</option><option value="published" {{ 'selected' if filters.status == 'published' }}>Published</option><option value="hidden" {{ 'selected' if filters.status == 'hidden' }}>Hidden</option></select></label>
+    <label class="field"><span>Product</span><select class="input" name="product" style="max-width:240px"><option value="">All products</option>{% for p in products %}<option value="{{ p.id }}" {{ 'selected' if filters.product == p.id|string }}>{{ p.name|truncate(40) }}</option>{% endfor %}</select></label>
+    <button class="btn btn-dark">Filter</button>
+    {% if filters %}<a href="/admin/reviews" class="btn btn-ghost">Clear</a>{% endif %}
+  </form>
+  {% if reviews %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Rating</th><th>Review</th><th>Product</th><th>Author</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+      {% for r in reviews %}
+        <tr>
+          <td class="nowrap"><span class="stars-txt">{{ '★' * r.rating }}<span style="color:#d4d9e2">{{ '★' * (5 - r.rating) }}</span></span></td>
+          <td style="min-width:280px;max-width:480px"><b>{{ r.title }}</b><div class="small">{{ r.body }}</div></td>
+          <td><a href="/admin/products/{{ r.product.id }}" class="small">{{ r.product.name|truncate(36) }}</a></td>
+          <td class="nowrap small">{{ r.author_name }}{% if r.verified_purchase %}<div class="sub text-green">✓ Verified</div>{% endif %}<div class="sub">{{ r.created_at|date }}</div></td>
+          <td>{{ pill(r.status, r.status|capitalize) }}</td>
+          <td class="nowrap">
+            <form method="post" action="/admin/reviews/{{ r.id }}/toggle" class="inline">{{ csrf() }}<input type="hidden" name="next" value="{{ request.url.path }}{{ qs() }}"><button class="btn btn-sm">{{ 'Hide' if r.status == 'published' else 'Publish' }}</button></form>
+            <form method="post" action="/admin/reviews/{{ r.id }}/delete" class="inline" data-confirm="Delete this review permanently?">{{ csrf() }}<input type="hidden" name="next" value="{{ request.url.path }}{{ qs() }}"><button class="btn btn-sm btn-danger" aria-label="Delete review">{{ icon("trash", 14) }}</button></form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {{ pager(pg, qs) }}
+  {% else %}{{ empty("No reviews match", "Try clearing the filters.") }}{% endif %}
+</section>
+{% endblock %}

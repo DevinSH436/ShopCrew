@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import breadcrumb %}
+{% block title %}Your addresses · {{ settings.store_name }}{% endblock %}
+{% block content %}
+{{ breadcrumb([("Your account", "/account"), ("Your addresses", None)]) }}
+<h1>Your addresses</h1>
+<div class="address-grid">
+  <a href="/account/addresses/new" class="address-card address-add"><span class="plus" aria-hidden="true">+</span><strong>Add address</strong></a>
+  {% for a in user.addresses|sort(attribute='is_default', reverse=true) %}
+  <article class="address-card {{ 'is-default' if a.is_default }}">
+    {% if a.is_default %}<span class="default-label">Default</span>{% endif %}
+    <p><strong>{{ a.full_name }}</strong> <span class="pill">{{ a.kind|title }}</span></p>
+    <p>{{ a.line1 }}{% if a.line2 %}<br>{{ a.line2 }}{% endif %}{% if a.landmark %}<br>{{ a.landmark }}{% endif %}<br>{{ a.city|upper }}, {{ a.state|upper }} {{ a.pincode }}<br>India</p>
+    <p class="small">Phone number: {{ a.phone }}</p>
+    <div class="address-actions">
+      <a href="/account/addresses/{{ a.id }}/edit">Edit</a>
+      <form method="post" action="/account/addresses/{{ a.id }}/delete" data-confirm="Remove this address?"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="link-btn">Remove</button></form>
+      {% if not a.is_default %}<form method="post" action="/account/addresses/{{ a.id }}/default"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="link-btn">Set as default</button></form>{% endif %}
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% endblock %}
