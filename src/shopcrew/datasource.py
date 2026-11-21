@@ -30,7 +30,7 @@ class DataSource(Protocol):
     """Read-only access to products, reviews and competitor prices."""
 
     def list_products(self) -> list[Product]:
-        """Return every product in the catalogue."""
+        """Return every product in the catalog."""
         ...
 
     def get_product(self, product_id: str) -> Product:

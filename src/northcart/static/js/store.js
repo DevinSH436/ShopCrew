@@ -123,31 +123,31 @@
   // Mobile category menu.
   $("[data-menu-toggle]")?.addEventListener("click", () => $("[data-menu]")?.classList.toggle("open"));
 
-  // Delivery PIN code (kept in the browser; used for delivery estimates).
+  // Delivery ZIP code (kept in the browser; used for delivery estimates).
   const store = {
     get: (k) => { try { return localStorage.getItem(k); } catch { return null; } },
     set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* storage blocked */ } },
   };
-  const pinLabel = $("[data-pincode-label]");
-  const dialog = $("[data-pincode-dialog]");
+  const pinLabel = $("[data-zip-label]");
+  const dialog = $("[data-zip-dialog]");
   const showPin = (pin, city) => { if (pinLabel && pin) pinLabel.textContent = city ? `${city} ${pin}` : pin; };
-  if (store.get("northcart_pincode")) showPin(store.get("northcart_pincode"), store.get("northcart_city"));
-  $$("[data-pincode-open]").forEach((b) => b.addEventListener("click", () => dialog?.showModal()));
-  $("[data-pincode-apply]")?.addEventListener("click", async (e) => {
+  if (store.get("northcart_zip_code")) showPin(store.get("northcart_zip_code"), store.get("northcart_city"));
+  $$("[data-zip-open]").forEach((b) => b.addEventListener("click", () => dialog?.showModal()));
+  $("[data-zip-apply]")?.addEventListener("click", async (e) => {
     e.preventDefault();
-    const form = $("[data-pincode-form]");
-    const pin = form.pincode.value.trim();
-    const out = $("[data-pincode-result]");
-    if (!/^[1-9][0-9]{5}$/.test(pin)) { out.textContent = "Please enter a valid 6-digit PIN code."; out.className = "small text-red"; return; }
+    const form = $("[data-zip-form]");
+    const pin = form.zip_code.value.trim();
+    const out = $("[data-zip-result]");
+    if (!/^[0-9]{5}(-[0-9]{4})?$/.test(pin)) { out.textContent = "Please enter a valid 5-digit ZIP code."; out.className = "small text-red"; return; }
     try {
-      const data = await (await fetch("/api/delivery?pincode=" + pin)).json();
-      store.set("northcart_pincode", pin);
+      const data = await (await fetch("/api/delivery?zip_code=" + pin)).json();
+      store.set("northcart_zip_code", pin);
       store.set("northcart_city", data.city || "");
       showPin(pin, data.city);
-      document.dispatchEvent(new CustomEvent("northcart:pincode", { detail: { pincode: pin, ...data } }));
+      document.dispatchEvent(new CustomEvent("northcart:zip_code", { detail: { zip_code: pin, ...data } }));
       dialog.close();
       toast(`Delivering to ${pin}: ${data.message}`, "info");
-    } catch { out.textContent = "Could not check this PIN code."; }
+    } catch { out.textContent = "Could not check this ZIP code."; }
   });
 })();
 
@@ -253,14 +253,14 @@
   // Cart quantity selects submit on change.
   $$("form[data-qty-form] select").forEach((s) => s.addEventListener("change", () => s.form.requestSubmit()));
 
-  // Address forms: fill the city from the PIN code when we know it.
+  // Address forms: fill the city from the ZIP code when we know it.
   $$("[data-pin-autofill]").forEach((input) => input.addEventListener("input", async () => {
     const pin = input.value.trim();
-    if (!/^[1-9][0-9]{5}$/.test(pin)) return;
+    if (!/^[0-9]{5}(-[0-9]{4})?$/.test(pin)) return;
     const scope = input.closest("form, details, .panel") || document;
     const city = $("input[name=city]", scope);
     try {
-      const data = await (await fetch("/api/delivery?pincode=" + pin)).json();
+      const data = await (await fetch("/api/delivery?zip_code=" + pin)).json();
       if (data.city && city && !city.value) city.value = data.city;
     } catch { /* ignore */ }
   }));

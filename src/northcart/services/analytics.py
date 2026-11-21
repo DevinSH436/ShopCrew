@@ -1,19 +1,33 @@
-"""Admin dashboard and report numbers. All grouping is by India date (IST)."""
+"""Admin dashboard and report numbers. All grouping is by the store's date (US Eastern)."""
 
 from __future__ import annotations
 
 from collections import defaultdict
-from datetime import UTC, date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
 from northcart.models import Category, Order, OrderItem, Product, Review, User
 
-IST = timezone(timedelta(hours=5, minutes=30))
+STORE_TZ = ZoneInfo("America/New_York")
 LOST_STATUSES = ("cancelled", "returned")
-GST_RATE = 18
+# State sales tax rates (percent, statewide base rate; local add-ons ignored in this demo).
+STATE_TAX_RATES: dict[str, float] = {
+    "Alabama": 4, "Alaska": 0, "Arizona": 5.6, "Arkansas": 6.5, "California": 7.25,
+    "Colorado": 2.9, "Connecticut": 6.35, "Delaware": 0, "District of Columbia": 6,
+    "Florida": 6, "Georgia": 4, "Hawaii": 4, "Idaho": 6, "Illinois": 6.25, "Indiana": 7,
+    "Iowa": 6, "Kansas": 6.5, "Kentucky": 6, "Louisiana": 5, "Maine": 5.5, "Maryland": 6,
+    "Massachusetts": 6.25, "Michigan": 6, "Minnesota": 6.875, "Mississippi": 7,
+    "Missouri": 4.225, "Montana": 0, "Nebraska": 5.5, "Nevada": 6.85, "New Hampshire": 0,
+    "New Jersey": 6.625, "New Mexico": 4.875, "New York": 4, "North Carolina": 4.75,
+    "North Dakota": 5, "Ohio": 5.75, "Oklahoma": 4.5, "Oregon": 0, "Pennsylvania": 6,
+    "Rhode Island": 7, "South Carolina": 6, "South Dakota": 4.2, "Tennessee": 7, "Texas": 6.25,
+    "Utah": 6.1, "Vermont": 6, "Virginia": 5.3, "Washington": 6.5, "West Virginia": 6,
+    "Wisconsin": 5, "Wyoming": 4,
+}  # fmt: skip
 
 
 def aware(value: datetime | None) -> datetime | None:
@@ -24,14 +38,14 @@ def aware(value: datetime | None) -> datetime | None:
 
 
 def ist_date(value: datetime) -> date:
-    """India calendar date of a stored timestamp."""
-    return aware(value).astimezone(IST).date()  # type: ignore[union-attr]
+    """Store-calendar (US Eastern) date of a stored timestamp."""
+    return aware(value).astimezone(STORE_TZ).date()  # type: ignore[union-attr]
 
 
 def period_bounds(days: int, now: datetime | None = None) -> tuple[datetime, datetime, datetime]:
     """(previous period start, current period start, now) for a rolling window of ``days``."""
     now = now or datetime.now(UTC)
-    today_ist = now.astimezone(IST).replace(hour=0, minute=0, second=0, microsecond=0)
+    today_ist = now.astimezone(STORE_TZ).replace(hour=0, minute=0, second=0, microsecond=0)
     start = (today_ist - timedelta(days=days - 1)).astimezone(UTC)
     prev = start - timedelta(days=days)
     return prev, start, now
@@ -87,9 +101,9 @@ def kpis(db: Session, days: int = 30) -> dict[str, dict[str, Any]]:
 
 
 def revenue_by_day(db: Session, days: int = 30) -> dict[str, list]:
-    """Daily revenue and order counts (IST days), zero-filled."""
+    """Daily revenue and order counts (STORE_TZ days), zero-filled."""
     _, start, now = period_bounds(days)
-    labels = [(start.astimezone(IST).date() + timedelta(days=i)) for i in range(days)]
+    labels = [(start.astimezone(STORE_TZ).date() + timedelta(days=i)) for i in range(days)]
     revenue = dict.fromkeys(labels, 0)
     orders = dict.fromkeys(labels, 0)
     for o in _orders_between(db, start, now):
@@ -98,7 +112,7 @@ def revenue_by_day(db: Session, days: int = 30) -> dict[str, list]:
             revenue[d] += o.total
             orders[d] += 1
     return {
-        "labels": [d.strftime("%d %b") for d in labels],
+        "labels": [d.strftime("%b %d") for d in labels],
         "revenue": list(revenue.values()),
         "orders": list(orders.values()),
     }
@@ -250,30 +264,31 @@ def sales_report(db: Session, start: datetime, end: datetime) -> dict[str, Any]:
     }
 
 
-def split_gst(amount: int, intra_state: bool, rate: int = GST_RATE) -> dict[str, float]:
-    """Split a GST-inclusive amount into taxable value and CGST/SGST or IGST."""
+def tax_rate(state: str) -> float:
+    """Sales tax rate (percent) for a US state; unknown states are taxed at 0%."""
+    return STATE_TAX_RATES.get(state.strip(), 0.0)
+
+
+def split_tax(amount: int, state: str) -> dict[str, float]:
+    """Split a tax-inclusive amount into the pre-tax value and the state sales tax."""
+    rate = tax_rate(state)
     taxable = round(amount * 100 / (100 + rate), 2)
-    tax = round(amount - taxable, 2)
-    if intra_state:
-        half = round(tax / 2, 2)
-        return {"taxable": taxable, "cgst": half, "sgst": round(tax - half, 2), "igst": 0.0,
-                "tax": tax}  # fmt: skip
-    return {"taxable": taxable, "cgst": 0.0, "sgst": 0.0, "igst": tax, "tax": tax}
+    return {"taxable": taxable, "tax": round(amount - taxable, 2), "rate": rate}
 
 
-def gst_summary(db: Session, home_state: str = "Maharashtra") -> list[dict[str, Any]]:
-    """Monthly GST summary for delivered orders (by delivery month)."""
+def tax_summary(db: Session) -> list[dict[str, Any]]:
+    """Monthly sales tax summary for delivered orders (by delivery month)."""
     months: dict[str, dict[str, float]] = defaultdict(
-        lambda: {"orders": 0, "gross": 0, "taxable": 0.0, "cgst": 0.0, "sgst": 0.0, "igst": 0.0}
+        lambda: {"orders": 0, "gross": 0, "taxable": 0.0, "tax": 0.0}
     )
     for o in db.scalars(select(Order).where(Order.status == "delivered")):
-        when = aware(o.delivered_at or o.created_at).astimezone(IST)  # type: ignore[union-attr]
+        when = aware(o.delivered_at or o.created_at).astimezone(STORE_TZ)  # type: ignore[union-attr]
         m = months[when.strftime("%Y-%m")]
-        g = split_gst(o.total, o.ship_state == home_state)
+        t = split_tax(o.total, o.ship_state)
         m["orders"] += 1
         m["gross"] += o.total
-        for k in ("taxable", "cgst", "sgst", "igst"):
-            m[k] += g[k]
+        m["taxable"] += t["taxable"]
+        m["tax"] += t["tax"]
     return [
         {
             "month": datetime.strptime(k, "%Y-%m").strftime("%b %Y"),

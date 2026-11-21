@@ -6,7 +6,7 @@
 <div class="page-head">
   <div>
     <h1 class="row">Order <span class="mono">{{ order.number }}</span> {{ pill(order.status) }} {{ pill(order.payment_status, order.payment_status|capitalize) }}</h1>
-    <p>Placed {{ order.created_at|datetime }} IST · {{ order.item_count }} item{{ 's' if order.item_count != 1 }} · {{ order.payment_label }}</p>
+    <p>Placed {{ order.created_at|datetime }} ET · {{ order.item_count }} item{{ 's' if order.item_count != 1 }} · {{ order.payment_label }}</p>
   </div>
   <div class="actions">
     <a href="/admin/orders/{{ order.number }}/invoice" target="_blank" class="btn">{{ icon("print", 16) }} Invoice &amp; packing slip</a>
@@ -16,13 +16,13 @@
 <div class="grid grid-main-r">
   <div class="card-stack">
     <section class="card">
-      <div class="card-head"><h2>Items</h2><span class="muted small">Prices include GST</span></div>
+      <div class="card-head"><h2>Items</h2><span class="muted small">Prices include sales tax</span></div>
       {% for it in order.items %}
       <div class="line-item">
         <img src="{{ it.product.thumb if it.product else '/static/img/favicon.svg' }}" alt="">
         <div style="flex:1">
           {% if it.product %}<a href="/admin/products/{{ it.product.id }}" class="strong">{{ it.name }}</a>{% else %}<span class="strong">{{ it.name }}</span>{% endif %}
-          <div class="small muted">SKU {{ it.sku }} · ${{ it.price|usd }} × {{ it.quantity }}{% if it.mrp > it.price %} · MRP <s>${{ it.mrp|usd }}</s>{% endif %}</div>
+          <div class="small muted">SKU {{ it.sku }} · ${{ it.price|usd }} × {{ it.quantity }}{% if it.mrp > it.price %} · List <s>${{ it.mrp|usd }}</s>{% endif %}</div>
         </div>
         <div class="strong">${{ it.line_total|usd }}</div>
       </div>
@@ -34,7 +34,7 @@
           <tr><td>Shipping</td><td>{{ '$' ~ order.shipping_fee|usd if order.shipping_fee else 'Free' }}</td></tr>
           {% if order.cod_fee %}<tr><td>COD fee</td><td>${{ order.cod_fee|usd }}</td></tr>{% endif %}
           <tr class="grand"><td>Total</td><td>${{ order.total|usd }}</td></tr>
-          <tr><td class="muted small">Of which GST (18%)</td><td class="muted small">${{ gst.tax|round(2) }}</td></tr>
+          <tr><td class="muted small">Of which sales tax ({{ tax.rate }}%)</td><td class="muted small">${{ tax.tax|round(2) }}</td></tr>
         </table>
       </div>
     </section>
@@ -90,8 +90,8 @@
         <p class="strong" style="margin:0">{{ order.user.name }}</p>
         <p class="small muted">{{ order.user.email }}<br>{{ customer_orders }} order{{ 's' if customer_orders != 1 }} with us</p>
         <h3 style="margin-top:12px">Ship to</h3>
-        <p class="small">{{ order.ship_name }}<br>{{ order.ship_line1 }}{% if order.ship_line2 %}<br>{{ order.ship_line2 }}{% endif %}<br>{{ order.ship_city }}, {{ order.ship_state }} {{ order.ship_pincode }}<br>📞 {{ order.ship_phone }}</p>
-        {% if order.expected_delivery and order.status not in ('delivered', 'cancelled', 'returned') %}<p class="small">Promised by <b>{{ order.expected_delivery|date('%a, %d %b') }}</b></p>{% endif %}
+        <p class="small">{{ order.ship_name }}<br>{{ order.ship_line1 }}{% if order.ship_line2 %}<br>{{ order.ship_line2 }}{% endif %}<br>{{ order.ship_city }}, {{ order.ship_state }} {{ order.ship_zip }}<br>📞 {{ order.ship_phone|phone }}</p>
+        {% if order.expected_delivery and order.status not in ('delivered', 'cancelled', 'returned') %}<p class="small">Promised by <b>{{ order.expected_delivery|date('%a, %b %d') }}</b></p>{% endif %}
       </div>
     </section>
 
@@ -111,11 +111,11 @@
       <div class="card-head"><h2>Shipping</h2></div>
       <form class="card-body" method="post" action="/admin/orders/{{ order.number }}/shipping">
         {{ csrf() }}
-        <label class="field"><span>Courier</span>
+        <label class="field"><span>Carrier</span>
           <input name="courier" value="{{ order.courier }}" list="couriers" placeholder="Assigned when shipped">
-          <datalist id="couriers"><option>Delhivery</option><option>Blue Dart</option><option>Ekart</option><option>XpressBees</option><option>Shadowfax</option><option>India Post</option></datalist>
+          <datalist id="couriers"><option>UPS</option><option>FedEx</option><option>USPS</option><option>DHL</option><option>OnTrac</option></datalist>
         </label>
-        <label class="field"><span>AWB / tracking number</span><input name="tracking_number" value="{{ order.tracking_number }}" class="mono"></label>
+        <label class="field"><span>Tracking number</span><input name="tracking_number" value="{{ order.tracking_number }}" class="mono"></label>
         <button class="btn btn-sm">Save shipping</button>
       </form>
     </section>

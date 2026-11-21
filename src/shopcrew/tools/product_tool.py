@@ -1,4 +1,4 @@
-"""Tool that returns a product's catalogue details (name, price, real features)."""
+"""Tool that returns a product's catalog details (name, price, real features)."""
 
 from __future__ import annotations
 

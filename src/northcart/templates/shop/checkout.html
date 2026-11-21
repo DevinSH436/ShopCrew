@@ -18,11 +18,11 @@
         <div class="address-options">
           {% for a in addresses %}
           <label class="address-option">
-            <input type="radio" name="address_id" value="{{ a.id }}" {% if a.id == selected %}checked{% endif %} data-delivery-label="{{ estimates[a.id]|date('%A, %d %b') }}">
+            <input type="radio" name="address_id" value="{{ a.id }}" {% if a.id == selected %}checked{% endif %} data-delivery-label="{{ estimates[a.id]|date('%A, %b %d') }}">
             <span>
               <strong>{{ a.full_name }}</strong> <span class="pill">{{ a.kind|title }}</span>{% if a.is_default %} <span class="pill pill-active">Default</span>{% endif %}<br>
               {{ a.one_line() }}<br>
-              <span class="small muted">Phone: {{ a.phone }} · Delivery by <strong>{{ estimates[a.id]|date('%a, %d %b') }}</strong></span>
+              <span class="small muted">Phone: {{ a.phone|phone }} · Delivery by <strong>{{ estimates[a.id]|date('%a, %b %d') }}</strong></span>
             </span>
           </label>
           {% endfor %}
@@ -44,14 +44,7 @@
         <h2><span class="step-num">2</span> Payment method</h2>
         <div class="pay-options" role="radiogroup">
           <div class="pay-option">
-            <label class="pay-head"><input type="radio" name="payment_method" value="upi" {% if payment == 'upi' %}checked{% endif %}> <span class="pay-title">UPI <span class="small muted">Google Pay, PhonePe, Paytm, BHIM</span></span></label>
-            <div class="pay-body">
-              <label class="field"><span>UPI ID</span><input name="upi_id" placeholder="yourname@okhdfcbank" autocomplete="off" data-validate="upi"></label>
-              <span class="small muted">You'll get a payment request on your UPI app (simulated in this demo).</span>
-            </div>
-          </div>
-          <div class="pay-option">
-            <label class="pay-head"><input type="radio" name="payment_method" value="card" {% if payment == 'card' %}checked{% endif %}> <span class="pay-title">Credit / Debit card <span class="card-brands">VISA · Mastercard · RuPay</span></span></label>
+            <label class="pay-head"><input type="radio" name="payment_method" value="card" {% if payment == 'card' %}checked{% endif %}> <span class="pay-title">Credit / Debit card <span class="card-brands">VISA · Mastercard · Amex · Discover</span></span></label>
             <div class="pay-body">
               <label class="field"><span>Card number</span><input name="card_number" inputmode="numeric" autocomplete="cc-number" placeholder="4111 1111 1111 1111" maxlength="23" data-validate="card"></label>
               <span class="card-row">
@@ -63,7 +56,14 @@
             </div>
           </div>
           <div class="pay-option">
-            <label class="pay-head"><input type="radio" name="payment_method" value="netbanking" {% if payment == 'netbanking' %}checked{% endif %}> <span class="pay-title">Net banking</span></label>
+            <label class="pay-head"><input type="radio" name="payment_method" value="paypal" {% if payment == 'paypal' %}checked{% endif %}> <span class="pay-title">PayPal</span></label>
+            <div class="pay-body">
+              <label class="field"><span>PayPal email</span><input name="paypal_email" type="email" placeholder="you@example.com" autocomplete="email"></label>
+              <span class="small muted">You'd be sent to PayPal to approve the payment (simulated in this demo).</span>
+            </div>
+          </div>
+          <div class="pay-option">
+            <label class="pay-head"><input type="radio" name="payment_method" value="bank" {% if payment == 'bank' %}checked{% endif %}> <span class="pay-title">Bank account (ACH)</span></label>
             <div class="pay-body">
               <label class="field"><span>Choose your bank</span>
                 <select name="bank"><option value="">Select bank</option>{% for b in banks %}<option>{{ b }}</option>{% endfor %}</select>
@@ -71,15 +71,15 @@
             </div>
           </div>
           <div class="pay-option">
-            <label class="pay-head"><input type="radio" name="payment_method" value="cod" {% if payment == 'cod' %}checked{% endif %}> <span class="pay-title">Cash on delivery <span class="small muted">+${{ settings.cod_fee }} handling fee</span></span></label>
-            <div class="pay-body"><span class="small muted">Pay by cash or UPI when your order arrives. Please keep exact change handy.</span></div>
+            <label class="pay-head"><input type="radio" name="payment_method" value="cod" {% if payment == 'cod' %}checked{% endif %}> <span class="pay-title">Pay on delivery <span class="small muted">+${{ settings.cod_fee }} handling fee</span></span></label>
+            <div class="pay-body"><span class="small muted">Pay the driver by card or cash when your order arrives.</span></div>
           </div>
         </div>
       </section>
 
       <section class="panel step">
         <h2><span class="step-num">3</span> Review items and delivery</h2>
-        <p class="delivery-banner">Arriving <strong data-checkout-date>{% if selected and estimates.get(selected) %}{{ estimates[selected]|date('%A, %d %b') }}{% else %}in 2–6 days{% endif %}</strong> · {% if summary.shipping_fee %}${{ summary.shipping_fee }} delivery{% else %}FREE delivery{% endif %}</p>
+        <p class="delivery-banner">Arriving <strong data-checkout-date>{% if selected and estimates.get(selected) %}{{ estimates[selected]|date('%A, %b %d') }}{% else %}in 2–6 days{% endif %}</strong> · {% if summary.shipping_fee %}${{ summary.shipping_fee }} delivery{% else %}FREE delivery{% endif %}</p>
         <ul class="review-items">
           {% for line in summary.lines %}{% set p = line.product %}
           <li>

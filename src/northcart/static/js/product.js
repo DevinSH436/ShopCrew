@@ -1,4 +1,4 @@
-/* Product page: gallery, zoom, PIN-code delivery check, reviews, frequently bought together. */
+/* Product page: gallery, zoom, ZIP-code delivery check, reviews, frequently bought together. */
 (() => {
   "use strict";
   const { $, $$, post, toast, setCartCount } = window.Northcart;
@@ -30,28 +30,28 @@
   const pinForm = $("[data-pin-check]");
   async function check(pin, quiet) {
     try {
-      const res = await fetch("/api/delivery?pincode=" + encodeURIComponent(pin));
+      const res = await fetch("/api/delivery?zip_code=" + encodeURIComponent(pin));
       const data = await res.json();
       if (!data.ok) { if (result) { result.textContent = data.message; result.className = "small text-red"; } return; }
       if (dateEl) dateEl.innerHTML = `<strong>${data.date_label}</strong>`;
       if (result) {
         result.className = "small";
-        result.textContent = `Delivering to ${data.city ? data.city + " " : ""}${pin} · Cash on delivery available`;
+        result.textContent = `Delivering to ${data.city ? data.city + " " : ""}${pin} · Pay on delivery available`;
       }
-      try { localStorage.setItem("northcart_pincode", pin); if (data.city) localStorage.setItem("northcart_city", data.city); } catch { /* ignore */ }
+      try { localStorage.setItem("northcart_zip_code", pin); if (data.city) localStorage.setItem("northcart_city", data.city); } catch { /* ignore */ }
       if (!quiet) toast(`Delivery by ${data.date_label}`, "info");
     } catch { /* offline */ }
   }
   pinForm?.addEventListener("submit", (e) => {
     e.preventDefault();
-    const pin = pinForm.pincode.value.trim();
-    if (!/^[1-9][0-9]{5}$/.test(pin)) { result.textContent = "Please enter a valid 6-digit PIN code."; result.className = "small text-red"; return; }
+    const pin = pinForm.zip_code.value.trim();
+    if (!/^[0-9]{5}(-[0-9]{4})?$/.test(pin)) { result.textContent = "Please enter a valid 5-digit ZIP code."; result.className = "small text-red"; return; }
     check(pin, false);
   });
   let saved = null;
-  try { saved = localStorage.getItem("northcart_pincode"); } catch { /* ignore */ }
-  if (saved && est) { if (pinForm) pinForm.pincode.value = saved; check(saved, true); }
-  document.addEventListener("northcart:pincode", (e) => { if (pinForm) pinForm.pincode.value = e.detail.pincode; check(e.detail.pincode, true); });
+  try { saved = localStorage.getItem("northcart_zip_code"); } catch { /* ignore */ }
+  if (saved && est) { if (pinForm) pinForm.zip_code.value = saved; check(saved, true); }
+  document.addEventListener("northcart:zip_code", (e) => { if (pinForm) pinForm.zip_code.value = e.detail.zip_code; check(e.detail.zip_code, true); });
 
   // Review form toggle.
   const form = $("[data-review-form]");

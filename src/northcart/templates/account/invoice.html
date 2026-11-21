@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tax invoice {{ invoice_no }} · {{ settings.store_name }}</title>
+<title>Invoice {{ invoice_no }} · {{ settings.store_name }}</title>
 <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
 <style>
   :root { --ink: #14213d; --line: #d6dae2; --muted: #5d6676; }
@@ -47,27 +47,27 @@
   <header>
     <div>
       <div class="logo">{% include "partials/logo.svg" %}</div>
-      <p class="muted">{{ store.company_name }}<br>{{ store.company_address }}<br>GSTIN: <strong>{{ store.gstin }}</strong> · State: Maharashtra (27)</p>
+      <p class="muted">{{ store.company_name }}<br>{{ store.company_address }}<br>EIN: <strong>{{ store.tax_id }}</strong></p>
     </div>
     <div style="text-align:right">
-      <h1>TAX INVOICE</h1>
-      <p class="muted">Original for recipient</p>
+      <h1>INVOICE</h1>
+      <p class="muted">Customer copy</p>
       <p>Invoice no. <strong>{{ invoice_no }}</strong><br>Invoice date {{ order.created_at|date }}<br>Order no. {{ order.number }}</p>
       {% if order.payment_status == 'paid' %}<span class="stamp">PAID</span>{% elif order.payment_status == 'refunded' %}<span class="stamp unpaid">REFUNDED</span>{% else %}<span class="stamp unpaid">PAY ON DELIVERY</span>{% endif %}
     </div>
   </header>
 
   <section class="meta">
-    <div><h2>Billed &amp; shipped to</h2><p><strong>{{ order.ship_name }}</strong><br>{{ order.ship_line1 }}{% if order.ship_line2 %}<br>{{ order.ship_line2 }}{% endif %}<br>{{ order.ship_city }}, {{ order.ship_state }} {{ order.ship_pincode }}<br>Phone {{ order.ship_phone }}</p></div>
-    <div><h2>Place of supply</h2><p>{{ order.ship_state }}</p><h2 style="margin-top:10px">Payment</h2><p>{{ order.payment_label }}{% if order.payment_ref %}<br><span class="muted">{{ order.payment_ref }}</span>{% endif %}</p></div>
-    <div><h2>Shipment</h2><p>{% if order.courier %}{{ order.courier }}<br>AWB {{ order.tracking_number }}{% else %}Not yet shipped{% endif %}</p><h2 style="margin-top:10px">Tax type</h2><p>{{ 'CGST + SGST (intra-state)' if intra_state else 'IGST (inter-state)' }}</p></div>
+    <div><h2>Bill &amp; ship to</h2><p><strong>{{ order.ship_name }}</strong><br>{{ order.ship_line1 }}{% if order.ship_line2 %}<br>{{ order.ship_line2 }}{% endif %}<br>{{ order.ship_city }}, {{ order.ship_state }} {{ order.ship_zip }}<br>Phone {{ order.ship_phone|phone }}</p></div>
+    <div><h2>Sales tax</h2><p>{{ order.ship_state }} · {{ rate }}%</p><h2 style="margin-top:10px">Payment</h2><p>{{ order.payment_label }}{% if order.payment_ref %}<br><span class="muted">{{ order.payment_ref }}</span>{% endif %}</p></div>
+    <div><h2>Shipment</h2><p>{% if order.courier %}{{ order.courier }}<br>Tracking {{ order.tracking_number }}{% else %}Not yet shipped{% endif %}</p></div>
   </section>
 
   <table>
     <thead>
       <tr>
-        <th>#</th><th>Description</th><th>HSN</th><th>Qty</th><th>Unit price</th><th>Taxable value</th>
-        {% if intra_state %}<th>CGST 9%</th><th>SGST 9%</th>{% else %}<th>IGST 18%</th>{% endif %}
+        <th>#</th><th>Description</th><th>Qty</th><th>Unit price</th><th>Pre-tax value</th>
+        <th>Sales tax {{ rate }}%</th>
         <th>Total</th>
       </tr>
     </thead>
@@ -76,36 +76,35 @@
       <tr>
         <td>{{ loop.index }}</td>
         <td>{{ i.name }}<br><span class="muted">SKU {{ i.sku }}</span></td>
-        <td>8518</td>
         <td>{{ i.quantity }}</td>
         <td>${{ i.price|usd }}</td>
         <td>${{ line.taxable|usd(true) }}</td>
-        {% if intra_state %}<td>${{ (line.tax / 2)|usd(true) }}</td><td>${{ (line.tax / 2)|usd(true) }}</td>{% else %}<td>${{ line.tax|usd(true) }}</td>{% endif %}
+        <td>${{ line.tax|usd(true) }}</td>
         <td>${{ line.gross|usd(true) }}</td>
       </tr>
       {% endfor %}
     </tbody>
     <tfoot>
       <tr>
-        <td colspan="5" style="text-align:right">Total</td>
+        <td colspan="4" style="text-align:right">Total</td>
         <td>${{ totals.taxable|usd(true) }}</td>
-        {% if intra_state %}<td>${{ (totals.tax / 2)|usd(true) }}</td><td>${{ (totals.tax / 2)|usd(true) }}</td>{% else %}<td>${{ totals.tax|usd(true) }}</td>{% endif %}
+        <td>${{ totals.tax|usd(true) }}</td>
         <td>${{ order.subtotal|usd(true) }}</td>
       </tr>
     </tfoot>
   </table>
 
   <div class="totals">
-    <div><span>Items (incl. GST)</span><span>${{ order.subtotal|usd(true) }}</span></div>
+    <div><span>Items (incl. sales tax)</span><span>${{ order.subtotal|usd(true) }}</span></div>
     {% if order.discount %}<div><span>Coupon {{ order.coupon_code }}</span><span>− ${{ order.discount|usd(true) }}</span></div>{% endif %}
     <div><span>Shipping</span><span>{% if order.shipping_fee %}${{ order.shipping_fee|usd(true) }}{% else %}FREE{% endif %}</span></div>
-    {% if order.cod_fee %}<div><span>COD handling</span><span>${{ order.cod_fee|usd(true) }}</span></div>{% endif %}
+    {% if order.cod_fee %}<div><span>Pay-on-delivery fee</span><span>${{ order.cod_fee|usd(true) }}</span></div>{% endif %}
     <div class="grand"><span>Grand total</span><span>${{ order.total|usd(true) }}</span></div>
   </div>
 
   <div class="sign">
-    <p class="muted">Whether tax is payable under reverse charge: No<br>Prices are inclusive of GST. HSN shown is indicative for this demo.</p>
-    <div class="box">For {{ store.company_name }}<div class="line">Authorised signatory</div></div>
+    <p class="muted">Prices include state sales tax at the base rate for the shipping state.<br>Local taxes are not modeled in this demo.</p>
+    <div class="box">For {{ store.company_name }}<div class="line">Authorized signature</div></div>
   </div>
   <footer>This is a computer-generated invoice from a portfolio demo store; no signature is required and no real goods were sold. Questions? {{ store.support_email }} · {{ store.support_phone }}</footer>
 </main>

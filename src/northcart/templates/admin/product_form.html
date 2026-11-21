@@ -63,11 +63,11 @@
       </section>
 
       <section class="card">
-        <div class="card-head"><h2>Pricing &amp; stock</h2><span class="muted small">Prices include 18% GST</span></div>
+        <div class="card-head"><h2>Pricing &amp; stock</h2><span class="muted small">Prices include sales tax</span></div>
         <div class="card-body">
           <div class="fields-3">
             <label class="{{ f_class('price') }}"><span>Selling price ($)</span><input name="price" type="number" min="1" value="{{ v.price if v.price is not none else '' }}" required>{{ field_error(errors, 'price') }}</label>
-            <label class="{{ f_class('mrp') }}"><span>MRP ($)</span><input name="mrp" type="number" min="1" value="{{ v.mrp if v.mrp is not none else '' }}">{{ field_error(errors, 'mrp') }}</label>
+            <label class="{{ f_class('mrp') }}"><span>List price ($)</span><input name="mrp" type="number" min="1" value="{{ v.mrp if v.mrp is not none else '' }}">{{ field_error(errors, 'mrp') }}</label>
             <label class="field"><span>Cost price ($)</span><input name="cost_price" type="number" min="0" value="{{ v.cost_price if v.cost_price is not none else '' }}"></label>
           </div>
           <p class="margin-box" data-margin aria-live="polite"></p>
@@ -123,7 +123,7 @@
           <div class="fields-2" style="margin-top:14px">
             <label class="field"><span>Artwork style</span>
               <select name="art_kind">{% for k in art_kinds %}<option value="{{ k }}" {{ 'selected' if v.art_kind == k }}>{{ k|capitalize }}</option>{% endfor %}</select></label>
-            <label class="field"><span>Colour</span><input type="color" name="color" value="{{ v.color or '#2563eb' }}" style="width:100%;height:38px;border:1px solid #d4d9e2;border-radius:8px;padding:2px"></label>
+            <label class="field"><span>Color</span><input type="color" name="color" value="{{ v.color or '#2563eb' }}" style="width:100%;height:38px;border:1px solid #d4d9e2;border-radius:8px;padding:2px"></label>
           </div>
         </div>
       </section>

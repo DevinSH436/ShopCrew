@@ -121,13 +121,13 @@
       const price = +f("price").value || 0, mrp = +f("mrp").value || 0, cost = +f("cost_price").value || 0;
       if (!margin) return;
       const parts = [];
-      if (mrp > price && price) parts.push(`<b>${Math.floor((mrp - price) * 100 / mrp)}% off</b> MRP`);
+      if (mrp > price && price) parts.push(`<b>${Math.floor((mrp - price) * 100 / mrp)}% off</b> list price`);
       if (price && cost) {
-        const net = price / 1.18; // price is GST inclusive
+        const net = price / 1.06; // price includes ~6% sales tax
         const m = ((net - cost) / net) * 100;
-        parts.push(`Margin after GST: <b class="${m < 15 ? "text-red" : "text-green"}">$${usd(Math.round(net - cost))} (${m.toFixed(1)}%)</b>`);
+        parts.push(`Margin after sales tax: <b class="${m < 15 ? "text-red" : "text-green"}">$${usd(Math.round(net - cost))} (${m.toFixed(1)}%)</b>`);
       }
-      margin.innerHTML = parts.join(" · ") || "Enter price, MRP and cost to see discount and margin.";
+      margin.innerHTML = parts.join(" · ") || "Enter price, list price and cost to see discount and margin.";
     };
     ["price", "mrp", "cost_price"].forEach((n) => f(n).addEventListener("input", updMargin)); updMargin();
 

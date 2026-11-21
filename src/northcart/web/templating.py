@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta, timezone
+from datetime import UTC, datetime
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from fastapi import Request
 from fastapi.responses import HTMLResponse
@@ -18,7 +19,7 @@ from northcart.services import catalog
 from northcart.services import settings as settings_svc
 from northcart.web.deps import cart_owner, csrf_token, pop_flashes
 
-IST = timezone(timedelta(hours=5, minutes=30))
+STORE_TZ = ZoneInfo("America/New_York")
 templates = Jinja2Templates(directory=str(PACKAGE_DIR / "templates"))
 
 
@@ -29,25 +30,33 @@ def usd(value: float | int | None, decimals: bool = False) -> str:
     return f"{value:,.2f}" if decimals else f"{int(value):,}"
 
 
-def to_ist(value: datetime | None) -> datetime | None:
-    """Convert a stored UTC timestamp to India time."""
+def to_store_tz(value: datetime | None) -> datetime | None:
+    """Convert a stored UTC timestamp to US Eastern time."""
     if value is None:
         return None
     if value.tzinfo is None:
         value = value.replace(tzinfo=UTC)
-    return value.astimezone(IST)
+    return value.astimezone(STORE_TZ)
 
 
-def fmt_date(value: datetime | None, fmt: str = "%d %b %Y") -> str:
-    """Date in IST, e.g. '20 Nov 2026'."""
-    v = to_ist(value)
-    return v.strftime(fmt) if v else ""
+def fmt_date(value: datetime | None, fmt: str = "%b %d, %Y") -> str:
+    """Date in US Eastern time, e.g. 'Nov 20, 2026'."""
+    v = to_store_tz(value)
+    return v.strftime(fmt).replace(" 0", " ") if v else ""
 
 
 def fmt_datetime(value: datetime | None) -> str:
-    """Date and time in IST, e.g. '20 Nov 2026, 4:05 PM'."""
-    v = to_ist(value)
-    return v.strftime("%d %b %Y, %I:%M %p").replace(" 0", " ") if v else ""
+    """Date and time in US Eastern time, e.g. 'Nov 20, 2026, 4:05 PM'."""
+    v = to_store_tz(value)
+    return v.strftime("%b %d, %Y, %I:%M %p").replace(" 0", " ") if v else ""
+
+
+def fmt_phone(value: str | None) -> str:
+    """US phone number: 6145550123 -> (614) 555-0123; anything else is shown as is."""
+    digits = "".join(c for c in value or "" if c.isdigit())
+    if len(digits) == 10:
+        return f"({digits[:3]}) {digits[3:6]}-{digits[6:]}"
+    return value or ""
 
 
 def ago(value: datetime | None) -> str:
@@ -75,12 +84,18 @@ def compact(value: int | float) -> str:
 
 
 templates.env.filters.update(
-    usd=usd, date=fmt_date, datetime=fmt_datetime, ago=ago, compact=compact, ist=to_ist
+    usd=usd,
+    date=fmt_date,
+    datetime=fmt_datetime,
+    ago=ago,
+    compact=compact,
+    phone=fmt_phone,
+    store_tz=to_store_tz,
 )
 templates.env.globals.update(
     ORDER_STATUS_LABELS=ORDER_STATUS_LABELS,
     PAYMENT_METHODS=PAYMENT_METHODS,
-    now=lambda: datetime.now(IST),
+    now=lambda: datetime.now(STORE_TZ),
 )
 
 

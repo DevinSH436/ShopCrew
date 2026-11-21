@@ -10,7 +10,7 @@
 <div class="price price-{{ size }}">
   {% if p.discount_pct %}<span class="price-off">-{{ p.discount_pct }}%</span>{% endif %}
   <span class="price-now"><sup>$</sup>{{ p.price|usd }}</span>
-  {% if p.mrp > p.price %}<span class="price-mrp">M.R.P.: <s>${{ p.mrp|usd }}</s></span>{% endif %}
+  {% if p.mrp > p.price %}<span class="price-mrp">List Price: <s>${{ p.mrp|usd }}</s></span>{% endif %}
 </div>
 {%- endmacro %}
 

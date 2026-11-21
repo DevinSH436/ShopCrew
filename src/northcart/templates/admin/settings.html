@@ -12,7 +12,7 @@
       {% for key, label, hint in fields %}
       <label class="field{{ ' has-error' if errors.get(key) }}"><span>{{ label }}{% if hint %} <small>{{ hint }}</small>{% endif %}</span>
         {% if key in ('announcement', 'hero_subtitle', 'company_address') %}<textarea name="{{ key }}" rows="2" maxlength="300">{{ values[key] }}</textarea>
-        {% else %}<input name="{{ key }}" value="{{ values[key] }}" maxlength="300" {{ 'class=mono' if key == 'gstin' }}>{% endif %}
+        {% else %}<input name="{{ key }}" value="{{ values[key] }}" maxlength="300" {{ 'class=mono' if key == 'tax_id' }}>{% endif %}
         {{ field_error(errors, key) }}
       </label>
       {% endfor %}

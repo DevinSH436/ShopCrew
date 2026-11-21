@@ -1,4 +1,4 @@
-"""Create and fill the store database with a realistic demo catalogue and order history.
+"""Create and fill the store database with a realistic demo catalog and order history.
 
 Usage::
 
@@ -45,35 +45,35 @@ NOW = datetime.now(UTC).replace(microsecond=0)
 DATA_DIR = PROJECT_ROOT / "data"
 
 CUSTOMER_CITIES = [
-    ("Mumbai", "Maharashtra", "400050"), ("Pune", "Maharashtra", "411038"),
-    ("Bengaluru", "Karnataka", "560034"), ("Hyderabad", "Telangana", "500081"),
-    ("Chennai", "Tamil Nadu", "600040"), ("New Delhi", "Delhi", "110017"),
-    ("Gurugram", "Haryana", "122002"), ("Noida", "Uttar Pradesh", "201301"),
-    ("Kolkata", "West Bengal", "700091"), ("Ahmedabad", "Gujarat", "380015"),
-    ("Jaipur", "Rajasthan", "302017"), ("Lucknow", "Uttar Pradesh", "226010"),
-    ("Kochi", "Kerala", "682024"), ("Indore", "Madhya Pradesh", "452010"),
-    ("Chandigarh", "Chandigarh", "160017"), ("Guwahati", "Assam", "781005"),
-    ("Bhubaneswar", "Odisha", "751024"), ("Coimbatore", "Tamil Nadu", "641018"),
-    ("Nagpur", "Maharashtra", "440010"), ("Dehradun", "Uttarakhand", "248001"),
+    ("New York", "New York", "10011"), ("Brooklyn", "New York", "11215"),
+    ("Boston", "Massachusetts", "02116"), ("Philadelphia", "Pennsylvania", "19103"),
+    ("Washington", "District of Columbia", "20009"), ("Atlanta", "Georgia", "30308"),
+    ("Miami", "Florida", "33130"), ("Columbus", "Ohio", "43215"),
+    ("Chicago", "Illinois", "60614"), ("Minneapolis", "Minnesota", "55408"),
+    ("Dallas", "Texas", "75204"), ("Houston", "Texas", "77006"),
+    ("Austin", "Texas", "78704"), ("Denver", "Colorado", "80206"),
+    ("Phoenix", "Arizona", "85004"), ("Los Angeles", "California", "90026"),
+    ("San Diego", "California", "92103"), ("San Francisco", "California", "94110"),
+    ("Portland", "Oregon", "97214"), ("Seattle", "Washington", "98122"),
 ]  # fmt: skip
-FIRST = ["Aarav", "Vivaan", "Aditya", "Arjun", "Sai", "Reyansh", "Krishna", "Ishaan", "Rohan",
-         "Kabir", "Ananya", "Diya", "Saanvi", "Aadhya", "Pari", "Myra", "Anika", "Kavya", "Riya",
-         "Meera", "Neha", "Pooja", "Rahul", "Vikram", "Farhan", "Aisha", "Simran", "Harpreet",
-         "Lakshmi", "Karthik", "Deepa", "Arnav", "Tanvi", "Nikhil", "Sneha", "Gaurav"]  # fmt: skip
-LAST = ["Sharma", "Verma", "Iyer", "Nair", "Reddy", "Patel", "Shah", "Mehta", "Gupta",
-        "Banerjee", "Das", "Khan", "Singh", "Kaur", "Menon", "Rao", "Joshi", "Kulkarni",
-        "Chatterjee", "Pillai", "Agarwal", "Bose", "Desai", "Mishra"]  # fmt: skip
+FIRST = ["James", "Olivia", "Liam", "Emma", "Noah", "Ava", "Ethan", "Sophia", "Mason", "Mia",
+         "Lucas", "Amelia", "Logan", "Harper", "Jacob", "Evelyn", "Daniel", "Abigail", "Henry",
+         "Emily", "Jackson", "Ella", "Sebastian", "Grace", "Aiden", "Chloe", "Carlos", "Maria",
+         "Jamal", "Aaliyah", "Kevin", "Priya", "Wei", "Mei", "Diego", "Sofia"]  # fmt: skip
+LAST = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis",
+        "Rodriguez", "Martinez", "Wilson", "Anderson", "Taylor", "Thomas", "Moore", "Jackson",
+        "Lee", "Harris", "Clark", "Lewis", "Walker", "Young", "Nguyen", "Patel"]  # fmt: skip
 STREETS = [
-    "MG Road",
-    "Linking Road",
-    "Indiranagar 100 Ft Road",
-    "Anna Salai",
-    "Park Street",
-    "SG Highway",
-    "Banjara Hills Rd No. 12",
-    "FC Road",
-    "Sector 18",
-    "Civil Lines",
+    "Main Street",
+    "Oak Avenue",
+    "Maple Drive",
+    "Park Avenue",
+    "Elm Street",
+    "Washington Boulevard",
+    "Lakeview Road",
+    "Cedar Lane",
+    "Sunset Boulevard",
+    "Pine Street",
 ]
 
 
@@ -117,9 +117,9 @@ def _make_user(rng: random.Random, i: int) -> User:
     first, last = rng.choice(FIRST), rng.choice(LAST)
     city, state, pin = rng.choice(CUSTOMER_CITIES)
     user = User(
-        email=f"{first.lower()}.{last.lower()}{i}@example.in",
+        email=f"{first.lower()}.{last.lower()}{i}@example.com",
         name=f"{first} {last}",
-        phone=f"9{rng.randint(100000000, 999999999)}",
+        phone=f"{rng.randint(201, 989)}555{rng.randint(1000, 9999)}",
         password_hash="!",  # cannot sign in
         created_at=NOW - timedelta(days=rng.randint(20, 400)),
     )
@@ -127,12 +127,11 @@ def _make_user(rng: random.Random, i: int) -> User:
         Address(
             full_name=user.name,
             phone=user.phone,
-            line1=f"{rng.randint(1, 250)}, {rng.choice(['Shanti', 'Sai', 'Ganga', 'Lotus', 'Green'])} "
-            f"{rng.choice(['Apartments', 'Residency', 'Heights', 'Enclave'])}",
-            line2=rng.choice(STREETS),
+            line1=f"{rng.randint(10, 9800)} {rng.choice(STREETS)}",
+            line2=rng.choice(["", "", f"Apt {rng.randint(1, 30)}{rng.choice('ABCD')}"]),
             city=city,
             state=state,
-            pincode=pin,
+            zip_code=pin,
             is_default=True,
         )
     )
@@ -154,23 +153,21 @@ def _seed_orders(db: Session, rng: random.Random, users: list[User], products: l
                 placed = NOW - timedelta(minutes=rng.randint(5, 600))
             picks = rng.choices(products, weights=popularity, k=rng.choice([1, 1, 1, 2, 2, 3]))
             items = {p.id: p for p in picks}.values()
-            number = f"HT-{placed:%y%m}-{rng.randint(100000, 999999)}"
+            number = f"NC-{placed:%y%m}-{rng.randint(100000, 999999)}"
             while number in used:
-                number = f"HT-{placed:%y%m}-{rng.randint(100000, 999999)}"
+                number = f"NC-{placed:%y%m}-{rng.randint(100000, 999999)}"
             used.add(number)
             order = Order(
                 number=number,
                 user=user,
-                payment_method=rng.choices(["upi", "card", "cod", "netbanking"], [50, 25, 20, 5])[
-                    0
-                ],
+                payment_method=rng.choices(["card", "paypal", "bank", "cod"], [62, 25, 8, 5])[0],
                 ship_name=addr.full_name,
                 ship_phone=addr.phone,
                 ship_line1=addr.line1,
                 ship_line2=addr.line2,
                 ship_city=addr.city,
                 ship_state=addr.state,
-                ship_pincode=addr.pincode,
+                ship_zip=addr.zip_code,
                 created_at=placed,
                 subtotal=0,
                 total=0,
@@ -193,7 +190,7 @@ def _seed_orders(db: Session, rng: random.Random, users: list[User], products: l
             order.shipping_fee = 5 if after < 35 else 0
             order.cod_fee = 2 if order.payment_method == "cod" else 0
             order.total = after + order.shipping_fee + order.cod_fee
-            order.expected_delivery = delivery_estimate(addr.pincode, placed)
+            order.expected_delivery = delivery_estimate(addr.zip_code, placed)
             online = order.payment_method != "cod"
             order.payment_status = "paid" if online else "pending"
             order.payment_ref = f"pay_{rng.getrandbits(48):012x}" if online else ""
@@ -313,31 +310,31 @@ def seed(db: Session) -> None:
             names = cd.COMPETITORS.get(spec["cat"], cd.COMPETITORS["default"])
             for name in rng.sample(names, min(len(names), 4)):
                 factor = rng.uniform(0.9, 1.22)
-                price = int(round(spec["price"] * factor / 10) * 10 - 1)
+                price = round(spec["price"] * factor)
                 p.competitor_prices.append(
                     CompetitorPrice(
-                        competitor=name, price=max(99, price), in_stock=rng.random() < 0.85,
+                        competitor=name, price=max(1, price), in_stock=rng.random() < 0.85,
                         last_checked=NOW - timedelta(days=rng.randint(0, 6)),
                     )
                 )  # fmt: skip
 
     # People
-    admin = User(email=settings.admin_email, name="Aditi Rao", phone="9800000001",
+    admin = User(email=settings.admin_email, name="Alex Morgan", phone="6145550100",
                  password_hash=hash_password(settings.admin_password), is_admin=True)  # fmt: skip
     demo = User(
         email=os.getenv("DEMO_CUSTOMER_EMAIL", "customer@northcart.test"),
-        name="Priya Sharma",
-        phone="9820012345",
+        name="Jordan Taylor",
+        phone="6145550123",
         password_hash=hash_password(os.getenv("DEMO_CUSTOMER_PASSWORD", "shop1234")),
     )
     demo.addresses.append(
-        Address(full_name="Priya Sharma", phone="9820012345", line1="B-702, Lotus Heights",
-                line2="Hiranandani Gardens, Powai", landmark="Near Galleria Mall",
-                city="Mumbai", state="Maharashtra", pincode="400076", is_default=True)
+        Address(full_name="Jordan Taylor", phone="6145550123", line1="742 Maple Drive",
+                line2="Apt 3B", landmark="Leave at the front desk",
+                city="Columbus", state="Ohio", zip_code="43215", is_default=True)
     )  # fmt: skip
     demo.addresses.append(
-        Address(full_name="Priya Sharma", phone="9820012345", line1="3rd Floor, WeWork Vijay Diamond",
-                line2="Andheri East", city="Mumbai", state="Maharashtra", pincode="400093",
+        Address(full_name="Jordan Taylor", phone="6145550123", line1="500 Commerce Street",
+                line2="Suite 400", city="Columbus", state="Ohio", zip_code="43215",
                 kind="work")
     )  # fmt: skip
     db.add_all([admin, demo])

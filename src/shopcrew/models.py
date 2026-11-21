@@ -17,7 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 
 class Product(BaseModel):
-    """A product in our catalogue."""
+    """A product in our catalog."""
 
     id: str
     name: str

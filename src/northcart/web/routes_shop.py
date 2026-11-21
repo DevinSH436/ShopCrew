@@ -19,22 +19,22 @@ from northcart.services import catalog
 from northcart.services import orders as order_svc
 from northcart.web.deps import current_user, flash
 from northcart.web.pages import PAGES
-from northcart.web.templating import IST, render, usd
+from northcart.web.templating import STORE_TZ, render, usd
 
 router = APIRouter()
 
 RECENT_KEY = "recent"
 REVIEWS_PER_PAGE = 10
 
-# First three digits of a PIN code -> city, for friendly delivery messages.
-PIN_CITIES = {
-    "110": "New Delhi", "400": "Mumbai", "560": "Bengaluru", "600": "Chennai",
-    "700": "Kolkata", "500": "Hyderabad", "411": "Pune", "380": "Ahmedabad",
-    "122": "Gurugram", "201": "Noida", "302": "Jaipur", "226": "Lucknow",
-    "682": "Kochi", "452": "Indore", "160": "Chandigarh", "781": "Guwahati",
-    "751": "Bhubaneswar", "641": "Coimbatore", "440": "Nagpur", "248": "Dehradun",
-    "141": "Ludhiana", "395": "Surat", "530": "Visakhapatnam", "800": "Patna",
-    "462": "Bhopal", "403": "Goa", "695": "Thiruvananthapuram",
+# First three digits of a ZIP code -> city, for friendly delivery messages.
+ZIP_CITIES = {
+    "100": "New York", "112": "Brooklyn", "021": "Boston", "191": "Philadelphia",
+    "200": "Washington", "303": "Atlanta", "331": "Miami", "432": "Columbus",
+    "441": "Cleveland", "452": "Cincinnati", "482": "Detroit", "606": "Chicago",
+    "554": "Minneapolis", "631": "St. Louis", "750": "Dallas", "770": "Houston",
+    "787": "Austin", "802": "Denver", "850": "Phoenix", "891": "Las Vegas",
+    "900": "Los Angeles", "921": "San Diego", "941": "San Francisco", "972": "Portland",
+    "981": "Seattle", "282": "Charlotte", "372": "Nashville",
 }  # fmt: skip
 
 
@@ -94,7 +94,7 @@ def home(
             .order_by(Product.sold_count.desc())
             .limit(1)
         )
-    deal_ends = datetime.now(IST).replace(hour=23, minute=59, second=59, microsecond=0)
+    deal_ends = datetime.now(STORE_TZ).replace(hour=23, minute=59, second=59, microsecond=0)
     return render(
         request,
         db,
@@ -341,7 +341,7 @@ def product_page(
             "together_total": product.price + sum(p.price for p in together),
             "recent": recently_viewed(request, db, exclude=slug),
             "sold_month": max(0, product.sold_count // 4 // 10 * 10),
-            "emi": product.price // 6 if product.price >= 45 else 0,
+            "emi": product.price // 4 if product.price >= 45 else 0,
         },
         user=user,
     )
@@ -358,20 +358,20 @@ def api_suggest(q: str = "", db: Session = Depends(get_db)) -> JSONResponse:
 
 
 @router.get("/api/delivery")
-def api_delivery(pincode: str = "") -> JSONResponse:
-    """Delivery estimate for a PIN code."""
-    pincode = pincode.strip()
-    if not order_svc.valid_pincode(pincode):
+def api_delivery(zip_code: str = "") -> JSONResponse:
+    """Delivery estimate for a ZIP code."""
+    zip_code = zip_code.strip()
+    if not order_svc.valid_zip(zip_code):
         return JSONResponse(
-            {"ok": False, "message": "Please enter a valid 6-digit PIN code."}, status_code=400
+            {"ok": False, "message": "Please enter a valid 5-digit ZIP code."}, status_code=400
         )
-    when = order_svc.delivery_estimate(pincode).astimezone(IST)
-    label = when.strftime("%A, %d %b").replace(" 0", " ")
+    when = order_svc.delivery_estimate(zip_code).astimezone(STORE_TZ)
+    label = when.strftime("%A, %b %d").replace(" 0", " ")
     return JSONResponse(
         {
             "ok": True,
-            "city": PIN_CITIES.get(pincode[:3], ""),
-            "days": order_svc.delivery_days(pincode),
+            "city": ZIP_CITIES.get(zip_code[:3], ""),
+            "days": order_svc.delivery_days(zip_code),
             "date_label": label,
             "message": f"Delivery by {label}",
             "cod": True,
@@ -404,7 +404,7 @@ async def contact_submit(request: Request) -> RedirectResponse:
     if not name or len(message) < 10:
         flash(request, "Please tell us your name and a message of at least 10 characters.", "error")
     else:
-        ticket = datetime.now(IST).strftime("%y%m%d%H%M")
+        ticket = datetime.now(STORE_TZ).strftime("%y%m%d%H%M")
         flash(
             request,
             f"Thanks {name.split()[0]}! Ticket #{ticket} created. We reply within 24 hours.",

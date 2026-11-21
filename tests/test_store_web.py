@@ -68,7 +68,7 @@ def sign_in(c: TestClient, email: str, password: str) -> None:
         "/sitemap.xml",
         "/robots.txt",
         "/api/suggest?q=bot",
-        "/api/delivery?pincode=400076",
+        "/api/delivery?zip_code=10011",
         "/art/pulsebeat-pro-wireless-earbuds.svg?v=2",
     ],
 )
@@ -87,7 +87,7 @@ def test_unknown_pages_are_404(client: TestClient) -> None:
 def test_product_page_shows_price_and_reviews(client: TestClient) -> None:
     html = client.get("/p/voltra-boom-portable-speaker").text
     assert "Voltra Boom" in html and "$33" in html
-    assert "Inclusive of all taxes" in html
+    assert "Sales tax included" in html
 
 
 def test_post_without_csrf_is_rejected(client: TestClient) -> None:
@@ -109,7 +109,7 @@ def test_bad_password_is_refused(client: TestClient) -> None:
 
 
 def test_guest_cart_then_checkout_with_cod(client: TestClient, db: Session) -> None:  # noqa: F811
-    product = db.scalar(select(Product).where(Product.slug == "aarohan-yoga-mat-6mm"))
+    product = db.scalar(select(Product).where(Product.slug == "ascend-yoga-mat-6mm"))
     assert product is not None
     token = csrf(client)
     headers = {"X-CSRF-Token": token, "X-Requested-With": "fetch", "Accept": "application/json"}
@@ -176,7 +176,7 @@ def test_admin_pages_and_mock_crew_run(client: TestClient, db: Session) -> None:
         assert client.get(path).status_code == 200, path
         csrf(client, path)  # every form on the page carries the token
 
-    product = db.scalar(select(Product).where(Product.slug == "mitti-cast-iron-tawa"))
+    product = db.scalar(select(Product).where(Product.slug == "ironside-cast-iron-griddle"))
     assert product is not None
     token = csrf(client, "/admin/ai")
     r = client.post(

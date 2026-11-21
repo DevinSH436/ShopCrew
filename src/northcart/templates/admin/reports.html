@@ -3,7 +3,7 @@
 {% block title %}Reports{% endblock %}
 {% block content %}
 <div class="page-head">
-  <div><h1>Reports</h1><p>Excludes cancelled and returned orders. Dates are in IST.</p></div>
+  <div><h1>Reports</h1><p>Excludes cancelled and returned orders. Dates are in US Eastern time.</p></div>
   <form class="row" method="get">
     <input type="hidden" name="tab" value="{{ tab }}">
     <label class="field" style="margin:0"><span>From</span><input class="input" type="date" name="from" value="{{ start }}"></label>
@@ -23,18 +23,18 @@
 
 <section class="card">
   <nav class="tabs" aria-label="Report">
-    {% for key, label in [("sales", "Daily sales"), ("category", "By category"), ("product", "By product"), ("gst", "GST summary")] %}
+    {% for key, label in [("sales", "Daily sales"), ("category", "By category"), ("product", "By product"), ("tax", "Sales tax")] %}
       <a href="?tab={{ key }}&from={{ start }}&to={{ end }}" class="{{ 'active' if tab == key }}">{{ label }}</a>
     {% endfor %}
   </nav>
-  {% if tab == "gst" %}
-    <div class="filters"><p class="muted small" style="margin:0;flex:1">Delivered orders by delivery month. Prices include 18% GST; intra-state (Maharashtra) splits into CGST + SGST, other states pay IGST.</p>
-      <a class="btn" href="/admin/reports/gst.csv">{{ icon("download", 16) }} Download CSV</a></div>
+  {% if tab == "tax" %}
+    <div class="filters"><p class="muted small" style="margin:0;flex:1">Delivered orders by delivery month. Prices include sales tax at each shipping state's base rate.</p>
+      <a class="btn" href="/admin/reports/sales-tax.csv">{{ icon("download", 16) }} Download CSV</a></div>
     <div class="table-wrap">
       <table class="table">
-        <thead><tr><th>Month</th><th class="num">Orders</th><th class="num">Gross (incl. GST)</th><th class="num">Taxable value</th><th class="num">CGST</th><th class="num">SGST</th><th class="num">IGST</th></tr></thead>
-        <tbody>{% for m in gst %}<tr><td class="strong">{{ m.month }}</td><td class="num">{{ m.orders }}</td><td class="num">${{ m.gross|usd }}</td><td class="num">${{ m.taxable|usd(true) }}</td><td class="num">${{ m.cgst|usd(true) }}</td><td class="num">${{ m.sgst|usd(true) }}</td><td class="num">${{ m.igst|usd(true) }}</td></tr>
-        {% else %}<tr><td colspan="7" class="muted">No delivered orders yet.</td></tr>{% endfor %}</tbody>
+        <thead><tr><th>Month</th><th class="num">Orders</th><th class="num">Gross (incl. tax)</th><th class="num">Pre-tax sales</th><th class="num">Sales tax</th></tr></thead>
+        <tbody>{% for m in tax %}<tr><td class="strong">{{ m.month }}</td><td class="num">{{ m.orders }}</td><td class="num">${{ m.gross|usd }}</td><td class="num">${{ m.taxable|usd(true) }}</td><td class="num">${{ m.tax|usd(true) }}</td></tr>
+        {% else %}<tr><td colspan="5" class="muted">No delivered orders yet.</td></tr>{% endfor %}</tbody>
       </table>
     </div>
   {% else %}
@@ -57,7 +57,7 @@
       {% if report.rows %}
       <div class="table-wrap"><table class="table">
         <thead><tr><th>Date</th><th class="num">Orders</th><th class="num">Units</th><th class="num">Gross</th><th class="num">Discount</th><th class="num">Shipping &amp; COD</th><th class="num">Net</th></tr></thead>
-        <tbody>{% for r in report.rows|reverse %}<tr><td class="nowrap">{{ r.date.strftime('%a, %d %b %Y') }}</td><td class="num">{{ r.orders }}</td><td class="num">{{ r.units }}</td><td class="num">${{ r.gross|usd }}</td><td class="num">{{ '−$' ~ r.discount|usd if r.discount else '–' }}</td><td class="num">${{ r.shipping|usd }}</td><td class="num strong">${{ r.net|usd }}</td></tr>{% endfor %}</tbody>
+        <tbody>{% for r in report.rows|reverse %}<tr><td class="nowrap">{{ r.date.strftime('%a, %b %d, %Y') }}</td><td class="num">{{ r.orders }}</td><td class="num">{{ r.units }}</td><td class="num">${{ r.gross|usd }}</td><td class="num">{{ '−$' ~ r.discount|usd if r.discount else '–' }}</td><td class="num">${{ r.shipping|usd }}</td><td class="num strong">${{ r.net|usd }}</td></tr>{% endfor %}</tbody>
         <tfoot><tr><th>Total</th><th class="num">{{ t.orders }}</th><th class="num">{{ t.units }}</th><th class="num">${{ t.gross|usd }}</th><th class="num">−${{ t.discount|usd }}</th><th class="num">${{ t.shipping|usd }}</th><th class="num">${{ t.net|usd }}</th></tr></tfoot>
       </table></div>
       {% else %}{{ empty("No sales in this range", "Pick a different date range.") }}{% endif %}

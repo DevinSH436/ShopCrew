@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% from "partials/macros.html" import breadcrumb %}
 {% macro fill(text) -%}
-{{ text|replace('{store}', settings.store_name)|replace('{company}', store.company_name)|replace('{address}', store.company_address)|replace('{phone}', store.support_phone)|replace('{email}', store.support_email)|replace('{gstin}', store.gstin)|replace('{free_ship}', settings.free_shipping_threshold|string)|replace('{ship_fee}', settings.shipping_fee|string)|replace('{cod_fee}', settings.cod_fee|string)|replace('{returns}', settings.return_window_days|string) }}
+{{ text|replace('{store}', settings.store_name)|replace('{company}', store.company_name)|replace('{address}', store.company_address)|replace('{phone}', store.support_phone)|replace('{email}', store.support_email)|replace('{tax_id}', store.tax_id)|replace('{free_ship}', settings.free_shipping_threshold|string)|replace('{ship_fee}', settings.shipping_fee|string)|replace('{cod_fee}', settings.cod_fee|string)|replace('{returns}', settings.return_window_days|string) }}
 {%- endmacro %}
 {% block title %}{{ fill(page.title) }} · {{ settings.store_name }}{% endblock %}
 {% block content %}
@@ -46,7 +46,7 @@
         <label class="field"><span>Topic</span>
           <select name="topic"><option>An order I placed</option><option>Returns &amp; refunds</option><option>Payments</option><option>My account</option><option>Something else</option></select>
         </label>
-        <label class="field"><span>Order number (optional)</span><input name="order" placeholder="HT-2611-123456"></label>
+        <label class="field"><span>Order number (optional)</span><input name="order" placeholder="NC-2611-123456"></label>
         <label class="field"><span>Message</span><textarea name="message" rows="5" minlength="10" required></textarea></label>
         <button class="btn btn-primary" type="submit">Send message</button>
       </form>

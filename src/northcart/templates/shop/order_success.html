@@ -11,9 +11,9 @@
     <p>Confirmation will be sent to <strong>{{ user.email }}</strong>.</p>
     <dl class="success-facts">
       <div><dt>Order number</dt><dd><strong>{{ order.number }}</strong></dd></div>
-      <div><dt>Arriving</dt><dd><strong class="text-green">{{ order.expected_delivery|date('%A, %d %B') }}</strong></dd></div>
+      <div><dt>Arriving</dt><dd><strong class="text-green">{{ order.expected_delivery|date('%A, %B %d') }}</strong></dd></div>
       <div><dt>Payment</dt><dd>{{ order.payment_label }}{% if order.payment_status == 'paid' %} · <span class="text-green">Paid</span>{% else %} · Pay ${{ order.total|usd }} on delivery{% endif %}</dd></div>
-      <div><dt>Deliver to</dt><dd>{{ order.ship_name }}, {{ order.ship_city }} {{ order.ship_pincode }}</dd></div>
+      <div><dt>Deliver to</dt><dd>{{ order.ship_name }}, {{ order.ship_city }} {{ order.ship_zip }}</dd></div>
     </dl>
     <ul class="success-items">
       {% for item in order.items %}

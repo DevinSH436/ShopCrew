@@ -1,7 +1,7 @@
 """Generated product artwork.
 
-The demo catalogue has no photos, so every product gets a clean studio-style SVG drawing
-of its kind (earbuds, bottle, sneaker...) in its own colour, plus three extra gallery
+The demo catalog has no photos, so every product gets a clean studio-style SVG drawing
+of its kind (earbuds, bottle, sneaker...) in its own color, plus three extra gallery
 views. Admins can upload real photos, which replace the artwork.
 """
 
@@ -41,12 +41,12 @@ def darken(c: str, amt: float) -> str:
 
 
 def is_light(c: str) -> bool:
-    """True for light colours (used to pick contrasting detail colours)."""
+    """True for light colors (used to pick contrasting detail colors)."""
     r, g, b = _rgb(c)
     return (0.299 * r + 0.587 * g + 0.114 * b) > 170
 
 
-# Each drawing is centred on (300, 300) in a 600x600 box and may use these fills:
+# Each drawing is centered on (300, 300) in a 600x600 box and may use these fills:
 #   url(#b) body gradient, url(#m) brushed metal, url(#s) soft shine.
 B, M, S = "url(#b)", "url(#m)", "url(#s)"
 

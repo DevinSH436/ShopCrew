@@ -27,7 +27,7 @@
       {% for u, orders, spend, last in rows %}
         <tr>
           <td><a href="/admin/customers/{{ u.id }}" class="strong">{{ u.name }}</a><div class="sub">{{ u.email }}</div></td>
-          <td class="nowrap">{{ u.phone or '–' }}</td>
+          <td class="nowrap">{{ (u.phone|phone) or '–' }}</td>
           <td class="num">{{ orders or 0 }}</td>
           <td class="num">${{ (spend or 0)|usd }}</td>
           <td class="nowrap">{{ last|ago if last else '–' }}</td>

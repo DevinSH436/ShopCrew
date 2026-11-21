@@ -11,7 +11,7 @@ from fastapi.responses import JSONResponse, RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
-from northcart.catalog_data import INDIAN_STATES
+from northcart.catalog_data import US_STATES
 from northcart.db import get_db
 from northcart.models import PAYMENT_METHODS, Address, Order, OrderItem, Product, User
 from northcart.services import cart as cart_svc
@@ -23,10 +23,10 @@ from northcart.web.templating import render
 
 router = APIRouter()
 
-UPI_RE = re.compile(r"^[\w.\-]{2,256}@[A-Za-z][A-Za-z0-9]{1,63}$")
+PAYPAL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[A-Za-z]{2,}$")
 BANKS = [
-    "State Bank of India", "HDFC Bank", "ICICI Bank", "Axis Bank", "Kotak Mahindra Bank",
-    "Bank of Baroda", "Punjab National Bank", "Yes Bank", "IDFC FIRST Bank", "Canara Bank",
+    "Chase", "Bank of America", "Wells Fargo", "Citibank", "U.S. Bank", "Capital One",
+    "PNC Bank", "Truist", "TD Bank", "Ally Bank",
 ]  # fmt: skip
 
 
@@ -192,13 +192,13 @@ async def cart_coupon(
 @router.get("/checkout")
 def checkout_page(
     request: Request,
-    payment: str = "upi",
+    payment: str = "card",
     db: Session = Depends(get_db),
     user: User = Depends(require_user),
 ):
     """Single-page checkout: address, payment, review."""
     owner = cart_svc.CartOwner(user_id=user.id)
-    payment = payment if payment in PAYMENT_METHODS else "upi"
+    payment = payment if payment in PAYMENT_METHODS else "card"
     coupon = request.session.get("coupon", "")
     summary = cart_svc.summarize(db, owner, coupon, payment)
     if not summary.lines:
@@ -213,7 +213,7 @@ def checkout_page(
     selected = _int(request.session.get("checkout_address")) or (
         addresses[0].id if addresses else 0
     )
-    estimates = {a.id: order_svc.delivery_estimate(a.pincode) for a in addresses}
+    estimates = {a.id: order_svc.delivery_estimate(a.zip_code) for a in addresses}
     return render(
         request,
         db,
@@ -226,7 +226,7 @@ def checkout_page(
             "estimates": estimates,
             "payment": payment,
             "banks": BANKS,
-            "states": INDIAN_STATES,
+            "states": US_STATES,
             "coupon_code": request.session.get("coupon", ""),
             "values": {"full_name": user.name, "phone": user.phone, "kind": "home"},
             "errors": {},
@@ -265,9 +265,9 @@ async def checkout_place(
         return RedirectResponse("/checkout", status_code=303)
     request.session["checkout_address"] = address.id
     error = ""
-    if method == "upi":
-        if not UPI_RE.match(str(form.get("upi_id") or "").strip()):
-            error = "Enter a valid UPI ID, like name@okbank."
+    if method == "paypal":
+        if not PAYPAL_RE.match(str(form.get("paypal_email") or "").strip()):
+            error = "Enter the email address of your PayPal account."
     elif method == "card":
         number = str(form.get("card_number") or "")
         expiry = str(form.get("card_expiry") or "").strip()
@@ -281,14 +281,14 @@ async def checkout_place(
             error = "Enter the 3 or 4 digit CVV."
         elif not str(form.get("card_name") or "").strip():
             error = "Enter the name on the card."
-    elif method == "netbanking":
+    elif method == "bank":
         if str(form.get("bank") or "") not in BANKS:
             error = "Choose your bank."
     elif method != "cod":
         error = "Please choose a payment method."
     if error:
         flash(request, error, "error")
-        return RedirectResponse(f"/checkout?payment={method or 'upi'}", status_code=303)
+        return RedirectResponse(f"/checkout?payment={method or 'card'}", status_code=303)
     try:
         order = order_svc.place_order(db, user, address, method, request.session.get("coupon", ""))
     except order_svc.OrderError as err:

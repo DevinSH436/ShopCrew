@@ -8,7 +8,7 @@
     <span class="avatar" style="width:52px;height:52px;font-size:1.3rem">{{ customer.name[:1] }}</span>
     <div>
       <h1 style="margin:0">{{ customer.name }} {% if customer.is_admin %}{{ pill('staff', 'Staff') }}{% endif %} {{ pill('active', 'Active') if customer.is_active else pill('blocked', 'Blocked') }}</h1>
-      <p>{{ customer.email }}{% if customer.phone %} · {{ customer.phone }}{% endif %} · customer since {{ customer.created_at|date('%b %Y') }}</p>
+      <p>{{ customer.email }}{% if customer.phone %} · {{ customer.phone|phone }}{% endif %} · customer since {{ customer.created_at|date('%b %Y') }}</p>
     </div>
   </div>
   {% if customer.id != user.id %}
@@ -46,7 +46,7 @@
       <div class="card-head"><h2>Addresses</h2></div>
       <div class="card-body">
         {% for a in addresses %}
-          <p class="small"><b>{{ a.full_name }}</b> {% if a.is_default %}{{ pill('ok', 'Default') }}{% endif %} <span class="muted">({{ a.kind }})</span><br>{{ a.one_line() }}<br>📞 {{ a.phone }}</p>
+          <p class="small"><b>{{ a.full_name }}</b> {% if a.is_default %}{{ pill('ok', 'Default') }}{% endif %} <span class="muted">({{ a.kind }})</span><br>{{ a.one_line() }}<br>📞 {{ a.phone|phone }}</p>
         {% else %}<p class="muted">No saved addresses.</p>{% endfor %}
       </div>
     </section>

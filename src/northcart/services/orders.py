@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import random
+import re
 import string
 from datetime import UTC, datetime, timedelta
 
@@ -22,11 +23,12 @@ from northcart.models import (
 )
 from northcart.services import cart as cart_svc
 
-COURIERS = ["Delhivery", "Blue Dart", "Ekart", "XpressBees", "Shadowfax"]
+COURIERS = ["UPS", "FedEx", "USPS", "OnTrac"]
 
-# First digit of an Indian PIN code -> postal region. Metro-heavy regions ship faster.
-_REGION_DAYS = {"1": 3, "2": 4, "3": 4, "4": 2, "5": 3, "6": 3, "7": 5, "8": 5, "9": 6}
-_METRO_PREFIXES = ("110", "400", "560", "600", "700", "500", "411", "380", "122", "201")
+# First digit of a US ZIP code -> region. The warehouse is in Ohio (4xx), so the Midwest
+# and East ship fastest; big metro areas get next-day-ish service.
+_REGION_DAYS = {"0": 3, "1": 2, "2": 3, "3": 3, "4": 2, "5": 3, "6": 3, "7": 4, "8": 4, "9": 5}
+_METRO_PREFIXES = ("100", "112", "606", "432", "441", "452", "191", "200", "900", "941", "981")
 
 # Which statuses an admin may move an order to from its current status.
 TRANSITIONS: dict[str, list[str]] = {
@@ -46,22 +48,22 @@ class OrderError(ValueError):
     """An order action that cannot be performed, with a customer-facing message."""
 
 
-def valid_pincode(pincode: str) -> bool:
-    """Indian PIN codes are 6 digits and never start with 0."""
-    return len(pincode) == 6 and pincode.isdigit() and pincode[0] != "0"
+def valid_zip(zip_code: str) -> bool:
+    """US ZIP codes: 5 digits, optionally followed by -1234 (ZIP+4)."""
+    return re.fullmatch(r"\d{5}(-\d{4})?", zip_code) is not None
 
 
-def delivery_days(pincode: str) -> int:
-    """Estimated business days to deliver to ``pincode``."""
-    if pincode.startswith(_METRO_PREFIXES):
+def delivery_days(zip_code: str) -> int:
+    """Estimated business days to deliver to ``zip_code``."""
+    if zip_code.startswith(_METRO_PREFIXES):
         return 2
-    return _REGION_DAYS.get(pincode[:1], 5)
+    return _REGION_DAYS.get(zip_code[:1], 5)
 
 
-def delivery_estimate(pincode: str, start: datetime | None = None) -> datetime:
+def delivery_estimate(zip_code: str, start: datetime | None = None) -> datetime:
     """Expected delivery date, skipping Sundays."""
     day = (start or datetime.now(UTC)).replace(hour=0, minute=0, second=0, microsecond=0)
-    remaining = delivery_days(pincode)
+    remaining = delivery_days(zip_code)
     while remaining > 0:
         day += timedelta(days=1)
         if day.weekday() != 6:
@@ -70,10 +72,10 @@ def delivery_estimate(pincode: str, start: datetime | None = None) -> datetime:
 
 
 def new_order_number(db: Session, when: datetime | None = None) -> str:
-    """Order number like ``HT-2611-482193`` (year, month, random)."""
+    """Order number like ``NC-2611-482193`` (year, month, random)."""
     when = when or datetime.now(UTC)
     while True:
-        number = f"HT-{when:%y%m}-" + "".join(random.choices(string.digits, k=6))
+        number = f"NC-{when:%y%m}-" + "".join(random.choices(string.digits, k=6))
         if db.scalar(select(Order.id).where(Order.number == number)) is None:
             return number
 
@@ -144,8 +146,8 @@ def place_order(
         ship_line2=", ".join(p for p in [address.line2, address.landmark] if p),
         ship_city=address.city,
         ship_state=address.state,
-        ship_pincode=address.pincode,
-        expected_delivery=delivery_estimate(address.pincode, now),
+        ship_zip=address.zip_code,
+        expected_delivery=delivery_estimate(address.zip_code, now),
         created_at=now,
     )
     for line in summary.lines:
@@ -181,7 +183,7 @@ def set_status(db: Session, order: Order, status: str, note: str = "") -> None:
     if status == "shipped" and not order.tracking_number:
         order.courier = order.courier or random.choice(COURIERS)
         order.tracking_number = "".join(random.choices(string.digits, k=12))
-        note = note or f"Shipped with {order.courier}. AWB {order.tracking_number}."
+        note = note or f"Shipped with {order.courier}. Tracking {order.tracking_number}."
     if status == "delivered":
         order.delivered_at = now
         if order.payment_method == "cod":

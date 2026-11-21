@@ -48,15 +48,15 @@
     <hr>
     {% if p.discount_pct >= 40 %}<span class="deal-flag">Limited time deal</span>{% endif %}
     {{ price(p, "lg") }}
-    <p class="tax-note">Inclusive of all taxes</p>
-    {% if emi %}<p class="emi-line"><strong>No-cost EMI</strong> from ${{ emi|usd }}/month on 6 months. <a href="/pages/help">Details</a></p>{% endif %}
+    <p class="tax-note">Sales tax included</p>
+    {% if emi %}<p class="emi-line"><strong>Pay in 4</strong> interest-free payments of ${{ emi|usd }}. <a href="/pages/help">Details</a></p>{% endif %}
 
     <div class="offers">
       <h2 class="offers-title">Offers</h2>
       <div class="offer-list">
         <div class="offer"><strong>Coupon</strong><span>Extra 10% off up to $15 with <button type="button" class="code-chip" data-copy="WELCOME10" title="Copy code">WELCOME10</button></span></div>
-        <div class="offer"><strong>Bank offer</strong><span>5% instant discount on HDFC &amp; ICICI credit cards, min $30</span></div>
-        <div class="offer"><strong>UPI</strong><span>Flat $2 cashback on your first UPI payment</span></div>
+        <div class="offer"><strong>Card offer</strong><span>5% back with the Northcart Rewards card, min $30</span></div>
+        <div class="offer"><strong>PayPal</strong><span>$2 off your first PayPal order</span></div>
         {% if p.price >= 75 %}<div class="offer"><strong>Flat $10</strong><span>off with <button type="button" class="code-chip" data-copy="FLAT10">FLAT10</button> on orders above $75</span></div>{% endif %}
       </div>
     </div>
@@ -82,11 +82,11 @@
        data-fee="{{ settings.shipping_fee }}">
       {% if p.price >= settings.free_shipping_threshold %}<strong class="text-green">FREE delivery</strong>{% else %}${{ settings.shipping_fee }} delivery{% endif %}
       <span data-delivery-date>in 2–6 days</span>.
-      <button type="button" class="link-btn" data-pincode-open>Check your PIN code</button>
+      <button type="button" class="link-btn" data-zip-open>Check your ZIP code</button>
     </p>
     <form class="pin-check" data-pin-check>
-      <label class="visually-hidden" for="pdp-pin">PIN code</label>
-      <input id="pdp-pin" name="pincode" inputmode="numeric" maxlength="6" placeholder="Enter PIN code" pattern="[1-9][0-9]{5}">
+      <label class="visually-hidden" for="pdp-pin">ZIP code</label>
+      <input id="pdp-pin" name="zip_code" inputmode="numeric" maxlength="10" placeholder="Enter ZIP code" pattern="[0-9]{5}(-[0-9]{4})?">
       <button class="btn btn-secondary btn-sm" type="submit">Check</button>
     </form>
     <p class="small muted" data-pin-result></p>
@@ -155,7 +155,7 @@
           <tr><th>Brand</th><td>{{ p.brand }}</td></tr>
           {% for k, v in (p.specs or {}).items() %}<tr><th>{{ k }}</th><td>{{ v }}</td></tr>{% endfor %}
           <tr><th>Item model number</th><td>{{ p.sku }}</td></tr>
-          <tr><th>Country of origin</th><td>India</td></tr>
+          <tr><th>Country of origin</th><td>Imported</td></tr>
           <tr><th>Customer reviews</th><td>{% if p.rating_count %}{{ stars(p.rating_avg) }} {{ '%.1f'|format(p.rating_avg) }} out of 5 ({{ p.rating_count }}){% else %}No reviews yet{% endif %}</td></tr>
         </tbody>
       </table>
@@ -236,7 +236,7 @@
       <article class="review">
         <div class="review-author"><span class="avatar" aria-hidden="true">{{ r.author_name[:1] }}</span><strong>{{ r.author_name }}</strong></div>
         <div class="review-head">{{ stars(r.rating) }} <strong>{{ r.title }}</strong></div>
-        <p class="review-meta">Reviewed in {{ r.author_city or 'India' }} on {{ r.created_at|date('%d %B %Y') }}{% if r.verified_purchase %} · <span class="verified">Verified Purchase</span>{% endif %}</p>
+        <p class="review-meta">Reviewed in {{ r.author_city or 'the United States' }} on {{ r.created_at|date('%B %d, %Y') }}{% if r.verified_purchase %} · <span class="verified">Verified Purchase</span>{% endif %}</p>
         <p class="review-body">{{ r.body }}</p>
         <div class="review-actions">
           {% if r.helpful_count %}<span class="small muted" data-helpful-count="{{ r.id }}">{{ r.helpful_count }} {{ 'person' if r.helpful_count == 1 else 'people' }} found this helpful</span>{% else %}<span class="small muted" data-helpful-count="{{ r.id }}"></span>{% endif %}

@@ -31,15 +31,15 @@ Demo sign-ins (local test values from `.env.example`): customer `customer@northc
 | Storefront | Seller admin (`/admin`) |
 |---|---|
 | Home with hero, category tiles, deal-of-the-day shelf with countdown, featured, best sellers, recently viewed | Dashboard: revenue and order KPIs vs previous period, revenue chart, status donut, category and payment split, low stock |
-| Search with autocomplete, filters (category, brand, price, rating, discount, stock), sort, pagination | Orders: status tabs, filters, bulk actions, CSV export, lifecycle with allowed transitions only, courier/AWB, GST invoice + packing slip |
-| Product page: gallery with zoom, MRP/discount, offers, PIN-code delivery estimate, specs, AI "Customers say", reviews with histogram and helpful votes | Products: full editor, image upload (signature-checked), competitor prices, ✨ **Write with AI** (Ollama) |
-| Cart with save-for-later, coupons, free-delivery progress | Inventory, categories, customers (block/staff), review moderation, coupons, reports (sales + GST), store settings |
-| Checkout: saved addresses, UPI / card (Luhn) / net banking / COD (simulated payments), order confirmation | **AI Crew**: run the 4 agents on any product, live agent cards and log, results, one-click **Apply** |
-| Account: orders with tracking timeline, cancel/return, printable GST invoice, addresses, wishlist, reviews | Ollama health check with fix instructions |
+| Search with autocomplete, filters (category, brand, price, rating, discount, stock), sort, pagination | Orders: status tabs, filters, bulk actions, CSV export, lifecycle with allowed transitions only, carrier + tracking number, invoice with state sales tax + packing slip |
+| Product page: gallery with zoom, list price/discount, Pay in 4, offers, ZIP-code delivery estimate, specs, AI "Customers say", reviews with histogram and helpful votes | Products: full editor, image upload (signature-checked), competitor prices, ✨ **Write with AI** (Ollama) |
+| Cart with save-for-later, coupons, free-delivery progress | Inventory, categories, customers (block/staff), review moderation, coupons, reports (sales + monthly sales tax), store settings |
+| Checkout: saved US addresses, card (Luhn) / PayPal / bank account (ACH) / pay on delivery (all simulated), order confirmation | **AI Crew**: run the 4 agents on any product, live agent cards and log, results, one-click **Apply** |
+| Account: orders with tracking timeline, cancel/return, printable invoice, addresses, wishlist, reviews | Ollama health check with fix instructions |
 
 **How the crew plugs in:** `northcart.services.ai.StoreDataSource` implements ShopCrew's `DataSource` protocol on top of the store database, which is exactly the swap point the original design left for a real data source. Runs execute in a background worker (one at a time, since a local model does one job well) and stream progress through CrewAI's event bus into the admin page.
 
-Details that make it feel real: US-dollar prices with US digit grouping ($1,234,567), IST timestamps, GST-inclusive prices with CGST/SGST vs IGST on invoices, PIN-code delivery estimates that skip Sundays, COD fee, order numbers like `HT-2611-482193`, stock reservation and restock on cancel/return, CSRF protection, scrypt password hashing, and generated product artwork (every brand and product is fictional).
+Details that make it feel real: US-dollar prices, US Eastern timestamps and US date formats, state sales tax broken out on invoices (base rate for each of the 50 states + DC), ZIP and ZIP+4 validation with delivery estimates from an Ohio warehouse that skip Sundays, US phone formatting, order numbers like `NC-2611-482193`, stock reservation and restock on cancel/return, CSRF protection, scrypt password hashing, and generated product artwork (every brand and product is fictional).
 
 ---
 
@@ -199,7 +199,7 @@ Excerpt from the demo run [`outputs/sample/earbuds-01/campaign_plan.md`](outputs
 │   ├── services/               # catalog, cart, orders, settings, analytics, ai (ShopCrew + Ollama)
 │   ├── web/                    # app factory, storefront/account/cart/admin routes, CSRF, sessions
 │   ├── templates/ · static/    # Jinja pages, CSS, vanilla JS
-│   ├── seed.py                 # demo catalogue, 900+ reviews, 4 months of orders
+│   ├── seed.py                 # demo catalog, 900+ reviews, 4 months of orders
 │   └── art.py                  # generated SVG product artwork
 ├── data/                       # sample products, 144 reviews, competitor prices
 ├── scripts/generate_sample_data.py
@@ -218,7 +218,7 @@ Excerpt from the demo run [`outputs/sample/earbuds-01/campaign_plan.md`](outputs
 │   ├── llm.py                  # LLM from env
 │   ├── cost.py                 # token usage → USD
 │   └── render.py               # Markdown renderers
-├── tests/                      # 165 tests, no API key needed
+├── tests/                      # 166 tests, no API key needed
 ├── Dockerfile · docker-compose.yml
 └── .github/workflows/ci.yml    # ruff + pytest + Docker build & smoke test
 ```
@@ -226,7 +226,7 @@ Excerpt from the demo run [`outputs/sample/earbuds-01/campaign_plan.md`](outputs
 ## Testing
 
 ```bash
-uv run pytest            # 165 tests, ~25s, no API key
+uv run pytest            # 166 tests, ~25s, no API key
 uv run ruff check . && uv run ruff format --check .
 ```
 
@@ -249,7 +249,7 @@ The tests cover the tools and stats (with hand-checkable fixtures), every schema
 - Implemented **sequential and hierarchical (manager-delegated) orchestration**, selectable from a CLI flag, plus per-run token and cost tracking that fixes a usage double-counting issue in the framework.
 - Shipped a **Streamlit dashboard** with live per-agent progress via the framework's event bus, accessible charts (Plotly) and zip export, packaged as a **non-root Docker image** with health checks.
 - Built **Northcart**, a full e-commerce site (FastAPI, SQLAlchemy, Jinja) with storefront, checkout, order tracking and a seller admin panel, and integrated the agent crew through a pluggable data-source interface so its insights apply to live listings; runs fully locally on **Ollama**.
-- Wrote **165 pytest tests** (including end-to-end crew runs and UI tests against a protocol-compatible mock LLM) running in **GitHub Actions CI** with ruff and a container smoke test; no API key needed.
+- Wrote **166 pytest tests** (including end-to-end crew runs and UI tests against a protocol-compatible mock LLM) running in **GitHub Actions CI** with ruff and a container smoke test; no API key needed.
 
 ---
 

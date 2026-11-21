@@ -55,14 +55,14 @@
   function validate() {
     if (!form.address_id || !$("input[name=address_id]:checked", form)) return "Please choose a delivery address.";
     const method = form.payment_method.value;
-    if (method === "upi" && !/^[\w.-]{2,256}@[A-Za-z][A-Za-z0-9]{1,63}$/.test(form.upi_id.value.trim())) return "Enter a valid UPI ID, like name@okbank.";
+    if (method === "paypal" && !/^[^@\s]+@[^@\s]+\.[A-Za-z]{2,}$/.test(form.paypal_email.value.trim())) return "Enter the email address of your PayPal account.";
     if (method === "card") {
       if (!luhn(form.card_number.value)) return "That card number doesn't look right.";
       if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(form.card_expiry.value.trim())) return "Enter the expiry date as MM/YY.";
       if (!/^\d{3,4}$/.test(form.card_cvv.value.trim())) return "Enter the 3 or 4 digit CVV.";
       if (!form.card_name.value.trim()) return "Enter the name on the card.";
     }
-    if (method === "netbanking" && !form.bank.value) return "Choose your bank.";
+    if (method === "bank" && !form.bank.value) return "Choose your bank.";
     return "";
   }
 

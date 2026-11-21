@@ -145,7 +145,7 @@ def test_cart_add_merges_lines_and_caps_quantity(db: Session) -> None:
 
 
 def test_cart_rejects_out_of_stock(db: Session) -> None:
-    p = _product(db, "kagaz-co-gel-pen-set")
+    p = _product(db, "paper-pine-gel-pen-set")
     p.stock = 0
     db.commit()
     with pytest.raises(cart_svc.CartError, match="out of stock"):
@@ -154,7 +154,7 @@ def test_cart_rejects_out_of_stock(db: Session) -> None:
 
 def test_shipping_fee_below_threshold_and_cod_fee(db: Session) -> None:
     owner = cart_svc.CartOwner(session_key="g2")
-    cart_svc.add(db, owner, _product(db, "kagaz-co-gel-pen-set").id)  # $4
+    cart_svc.add(db, owner, _product(db, "paper-pine-gel-pen-set").id)  # $4
     s = cart_svc.summarize(db, owner, payment_method="cod")
     assert s.subtotal == 4
     assert s.shipping_fee == 5 and s.cod_fee == 2
@@ -164,7 +164,7 @@ def test_shipping_fee_below_threshold_and_cod_fee(db: Session) -> None:
 
 def test_coupon_rules(db: Session) -> None:
     owner = cart_svc.CartOwner(session_key="g3")
-    cart_svc.add(db, owner, _product(db, "kagaz-co-gel-pen-set").id)  # $4
+    cart_svc.add(db, owner, _product(db, "paper-pine-gel-pen-set").id)  # $4
     s = cart_svc.summarize(db, owner, coupon_code="WELCOME10")
     assert s.coupon_discount == 0 and "more to use WELCOME10" in s.coupon_error
     assert "not a valid coupon" in cart_svc.summarize(db, owner, coupon_code="NOPE").coupon_error
@@ -188,7 +188,7 @@ def test_guest_cart_merges_into_user_cart(db: Session) -> None:
 # ---------------------------------------------------------------------------- orders
 
 
-def _place(db: Session, payment: str = "upi", coupon: str = "") -> tuple[Order, Product, int]:
+def _place(db: Session, payment: str = "card", coupon: str = "") -> tuple[Order, Product, int]:
     user = _customer(db)
     p = _product(db, "pulsebeat-pro-wireless-earbuds")
     stock_before = p.stock
@@ -203,7 +203,7 @@ def test_place_order_reserves_stock_and_clears_cart(db: Session) -> None:
     order, p, stock_before = _place(db, coupon="WELCOME10")
     db.refresh(p)
     assert p.stock == stock_before - 2
-    assert order.number.startswith("HT-")
+    assert order.number.startswith("NC-")
     assert order.total == 2 * 36 - 7  # WELCOME10: 10% of $72
     assert order.payment_status == "paid" and order.payment_ref.startswith("pay_")
     assert [e.status for e in order.events] == ["placed"]
@@ -242,18 +242,19 @@ def test_empty_cart_cannot_be_ordered(db: Session) -> None:
     user = _customer(db)
     address = user.addresses[0]
     with pytest.raises(order_svc.OrderError, match="empty"):
-        order_svc.place_order(db, user, address, "upi")
+        order_svc.place_order(db, user, address, "card")
 
 
 @pytest.mark.parametrize(
-    ("pin", "ok"), [("400076", True), ("110017", True), ("012345", False), ("4000", False)]
+    ("zip_code", "ok"),
+    [("10011", True), ("02116", True), ("43215-1234", True), ("400076", False), ("4321", False)],
 )
-def test_pincode_validation(pin: str, ok: bool) -> None:
-    assert order_svc.valid_pincode(pin) is ok
+def test_zip_code_validation(zip_code: str, ok: bool) -> None:
+    assert order_svc.valid_zip(zip_code) is ok
 
 
 def test_metro_delivery_is_faster() -> None:
-    assert order_svc.delivery_days("400076") < order_svc.delivery_days("795001")
+    assert order_svc.delivery_days("10011") < order_svc.delivery_days("99501")
 
 
 # ------------------------------------------------------------- ShopCrew on store data
@@ -346,7 +347,7 @@ def test_shopper_summary_never_shows_seller_advice(db: Session) -> None:
 def test_crew_run_needs_reviews_and_prices(db: Session) -> None:
     from northcart.services import ai
 
-    p = _product(db, "kagaz-co-gel-pen-set")
+    p = _product(db, "paper-pine-gel-pen-set")
     db.query(Review).filter(Review.product_id == p.id).delete()
     db.query(CompetitorPrice).filter(CompetitorPrice.product_id == p.id).delete()
     db.commit()

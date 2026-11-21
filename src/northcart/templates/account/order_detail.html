@@ -14,11 +14,11 @@
 <section class="panel tracking">
   <div class="row-between">
     <h2>
-      {% if order.status == 'delivered' %}Delivered on {{ order.delivered_at|date('%A, %d %B') }}
+      {% if order.status == 'delivered' %}Delivered on {{ order.delivered_at|date('%A, %B %d') }}
       {% elif order.status == 'cancelled' %}This order was cancelled
       {% elif order.status == 'returned' %}Returned · refund initiated
       {% elif order.status == 'return_requested' %}Return requested
-      {% else %}Arriving {{ order.expected_delivery|date('%A, %d %B') }}{% endif %}
+      {% else %}Arriving {{ order.expected_delivery|date('%A, %B %d') }}{% endif %}
     </h2>
     {{ status_pill(order.status, order.status_label) }}
   </div>
@@ -33,7 +33,7 @@
     {% endfor %}
   </ol>
   {% if order.tracking_number %}
-  <p class="shipment">Shipped with <strong>{{ order.courier }}</strong> · Tracking ID (AWB) <code>{{ order.tracking_number }}</code></p>
+  <p class="shipment">Shipped with <strong>{{ order.courier }}</strong> · Tracking number <code>{{ order.tracking_number }}</code></p>
   {% endif %}
 </section>
 
@@ -57,14 +57,14 @@
   <div>
     <section class="panel">
       <h2 class="h-sm">Shipping address</h2>
-      <p><strong>{{ order.ship_name }}</strong><br>{{ order.ship_line1 }}{% if order.ship_line2 %}<br>{{ order.ship_line2 }}{% endif %}<br>{{ order.ship_city }}, {{ order.ship_state }} {{ order.ship_pincode }}<br>Phone: {{ order.ship_phone }}</p>
+      <p><strong>{{ order.ship_name }}</strong><br>{{ order.ship_line1 }}{% if order.ship_line2 %}<br>{{ order.ship_line2 }}{% endif %}<br>{{ order.ship_city }}, {{ order.ship_state }} {{ order.ship_zip }}<br>Phone: {{ order.ship_phone|phone }}</p>
     </section>
     <section class="panel">
       <h2 class="h-sm">Payment</h2>
       <p>{{ order.payment_label }} {{ status_pill(order.payment_status, order.payment_status|title) }}</p>
       {% if order.payment_ref %}<p class="small muted">Transaction ID {{ order.payment_ref }}</p>{% endif %}
       <dl class="summary-list">
-        <dt>Items total (MRP)</dt><dd>${{ order.mrp_total|usd }}</dd>
+        <dt>Items total (list price)</dt><dd>${{ order.mrp_total|usd }}</dd>
         {% if order.mrp_total > order.subtotal %}<dt>Product discount</dt><dd class="text-green">− ${{ (order.mrp_total - order.subtotal)|usd }}</dd>{% endif %}
         {% if order.discount %}<dt>Coupon {{ order.coupon_code }}</dt><dd class="text-green">− ${{ order.discount|usd }}</dd>{% endif %}
         <dt>Delivery</dt><dd>{% if order.shipping_fee %}${{ order.shipping_fee }}{% else %}FREE{% endif %}</dd>

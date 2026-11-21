@@ -11,10 +11,10 @@ from northcart.models import Setting
 DEFAULTS: dict[str, Any] = {
     "announcement": "Free delivery on orders above $35 · Use WELCOME10 for 10% off your first order",
     "support_email": "support@northcart.test",
-    "support_phone": "1800-120-4228",
-    "gstin": "27AAACH0000A1Z5",
-    "company_name": "Northcart Retail Pvt. Ltd.",
-    "company_address": "4th Floor, Lotus Corporate Park, Goregaon East, Mumbai 400063",
+    "support_phone": "1-800-555-0142",
+    "tax_id": "12-3456789",
+    "company_name": "Northcart, Inc.",
+    "company_address": "500 Commerce Street, Suite 400, Columbus, OH 43215",
     "hero_title": "The Big Holiday Sale is live",
     "hero_subtitle": "Up to 60% off on audio, wearables and home essentials. Extra 10% with WELCOME10.",
 }

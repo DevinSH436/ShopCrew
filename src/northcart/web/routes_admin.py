@@ -1,4 +1,4 @@
-"""Seller / admin panel at ``/admin``: dashboard, orders, catalogue, customers, AI crew."""
+"""Seller / admin panel at ``/admin``: dashboard, orders, catalog, customers, AI crew."""
 
 from __future__ import annotations
 
@@ -40,7 +40,7 @@ from northcart.services import settings as settings_svc
 from northcart.services.catalog import refresh_rating
 from northcart.services.orders import TRANSITIONS, OrderError, set_status
 from northcart.web.deps import flash, require_admin
-from northcart.web.templating import IST, render
+from northcart.web.templating import STORE_TZ, render
 
 router = APIRouter(prefix="/admin", dependencies=[Depends(require_admin)])
 
@@ -109,11 +109,11 @@ def to_int(value: Any, default: int | None = None) -> int | None:
 
 
 def parse_day(value: str | None, end: bool = False) -> datetime | None:
-    """``YYYY-MM-DD`` in IST -> UTC datetime at the start (or end) of that day."""
+    """``YYYY-MM-DD`` in STORE_TZ -> UTC datetime at the start (or end) of that day."""
     if not value:
         return None
     try:
-        d = datetime.strptime(value, "%Y-%m-%d").replace(tzinfo=IST)
+        d = datetime.strptime(value, "%Y-%m-%d").replace(tzinfo=STORE_TZ)
     except ValueError:
         return None
     if end:
@@ -295,16 +295,16 @@ def orders_export(request: Request, db: DB) -> StreamingResponse:
         .order_by(Order.created_at.desc())
     )
     rows = [
-        [o.number, analytics.aware(o.created_at).astimezone(IST).strftime("%Y-%m-%d %H:%M"),  # type: ignore[union-attr]
-         o.ship_name, o.user.email, o.ship_city, o.ship_state, o.ship_pincode, o.item_count,
+        [o.number, analytics.aware(o.created_at).astimezone(STORE_TZ).strftime("%Y-%m-%d %H:%M"),  # type: ignore[union-attr]
+         o.ship_name, o.user.email, o.ship_city, o.ship_state, o.ship_zip, o.item_count,
          o.subtotal, o.discount, o.coupon_code, o.shipping_fee + o.cod_fee, o.total,
          o.payment_label, o.payment_status, o.status_label, o.courier, o.tracking_number]
         for o in orders
     ]  # fmt: skip
-    header = ["Order", "Placed (IST)", "Customer", "Email", "City", "State", "PIN", "Units",
+    header = ["Order", "Placed (ET)", "Customer", "Email", "City", "State", "ZIP", "Units",
               "Subtotal", "Discount", "Coupon", "Fees", "Total", "Payment", "Payment status",
-              "Status", "Courier", "AWB"]  # fmt: skip
-    stamp = datetime.now(IST).strftime("%Y%m%d")
+              "Status", "Carrier", "Tracking"]  # fmt: skip
+    stamp = datetime.now(STORE_TZ).strftime("%Y%m%d")
     return csv_response(f"northcart-orders-{stamp}.csv", header, rows)
 
 
@@ -357,7 +357,7 @@ def order_detail(
         "order": order,
         "next_statuses": TRANSITIONS.get(order.status, []),
         "customer_orders": customer_orders,
-        "gst": analytics.split_gst(order.total, order.ship_state == "Maharashtra"),
+        "tax": analytics.split_tax(order.total, order.ship_state),
     }
     return page(request, db, user, "admin/order_detail.html", ctx, "orders")
 
@@ -406,23 +406,23 @@ def order_invoice(
     db: DB,
     user: Admin,
 ) -> Response:
-    """Printable GST tax invoice and packing slip."""
+    """Printable invoice (sales tax broken out) and packing slip."""
     order = _order_or_404(db, number)
-    intra = order.ship_state == "Maharashtra"
+    state = order.ship_state
     lines = []
     for item in order.items:
-        g = analytics.split_gst(item.line_total, intra)
+        g = analytics.split_tax(item.line_total, state)
         lines.append({"item": item, **g})
     fees = order.shipping_fee + order.cod_fee
     ctx = {
         "order": order,
         "lines": lines,
-        "intra": intra,
+        "rate": analytics.tax_rate(state),
         "fees": fees,
-        "fees_gst": analytics.split_gst(fees, intra) if fees else None,
-        "discount_gst": analytics.split_gst(order.discount, intra) if order.discount else None,
-        "totals": analytics.split_gst(order.total, intra),
-        "invoice_no": "INV-" + order.number.removeprefix("HT-"),
+        "fees_tax": analytics.split_tax(fees, state) if fees else None,
+        "discount_tax": analytics.split_tax(order.discount, state) if order.discount else None,
+        "totals": analytics.split_tax(order.total, state),
+        "invoice_no": "INV-" + order.number.removeprefix("NC-"),
     }
     return render(request, db, "admin/invoice.html", ctx, user=user)
 
@@ -1085,7 +1085,7 @@ def _coupon_values(c: Coupon | None, request: Request | None = None) -> dict[str
     return {"code": c.code, "description": c.description, "kind": c.kind, "value": c.value,
             "min_order": c.min_order, "max_discount": c.max_discount,
             "usage_limit": c.usage_limit, "is_active": c.is_active,
-            "expires_at": exp.astimezone(IST).strftime("%Y-%m-%d") if exp else ""}  # fmt: skip
+            "expires_at": exp.astimezone(STORE_TZ).strftime("%Y-%m-%d") if exp else ""}  # fmt: skip
 
 
 def _parse_coupon(db: Session, form: Any, coupon: Coupon | None) -> tuple[dict, dict]:
@@ -1318,7 +1318,7 @@ async def ai_apply(request: Request, run_id: int, db: DB) -> Response:
 
 
 def _report_range(request: Request) -> tuple[datetime, datetime, str, str]:
-    today = datetime.now(IST).date()
+    today = datetime.now(STORE_TZ).date()
     p = request.query_params
     start_s = p.get("from") or (today - timedelta(days=29)).isoformat()
     end_s = p.get("to") or today.isoformat()
@@ -1329,11 +1329,11 @@ def _report_range(request: Request) -> tuple[datetime, datetime, str, str]:
 
 @router.get("/reports")
 def reports(request: Request, db: DB, user: Admin) -> Response:
-    """Sales and GST reports."""
+    """Sales and sales tax reports."""
     start, end, start_s, end_s = _report_range(request)
     ctx = {
         "report": analytics.sales_report(db, start, end),
-        "gst": analytics.gst_summary(db),
+        "tax": analytics.tax_summary(db),
         "start": start_s,
         "end": end_s,
         "tab": request.query_params.get("tab", "sales"),
@@ -1356,17 +1356,17 @@ def reports_sales_csv(request: Request, db: DB) -> StreamingResponse:
     else:
         rows = [[r["date"].isoformat(), r["orders"], r["units"], r["gross"], r["discount"],
                  r["shipping"], r["net"]] for r in rep["rows"]]  # fmt: skip
-        header = ["Date", "Orders", "Units", "Gross", "Discount", "Shipping & COD", "Net"]
+        header = ["Date", "Orders", "Units", "Gross", "Discount", "Shipping & fees", "Net"]
     return csv_response(f"northcart-sales-{view}-{start_s}-to-{end_s}.csv", header, rows)
 
 
-@router.get("/reports/gst.csv")
-def reports_gst_csv(db: DB) -> StreamingResponse:
-    """Download the monthly GST summary."""
-    rows = [[m["month"], m["orders"], m["gross"], m["taxable"], m["cgst"], m["sgst"], m["igst"]]
-            for m in analytics.gst_summary(db)]  # fmt: skip
-    header = ["Month", "Orders", "Gross (incl. GST)", "Taxable value", "CGST", "SGST", "IGST"]
-    return csv_response("northcart-gst-summary.csv", header, rows)
+@router.get("/reports/sales-tax.csv")
+def reports_tax_csv(db: DB) -> StreamingResponse:
+    """Download the monthly sales tax summary."""
+    rows = [[m["month"], m["orders"], m["gross"], m["taxable"], m["tax"]]
+            for m in analytics.tax_summary(db)]  # fmt: skip
+    header = ["Month", "Orders", "Gross (incl. sales tax)", "Pre-tax sales", "Sales tax"]
+    return csv_response("northcart-sales-tax-summary.csv", header, rows)
 
 
 # --------------------------------------------------------------------------------------
@@ -1381,7 +1381,7 @@ SETTING_FIELDS = [
     ("support_phone", "Support phone", ""),
     ("company_name", "Legal company name", "Printed on invoices and the footer."),
     ("company_address", "Registered address", ""),
-    ("gstin", "GSTIN", "15-character GST identification number."),
+    ("tax_id", "EIN", "Federal Employer Identification Number, e.g. 12-3456789."),
 ]
 
 
@@ -1399,15 +1399,14 @@ async def settings_save(request: Request, db: DB, user: Admin) -> Response:
     form = await request.form()
     values = {k: str(form.get(k, "")).strip()[:300] for k, _, _ in SETTING_FIELDS}
     errors = {}
-    if values["gstin"] and not re.fullmatch(r"[0-9]{2}[A-Z0-9]{13}", values["gstin"].upper()):
-        errors["gstin"] = "A GSTIN has 15 characters, starting with a 2-digit state code."
+    if values["tax_id"] and not re.fullmatch(r"[0-9]{2}-[0-9]{7}", values["tax_id"]):
+        errors["tax_id"] = "An EIN looks like 12-3456789."
     if values["support_email"] and "@" not in values["support_email"]:
         errors["support_email"] = "Enter a valid email address."
     if errors:
         ctx = {"fields": SETTING_FIELDS, "values": values, "model": ai_svc.configured_model(),
                "errors": errors}  # fmt: skip
         return page(request, db, user, "admin/settings.html", ctx, "settings", 422)
-    values["gstin"] = values["gstin"].upper()
     settings_svc.set_many(db, values)
     flash(request, "Settings saved.")
     return back("/admin/settings")

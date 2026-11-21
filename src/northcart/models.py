@@ -41,10 +41,10 @@ ORDER_STATUS_LABELS = {
     "returned": "Returned",
 }
 PAYMENT_METHODS = {
-    "upi": "UPI",
     "card": "Credit / Debit card",
-    "netbanking": "Net banking",
-    "cod": "Cash on delivery",
+    "paypal": "PayPal",
+    "bank": "Bank account (ACH)",
+    "cod": "Pay on delivery",
 }
 
 
@@ -89,7 +89,7 @@ class Address(Base):
     landmark: Mapped[str] = mapped_column(String(120), default="")
     city: Mapped[str] = mapped_column(String(80))
     state: Mapped[str] = mapped_column(String(80))
-    pincode: Mapped[str] = mapped_column(String(6))
+    zip_code: Mapped[str] = mapped_column(String(10))
     kind: Mapped[str] = mapped_column(String(10), default="home")  # home / work
     is_default: Mapped[bool] = mapped_column(Boolean, default=False)
 
@@ -97,7 +97,7 @@ class Address(Base):
 
     def one_line(self) -> str:
         """Address on a single line."""
-        parts = [self.line1, self.line2, self.landmark, self.city, f"{self.state} {self.pincode}"]
+        parts = [self.line1, self.line2, self.landmark, self.city, f"{self.state} {self.zip_code}"]
         return ", ".join(p for p in parts if p)
 
 
@@ -138,7 +138,7 @@ class Product(Base):
     highlights: Mapped[list[str]] = mapped_column(JSON, default=list)
     specs: Mapped[dict[str, str]] = mapped_column(JSON, default=dict)
     tags: Mapped[list[str]] = mapped_column(JSON, default=list)
-    # Generated artwork: which drawing and which colour to use when no photo is uploaded.
+    # Generated artwork: which drawing and which color to use when no photo is uploaded.
     art_kind: Mapped[str] = mapped_column(String(30), default="box")
     color: Mapped[str] = mapped_column(String(9), default="#4f46e5")
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
@@ -335,7 +335,7 @@ class Order(Base):
     ship_line2: Mapped[str] = mapped_column(String(200), default="")
     ship_city: Mapped[str] = mapped_column(String(80))
     ship_state: Mapped[str] = mapped_column(String(80))
-    ship_pincode: Mapped[str] = mapped_column(String(6))
+    ship_zip: Mapped[str] = mapped_column(String(10))
     courier: Mapped[str] = mapped_column(String(60), default="")
     tracking_number: Mapped[str] = mapped_column(String(40), default="")
     expected_delivery: Mapped[datetime | None] = mapped_column(
@@ -379,7 +379,7 @@ class Order(Base):
     def ship_address(self) -> str:
         """Delivery address on one line."""
         parts = [self.ship_line1, self.ship_line2, self.ship_city]
-        return ", ".join(p for p in parts if p) + f", {self.ship_state} {self.ship_pincode}"
+        return ", ".join(p for p in parts if p) + f", {self.ship_state} {self.ship_zip}"
 
 
 class OrderItem(Base):

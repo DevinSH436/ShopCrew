@@ -12,7 +12,7 @@
       <input type="hidden" name="action" value="profile">
       <label class="field"><span>Name</span><input name="name" autocomplete="name" required value="{{ user.name }}">{% if errors.name %}<span class="field-error">{{ errors.name }}</span>{% endif %}</label>
       <label class="field"><span>Email</span><input value="{{ user.email }}" disabled><small>Email can't be changed in this demo.</small></label>
-      <label class="field"><span>Mobile number</span><input name="phone" inputmode="tel" required value="{{ user.phone }}">{% if errors.phone %}<span class="field-error">{{ errors.phone }}</span>{% endif %}</label>
+      <label class="field"><span>Phone number</span><input name="phone" inputmode="tel" required value="{{ user.phone }}">{% if errors.phone %}<span class="field-error">{{ errors.phone }}</span>{% endif %}</label>
       <button class="btn btn-primary" type="submit">Save changes</button>
     </form>
   </section>

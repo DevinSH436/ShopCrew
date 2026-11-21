@@ -1,7 +1,7 @@
 """Generate the deterministic sample data in ``data/``.
 
 Run with ``uv run python scripts/generate_sample_data.py``. The output is committed, so
-this script only needs re-running if you change the product catalogue or review pools.
+this script only needs re-running if you change the product catalog or review pools.
 Reviews are assembled from hand-written, product-specific snippets with a fixed seed so
 the data looks realistic but is reproducible.
 """
@@ -152,7 +152,7 @@ REVIEW_POOLS: dict[str, dict[str, list[str]]] = {
         "neutral": [
             "Good bottle, a little heavy when full.",
             "Does the job. Mouth is a bit narrow for ice cubes.",
-            "Fine quality, colour slightly different from the photo.",
+            "Fine quality, color slightly different from the photo.",
         ],
         "negative": [
             "Paint started chipping near the base after a month.",

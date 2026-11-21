@@ -22,7 +22,7 @@
 {% for o in orders %}
 <article class="order-card">
   <header class="order-card-head">
-    <div><span class="oc-label">Order placed</span><span>{{ o.created_at|date('%d %B %Y') }}</span></div>
+    <div><span class="oc-label">Order placed</span><span>{{ o.created_at|date('%B %d, %Y') }}</span></div>
     <div><span class="oc-label">Total</span><span>${{ o.total|usd }}</span></div>
     <div class="hide-xs"><span class="oc-label">Ship to</span><span>{{ o.ship_name }}</span></div>
     <div class="oc-right"><span class="oc-label">Order # {{ o.number }}</span>
@@ -31,10 +31,10 @@
   <div class="order-card-body">
     <div class="oc-status">
       <h2 class="h-sm">
-        {% if o.status == 'delivered' %}Delivered {{ o.delivered_at|date('%d %b %Y') }}
+        {% if o.status == 'delivered' %}Delivered {{ o.delivered_at|date('%b %d, %Y') }}
         {% elif o.status == 'cancelled' %}Cancelled
         {% elif o.status in ('returned', 'return_requested') %}{{ o.status_label }}
-        {% else %}Arriving {{ o.expected_delivery|date('%A, %d %b') }}{% endif %}
+        {% else %}Arriving {{ o.expected_delivery|date('%A, %b %d') }}{% endif %}
       </h2>
       {{ status_pill(o.status, o.status_label) }}
       {% if o.status == 'delivered' and not can_return(o) %}<p class="small muted">Return window closed</p>{% endif %}

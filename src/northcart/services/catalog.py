@@ -1,4 +1,4 @@
-"""Catalogue queries: search, filters, facets, related products, rating stats."""
+"""Catalog queries: search, filters, facets, related products, rating stats."""
 
 from __future__ import annotations
 
@@ -71,7 +71,7 @@ def _base_query(params: SearchParams):  # type: ignore[no-untyped-def]
 
 
 def search_products(db: Session, params: SearchParams) -> SearchResult:
-    """Filter, sort and paginate the catalogue."""
+    """Filter, sort and paginate the catalog."""
     base = _base_query(params)
 
     # Facets are computed before brand/price filters so the sidebar keeps its options.

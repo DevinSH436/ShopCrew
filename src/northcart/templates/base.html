@@ -29,9 +29,9 @@
     <a href="/" class="logo" aria-label="{{ settings.store_name }} home">
       {% include "partials/logo.svg" %}
     </a>
-    <button class="deliver-to" data-pincode-open aria-label="Choose delivery location">
+    <button class="deliver-to" data-zip-open aria-label="Choose delivery location">
       <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="2.5" fill="currentColor"/></svg>
-      <span><small>Deliver to</small><strong data-pincode-label>Enter PIN code</strong></span>
+      <span><small>Deliver to</small><strong data-zip-label>Enter ZIP code</strong></span>
     </button>
     <form class="search" action="/search" method="get" role="search" autocomplete="off">
       <select name="category" aria-label="Search in category">
@@ -107,7 +107,7 @@
       <a href="/account/orders">Track your order</a>
       <a href="/pages/shipping">Shipping &amp; delivery</a>
       <a href="/pages/returns">Returns &amp; refunds</a>
-      <a href="/pages/help">Help centre &amp; FAQ</a>
+      <a href="/pages/help">Help center &amp; FAQ</a>
       <a href="/pages/contact">Contact us</a>
     </div>
     <div>
@@ -119,33 +119,33 @@
     </div>
     <div>
       <h3>Customer care</h3>
-      <p>{{ store.support_phone }}<br><span class="muted-light">9 AM – 9 PM, all days</span></p>
+      <p>{{ store.support_phone }}<br><span class="muted-light">9 AM – 9 PM ET, every day</span></p>
       <p><a href="mailto:{{ store.support_email }}">{{ store.support_email }}</a></p>
       <div class="pay-badges" aria-label="Payment methods">
-        <span>UPI</span><span>VISA</span><span>Mastercard</span><span>RuPay</span><span>COD</span>
+        <span>VISA</span><span>Mastercard</span><span>Amex</span><span>Discover</span><span>PayPal</span>
       </div>
     </div>
   </div>
   <div class="footer-bottom">
     <div class="container">
       <a href="/" class="logo logo-small" aria-label="{{ settings.store_name }} home">{% include "partials/logo.svg" %}</a>
-      <p>© {{ now().year }} {{ store.company_name }} · GSTIN {{ store.gstin }} · {{ store.company_address }}</p>
+      <p>© {{ now().year }} {{ store.company_name }} · EIN {{ store.tax_id }} · {{ store.company_address }}</p>
       <p class="muted-light">A portfolio demo store. Payments are simulated; no real orders are fulfilled.</p>
     </div>
   </div>
 </footer>
 
-<dialog class="modal" data-pincode-dialog>
-  <form method="dialog" class="modal-body" data-pincode-form>
+<dialog class="modal" data-zip-dialog>
+  <form method="dialog" class="modal-body" data-zip-form>
     <h2>Choose your location</h2>
     <p class="muted">Delivery options and speed vary by location.</p>
-    <label class="field"><span>PIN code</span>
-      <input name="pincode" inputmode="numeric" maxlength="6" pattern="[1-9][0-9]{5}" placeholder="e.g. 400076" required>
+    <label class="field"><span>ZIP code</span>
+      <input name="zip_code" inputmode="numeric" maxlength="10" pattern="[0-9]{5}(-[0-9]{4})?" placeholder="e.g. 10001" required>
     </label>
-    <p class="small" data-pincode-result></p>
+    <p class="small" data-zip-result></p>
     <div class="modal-actions">
       <button value="cancel" formnovalidate class="btn btn-ghost">Close</button>
-      <button class="btn btn-primary" data-pincode-apply>Apply</button>
+      <button class="btn btn-primary" data-zip-apply>Apply</button>
     </div>
   </form>
 </dialog>

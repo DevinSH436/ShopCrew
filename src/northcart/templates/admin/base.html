@@ -54,7 +54,7 @@
     <button class="icon-btn side-toggle" data-side-toggle aria-label="Open navigation" aria-controls="sidebar">{{ icon("menu", 22) }}</button>
     <form class="top-search" action="/admin/search" method="get" role="search">
       {{ icon("search") }}
-      <input type="search" name="q" placeholder="Search orders (HT-…), products, customers" value="{{ request.query_params.get('q', '') if section == '' else '' }}" aria-label="Search the admin">
+      <input type="search" name="q" placeholder="Search orders (NC-…), products, customers" value="{{ request.query_params.get('q', '') if section == '' else '' }}" aria-label="Search the admin">
       <kbd>/</kbd>
     </form>
     <div class="top-actions">

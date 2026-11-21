@@ -1,6 +1,6 @@
 """Content for the static information pages (/pages/<slug>).
 
-Text may contain ``{company}``, ``{address}``, ``{phone}``, ``{email}``, ``{gstin}``,
+Text may contain ``{company}``, ``{address}``, ``{phone}``, ``{email}``, ``{tax_id}``,
 ``{store}``, ``{free_ship}``, ``{ship_fee}``, ``{cod_fee}`` and ``{returns}`` placeholders,
 which the template fills from the store settings.
 """
@@ -16,10 +16,10 @@ PAGES: dict[str, dict] = {
             (
                 "Our story",
                 [
-                    "We started {store} in Mumbai with a simple idea: a haat (the weekly village "
-                    "market) where you can trust the seller, compare prices and pick the best for "
-                    "your family. Today we ship to over 19,000 PIN codes across India.",
-                    "Every product listed is checked by our catalogue team. Descriptions are "
+                    "We started {store} in Columbus, Ohio with a simple idea: a neighborhood "
+                    "store online, where you can trust the seller, compare prices and pick the "
+                    "best for your family. Today we ship to all 50 states.",
+                    "Every product listed is checked by our catalog team. Descriptions are "
                     "written from real customer feedback, and we never list a feature a product "
                     "doesn't have.",
                 ],
@@ -32,7 +32,7 @@ PAGES: dict[str, dict] = {
                     "Easy returns: {returns}-day returns on most products, refunds in 5–7 days.",
                 ],
             ),
-            ("Registered office", ["{company}, {address}. GSTIN {gstin}."]),
+            ("Headquarters", ["{company}, {address}. EIN {tax_id}."]),
         ],
     },
     "careers": {
@@ -42,10 +42,10 @@ PAGES: dict[str, dict] = {
             (
                 "Open roles",
                 [
-                    "Senior Backend Engineer (Python) · Mumbai / Remote",
-                    "Category Manager, Audio & Wearables · Mumbai",
-                    "Customer Experience Associate (Hindi, Tamil or Bengali) · Bengaluru",
-                    "Warehouse Operations Lead · Bhiwandi",
+                    "Senior Backend Engineer (Python) · Columbus, OH / Remote (US)",
+                    "Category Manager, Audio & Wearables · Columbus, OH",
+                    "Customer Experience Associate (English and Spanish) · Remote (US)",
+                    "Warehouse Operations Lead · Groveport, OH",
                 ],
             ),
             ("How to apply", ["Write to {email} with the role in the subject line."]),
@@ -53,13 +53,13 @@ PAGES: dict[str, dict] = {
     },
     "sell": {
         "title": "Sell on {store}",
-        "lead": "Reach lakhs of customers with zero listing fees for the first 90 days.",
+        "lead": "Reach millions of shoppers with zero listing fees for the first 90 days.",
         "sections": [
             (
                 "Why sell with us",
                 [
                     "Payments settled every 7 days, straight to your bank account.",
-                    "Fulfilment from our warehouses, or ship it yourself with our courier rates.",
+                    "Fulfillment from our warehouses, or ship it yourself with our carrier rates.",
                     "AI-powered listing help: our ShopCrew assistant drafts SEO copy and pricing "
                     "suggestions from your reviews and the market.",
                 ],
@@ -67,7 +67,8 @@ PAGES: dict[str, dict] = {
             (
                 "What you need",
                 [
-                    "GSTIN, PAN, a bank account in your business name, and at least one product.",
+                    "An EIN (or SSN for sole proprietors), a US bank account in your business "
+                    "name, and at least one product.",
                 ],
             ),
         ],
@@ -79,8 +80,8 @@ PAGES: dict[str, dict] = {
             (
                 "Nov 2026: Big Holiday Sale breaks records",
                 [
-                    "Orders during the festive week grew 3x year on year, with Tier-2 cities "
-                    "contributing more than half of all orders.",
+                    "Orders during Black Friday week grew 3x year over year, with shoppers "
+                    "outside the big metro areas placing more than half of all orders.",
                 ],
             ),
             (
@@ -101,25 +102,24 @@ PAGES: dict[str, dict] = {
             (
                 "Delivery times",
                 [
-                    "Metro cities (Mumbai, Delhi NCR, Bengaluru, Chennai, Hyderabad, Kolkata, "
-                    "Pune, "
-                    "Ahmedabad): 1–2 business days.",
-                    "Rest of India: 3–6 business days. North-East and island territories may take "
+                    "Major metro areas (New York, Chicago, Los Angeles, San Francisco, Seattle, "
+                    "Houston, Philadelphia, Washington DC) and the Midwest: 1–2 business days.",
+                    "Rest of the continental US: 3–5 business days. Alaska and Hawaii may take "
                     "up to 8 days.",
-                    "Enter your PIN code on any product page to see the exact delivery date.",
+                    "Enter your ZIP code on any product page to see the exact delivery date.",
                 ],
             ),
             (
-                "Cash on delivery",
+                "Pay on delivery",
                 [
-                    "Available on all PIN codes we serve, for orders up to $700. A ${cod_fee} "
-                    "handling fee applies.",
+                    "Available for orders up to $700: pay the driver by card or cash. A "
+                    "${cod_fee} handling fee applies.",
                 ],
             ),
             (
                 "Tracking",
                 [
-                    "Once your order ships you'll see the courier and AWB number under "
+                    "Once your order ships you'll see the carrier and tracking number under "
                     "Your Orders.",
                 ],
             ),
@@ -148,15 +148,15 @@ PAGES: dict[str, dict] = {
             (
                 "Refund timelines",
                 [
-                    "UPI: 1–2 business days · Cards and net banking: 5–7 business days · Cash on "
-                    "delivery orders: refunded to your bank account or UPI ID within 3 days of "
+                    "PayPal: 1–2 business days · Cards and bank accounts: 5–7 business days · "
+                    "Pay-on-delivery orders: refunded to your bank account within 3 days of "
                     "pickup.",
                 ],
             ),
         ],
     },
     "help": {
-        "title": "Help centre",
+        "title": "Help center",
         "lead": "Answers to the questions we hear most. Still stuck? Call {phone}.",
         "faq": [
             (
@@ -172,18 +172,18 @@ PAGES: dict[str, dict] = {
             ),
             (
                 "When will I get my refund?",
-                "UPI refunds take 1–2 business days; cards and net "
-                "banking take 5–7 business days after we receive the return.",
+                "PayPal refunds take 1–2 business days; cards and bank "
+                "accounts take 5–7 business days after we receive the return.",
             ),
             (
-                "Is cash on delivery available?",
-                "Yes, on every PIN code we deliver to. A ${cod_fee} handling fee applies.",
+                "Can I pay on delivery?",
+                "Yes, for orders up to $700. A ${cod_fee} handling fee applies.",
             ),
             (
                 "Are the products genuine?",
                 "Every product is sourced directly from the brand or "
-                "its authorised distributor and comes with the manufacturer's warranty and a GST "
-                "invoice.",
+                "its authorized distributor and comes with the manufacturer's warranty and an "
+                "itemized invoice.",
             ),
             (
                 "How do I use a coupon?",
@@ -196,7 +196,7 @@ PAGES: dict[str, dict] = {
                 "{phone} and we'll update it. After shipping, the address can't be changed.",
             ),
             (
-                "How do I get a GST invoice?",
+                "How do I get an invoice?",
                 "Open the order and click 'Invoice'. You can print it or save it as a PDF.",
             ),
         ],
@@ -214,7 +214,7 @@ PAGES: dict[str, dict] = {
     },
     "terms": {
         "title": "Terms of use",
-        "lead": "Last updated 1 November 2026.",
+        "lead": "Last updated November 1, 2026.",
         "sections": [
             (
                 "1. About these terms",
@@ -234,15 +234,16 @@ PAGES: dict[str, dict] = {
             (
                 "3. Prices and availability",
                 [
-                    "All prices are in US dollars and include taxes. We may cancel orders caused "
+                    "All prices are in US dollars and include sales tax. We may cancel orders "
+                    "caused "
                     "by a pricing error and refund you in full.",
                 ],
             ),
             (
                 "4. Governing law",
                 [
-                    "These terms are governed by the laws of India. Courts in Mumbai have "
-                    "exclusive jurisdiction.",
+                    "These terms are governed by the laws of the State of Ohio. Courts in "
+                    "Franklin County, Ohio have exclusive jurisdiction.",
                 ],
             ),
         ],
@@ -268,24 +269,24 @@ PAGES: dict[str, dict] = {
             (
                 "Your rights",
                 [
-                    "Under the Digital Personal Data Protection Act, 2023 you can ask us for a "
-                    "copy "
-                    "of your data, correct it, or delete your account. Write to {email}.",
+                    "Depending on your state (for example under the California Consumer Privacy "
+                    "Act), you can ask us for a copy of your data, correct it, or delete your "
+                    "account. Write to {email}.",
                 ],
             ),
         ],
     },
     "grievance": {
-        "title": "Grievance redressal",
-        "lead": "As required by the Consumer Protection (E-Commerce) Rules, 2020.",
+        "title": "Complaints",
+        "lead": "Not happy with an order or with us? Tell us and we'll make it right.",
         "sections": [
             (
-                "Grievance Officer",
+                "Customer Advocate",
                 [
-                    "Ms. Ananya Rao, Grievance Officer",
+                    "Dana Brooks, Customer Advocate",
                     "{company}, {address}",
-                    "Email: grievance@northcart.test · Phone: {phone}",
-                    "Monday to Friday, 10 AM – 6 PM",
+                    "Email: complaints@northcart.test · Phone: {phone}",
+                    "Monday to Friday, 9 AM – 5 PM ET",
                 ],
             ),
             (

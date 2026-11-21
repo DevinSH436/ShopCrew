@@ -13,7 +13,7 @@ from fastapi.responses import JSONResponse, RedirectResponse
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session, selectinload
 
-from northcart.catalog_data import INDIAN_STATES
+from northcart.catalog_data import US_STATES
 from northcart.config import get_settings
 from northcart.db import get_db
 from northcart.models import (
@@ -26,8 +26,8 @@ from northcart.models import (
     WishlistItem,
 )
 from northcart.security import hash_password, verify_password
+from northcart.services import analytics, catalog
 from northcart.services import cart as cart_svc
-from northcart.services import catalog
 from northcart.services import orders as order_svc
 from northcart.services import settings as settings_svc
 from northcart.web.deps import current_user, flash, login, logout, require_user
@@ -36,7 +36,7 @@ from northcart.web.templating import render
 router = APIRouter()
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[A-Za-z]{2,}$")
-PHONE_RE = re.compile(r"^[6-9]\d{9}$")
+PHONE_RE = re.compile(r"^[2-9]\d{2}[2-9]\d{6}$")
 CANCEL_REASONS = [
     "Ordered by mistake",
     "Found a better price elsewhere",
@@ -67,11 +67,9 @@ def safe_next(url: str | None) -> str:
 
 
 def clean_phone(raw: str) -> str:
-    """Strip spaces, dashes and a leading +91 / 0 from an Indian mobile number."""
+    """Strip spaces, dashes, brackets and a leading +1 from a US phone number."""
     digits = re.sub(r"\D", "", raw or "")
-    if len(digits) == 12 and digits.startswith("91"):
-        digits = digits[2:]
-    if len(digits) == 11 and digits.startswith("0"):
+    if len(digits) == 11 and digits.startswith("1"):
         digits = digits[1:]
     return digits
 
@@ -168,7 +166,7 @@ async def register_submit(request: Request, db: Session = Depends(get_db)):
         errors["email"] = "An account with this email already exists. Sign in instead."
     phone = clean_phone(values["phone"])
     if not PHONE_RE.match(phone):
-        errors["phone"] = "Enter a 10-digit Indian mobile number."
+        errors["phone"] = "Enter a 10-digit US phone number."
     if len(password) < 8:
         errors["password"] = "Use at least 8 characters."
     elif password != confirm:
@@ -268,7 +266,7 @@ async def profile_submit(
         if len(name) < 2:
             errors["name"] = "Enter your name."
         if not PHONE_RE.match(phone):
-            errors["phone"] = "Enter a 10-digit Indian mobile number."
+            errors["phone"] = "Enter a 10-digit US phone number."
         if not errors:
             user.name, user.phone = name, phone
             db.commit()
@@ -449,16 +447,13 @@ def order_buy_again(
 def order_invoice(
     number: str, request: Request, db: Session = Depends(get_db), user: User = Depends(require_user)
 ):
-    """Printable GST tax invoice."""
+    """Printable invoice with the state sales tax broken out."""
     order = _own_order(db, user, number)
     store = settings_svc.all_settings(db)
-    intra_state = order.ship_state.strip().lower() == "maharashtra"
     lines = []
     for item in order.items:
         gross = item.price * item.quantity
-        taxable = round(gross / 1.18, 2)
-        tax = round(gross - taxable, 2)
-        lines.append({"item": item, "gross": gross, "taxable": taxable, "tax": tax})
+        lines.append({"item": item, "gross": gross, **analytics.split_tax(gross, order.ship_state)})
     charges = order.shipping_fee + order.cod_fee
     totals = {
         "taxable": round(sum(line["taxable"] for line in lines), 2),
@@ -473,9 +468,9 @@ def order_invoice(
             "lines": lines,
             "totals": totals,
             "charges": charges,
-            "intra_state": intra_state,
+            "rate": analytics.tax_rate(order.ship_state),
             "store": store,
-            "invoice_no": "INV-" + order.number.removeprefix("HT-"),
+            "invoice_no": "INV-" + order.number.removeprefix("NC-"),
         },
         user=user,
     )
@@ -490,21 +485,21 @@ def address_form_errors(values: dict[str, str]) -> dict[str, str]:
     if len(values.get("full_name", "")) < 2:
         errors["full_name"] = "Enter the recipient's full name."
     if not PHONE_RE.match(values.get("phone", "")):
-        errors["phone"] = "Enter a 10-digit mobile number."
-    if not order_svc.valid_pincode(values.get("pincode", "")):
-        errors["pincode"] = "Enter a valid 6-digit PIN code."
+        errors["phone"] = "Enter a 10-digit US phone number."
+    if not order_svc.valid_zip(values.get("zip_code", "")):
+        errors["zip_code"] = "Enter a valid 5-digit ZIP code."
     if len(values.get("line1", "")) < 3:
-        errors["line1"] = "Enter flat / house number and building."
+        errors["line1"] = "Enter the street address."
     if len(values.get("city", "")) < 2:
-        errors["city"] = "Enter the town or city."
-    if values.get("state") not in INDIAN_STATES:
+        errors["city"] = "Enter the city."
+    if values.get("state") not in US_STATES:
         errors["state"] = "Choose a state."
     return errors
 
 
 def read_address_form(form) -> dict[str, str]:  # type: ignore[no-untyped-def]
     """Pull address fields out of a submitted form."""
-    keys = ("full_name", "phone", "pincode", "line1", "line2", "landmark", "city", "state", "kind")
+    keys = ("full_name", "phone", "zip_code", "line1", "line2", "landmark", "city", "state", "kind")
     values = {k: str(form.get(k) or "").strip() for k in keys}
     values["phone"] = clean_phone(values["phone"])
     values["kind"] = values["kind"] if values["kind"] in {"home", "work"} else "home"
@@ -561,7 +556,7 @@ def address_form(
     if address:
         values = {
             k: getattr(address, k)
-            for k in ("full_name", "phone", "pincode", "line1", "line2", "landmark", "city",
+            for k in ("full_name", "phone", "zip_code", "line1", "line2", "landmark", "city",
                       "state", "kind")
         }  # fmt: skip
     else:
@@ -574,7 +569,7 @@ def address_form(
             "address": address,
             "values": values,
             "errors": {},
-            "states": INDIAN_STATES,
+            "states": US_STATES,
             "next": safe_next(next) if next else "",
         },
         user=user,
@@ -604,7 +599,7 @@ async def address_submit(
                 "address": address,
                 "values": values,
                 "errors": errors,
-                "states": INDIAN_STATES,
+                "states": US_STATES,
                 "next": next_url,
             },
             user=user,

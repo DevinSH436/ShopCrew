@@ -4,16 +4,16 @@
 {% set e = errors or {} %}
 <div class="grid-2">
   <label class="field"><span>Full name</span><input name="full_name" {{ fa }} autocomplete="name" required value="{{ v.get('full_name', '') }}">{% if e.full_name %}<span class="field-error">{{ e.full_name }}</span>{% endif %}</label>
-  <label class="field"><span>Mobile number</span><input name="phone" {{ fa }} inputmode="tel" autocomplete="tel-national" maxlength="14" required value="{{ v.get('phone', '') }}" placeholder="10-digit mobile number">{% if e.phone %}<span class="field-error">{{ e.phone }}</span>{% endif %}</label>
+  <label class="field"><span>Phone number</span><input name="phone" {{ fa }} inputmode="tel" autocomplete="tel-national" maxlength="14" required value="{{ v.get('phone', '') }}" placeholder="(555) 555-0123">{% if e.phone %}<span class="field-error">{{ e.phone }}</span>{% endif %}</label>
 </div>
 <div class="grid-2">
-  <label class="field"><span>PIN code</span><input name="pincode" {{ fa }} inputmode="numeric" autocomplete="postal-code" maxlength="6" pattern="[1-9][0-9]{5}" required value="{{ v.get('pincode', '') }}" placeholder="6 digits [0-9] PIN code" data-pin-autofill>{% if e.pincode %}<span class="field-error">{{ e.pincode }}</span>{% endif %}</label>
-  <label class="field"><span>Town / City</span><input name="city" {{ fa }} autocomplete="address-level2" required value="{{ v.get('city', '') }}">{% if e.city %}<span class="field-error">{{ e.city }}</span>{% endif %}</label>
+  <label class="field"><span>ZIP code</span><input name="zip_code" {{ fa }} inputmode="numeric" autocomplete="postal-code" maxlength="10" pattern="[0-9]{5}(-[0-9]{4})?" required value="{{ v.get('zip_code', '') }}" placeholder="5-digit ZIP code" data-pin-autofill>{% if e.zip_code %}<span class="field-error">{{ e.zip_code }}</span>{% endif %}</label>
+  <label class="field"><span>City</span><input name="city" {{ fa }} autocomplete="address-level2" required value="{{ v.get('city', '') }}">{% if e.city %}<span class="field-error">{{ e.city }}</span>{% endif %}</label>
 </div>
-<label class="field"><span>Flat, house no., building, company, apartment</span><input name="line1" {{ fa }} autocomplete="address-line1" required value="{{ v.get('line1', '') }}">{% if e.line1 %}<span class="field-error">{{ e.line1 }}</span>{% endif %}</label>
-<label class="field"><span>Area, street, sector, village</span><input name="line2" {{ fa }} autocomplete="address-line2" value="{{ v.get('line2', '') }}"></label>
+<label class="field"><span>Street address</span><input name="line1" {{ fa }} autocomplete="address-line1" required value="{{ v.get('line1', '') }}">{% if e.line1 %}<span class="field-error">{{ e.line1 }}</span>{% endif %}</label>
+<label class="field"><span>Apt, suite, unit <small>(optional)</small></span><input name="line2" {{ fa }} autocomplete="address-line2" value="{{ v.get('line2', '') }}"></label>
 <div class="grid-2">
-  <label class="field"><span>Landmark <small>(optional)</small></span><input name="landmark" {{ fa }} value="{{ v.get('landmark', '') }}" placeholder="E.g. near Apollo Hospital"></label>
+  <label class="field"><span>Delivery instructions <small>(optional)</small></span><input name="landmark" {{ fa }} value="{{ v.get('landmark', '') }}" placeholder="E.g. leave at the side door"></label>
   <label class="field"><span>State</span>
     <select name="state" {{ fa }} autocomplete="address-level1" required>
       <option value="">Choose a state</option>
@@ -24,6 +24,6 @@
 <fieldset class="field addr-kind">
   <legend>Address type</legend>
   <label class="checkbox"><input type="radio" name="kind" value="home" {{ fa }} {% if v.get('kind', 'home') == 'home' %}checked{% endif %}> Home <small>(all-day delivery)</small></label>
-  <label class="checkbox"><input type="radio" name="kind" value="work" {{ fa }} {% if v.get('kind') == 'work' %}checked{% endif %}> Work <small>(10 AM – 6 PM)</small></label>
+  <label class="checkbox"><input type="radio" name="kind" value="work" {{ fa }} {% if v.get('kind') == 'work' %}checked{% endif %}> Work <small>(9 AM – 5 PM)</small></label>
 </fieldset>
 <label class="checkbox field"><input type="checkbox" name="is_default" value="1" {{ fa }} {% if address is defined and address and address.is_default %}checked{% endif %}> Make this my default address</label>

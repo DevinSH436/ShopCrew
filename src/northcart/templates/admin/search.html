@@ -4,7 +4,7 @@
 {% block content %}
 <div class="page-head"><div><h1>Search results</h1><p>{{ 'for “' ~ q ~ '”' if q else 'Type in the search bar above.' }}</p></div></div>
 {% if q and not (orders or products or customers) %}
-  <section class="card">{{ empty("Nothing found", "Try an order number like HT-2611-123456, a product name, SKU, or a customer's email.") }}</section>
+  <section class="card">{{ empty("Nothing found", "Try an order number like NC-2611-123456, a product name, SKU, or a customer's email.") }}</section>
 {% endif %}
 {% if orders %}
 <section class="card">
@@ -26,7 +26,7 @@
 <section class="card">
   <div class="card-head"><h2>Customers</h2></div>
   <div class="table-wrap no-max"><table class="table"><tbody>
-  {% for u in customers %}<tr><td><a href="/admin/customers/{{ u.id }}" class="strong">{{ u.name }}</a></td><td>{{ u.email }}</td><td>{{ u.phone }}</td></tr>{% endfor %}
+  {% for u in customers %}<tr><td><a href="/admin/customers/{{ u.id }}" class="strong">{{ u.name }}</a></td><td>{{ u.email }}</td><td>{{ u.phone|phone }}</td></tr>{% endfor %}
   </tbody></table></div>
 </section>
 {% endif %}
